@@ -47,7 +47,7 @@ public class ERPServer implements IServer {
             if (res.succeeded()) {
                 System.out.println("ERP Server is now listening on port " + res.result().actualPort());
             } else {
-                System.err.println("Couldnt start network server.");
+                System.err.println("Couldnt start network server: " + res.cause());
             }
         });
     }
