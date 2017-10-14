@@ -1,4 +1,4 @@
-module rpg.core {
+module erp.core {
     requires java.base;
 
     requires java.logging;

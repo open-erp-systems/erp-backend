@@ -23,6 +23,9 @@
         <!-- vertx.io version -->
         <vertx.version>3.4.2</vertx.version>
 
+        <!-- hazelcast version -->
+        <hazelcast.version>3.8.6</hazelcast.version>
+
         <apache.commons.lang.version>3.5</apache.commons.lang.version>
     </properties>
 

@@ -1,9 +1,16 @@
 package com.jukusoft.erp.server;
 
+import com.hazelcast.config.Config;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
+import io.vertx.core.spi.cluster.ClusterManager;
+import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
+
+import javax.transaction.xa.XAException;
 
 public class ERPServer implements IServer {
 
@@ -16,12 +23,45 @@ public class ERPServer implements IServer {
     //vert.x network server
     protected NetServer netServer = null;
 
+    //instance of hazelcast
+    protected HazelcastInstance hazelcastInstance = null;
+
+    //vert.x cluster manager
+    protected ClusterManager clusterManager = null;
+
     public void start() {
+        //create an new hazelcast instance
+        Config config = new Config();
+        this.hazelcastInstance = Hazelcast.newHazelcastInstance(config);
+
+        //http://vertx.io/docs/vertx-hazelcast/java/
+
+        //create new vert.x cluster manager
+        this.clusterManager = new HazelcastClusterManager(this.hazelcastInstance);
+
         //create new vertx.io options
         this.vertxOptions = new VertxOptions();
 
+        //set cluster manager
+        this.vertxOptions.setClusterManager(this.clusterManager);
+
+        //create clustered vertx. instance
+        Vertx.clusteredVertx(this.vertxOptions, res -> {
+            if (res.succeeded()) {
+                this.vertx = res.result();
+
+                postStart();
+            } else {
+                // failed!
+
+                System.exit(1);
+            }
+        });
+    }
+
+    protected void postStart () {
         //create new instance of vertx.io
-        this.vertx = Vertx.vertx(this.vertxOptions);
+        //this.vertx = Vertx.clusteredVertx(this.vertxOptions, this.vertxOptions);
 
         //create options for TCP network server
         NetServerOptions netServerOptions = new NetServerOptions();
