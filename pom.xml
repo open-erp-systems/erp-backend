@@ -19,8 +19,22 @@
         <junit.version>4.12</junit.version>
         <json.version>20170516</json.version>
         <ini4j.version>0.5.4</ini4j.version>
+
+        <!-- vertx.io version -->
+        <vertx.version>3.4.2</vertx.version>
+
         <apache.commons.lang.version>3.5</apache.commons.lang.version>
     </properties>
+
+    <dependencies>
+        <!-- JUnit tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

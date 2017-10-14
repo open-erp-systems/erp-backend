@@ -12,11 +12,33 @@
     <artifactId>erp-server</artifactId>
 
     <dependencies>
+        <!-- JUnit tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- erp core features -->
         <dependency>
             <groupId>com.jukusoft</groupId>
             <artifactId>erp-core</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <!-- vert.x -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
+
+        <!-- json -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
         </dependency>
     </dependencies>
 

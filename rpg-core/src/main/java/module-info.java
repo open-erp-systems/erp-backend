@@ -1,0 +1,2 @@
+module rpg.core {
+}
