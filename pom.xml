@@ -112,8 +112,8 @@
                     <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
 
                     <sourceDirectories>
-                        <sourceDirectory>${basedir}/erp-core/src/main/scala</sourceDirectory>
-                        <sourceDirectory>${basedir}/erp-server/src/main/scala</sourceDirectory>
+                        <sourceDirectory>${basedir}/erp-core/src/main/java</sourceDirectory>
+                        <sourceDirectory>${basedir}/erp-server/src/main/java</sourceDirectory>
                     </sourceDirectories>
                 </configuration>
                 <!-- travis CI doesnt requires an rep token -->
