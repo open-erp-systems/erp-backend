@@ -83,6 +83,7 @@
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>4.3.0</version>
+                <!-- travis CI doesnt requires an rep token -->
                 <!-- <configuration>
                     <repoToken>repoToken</repoToken>
                 </configuration> -->
