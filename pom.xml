@@ -27,6 +27,8 @@
         <hazelcast.version>3.8.6</hazelcast.version>
 
         <apache.commons.lang.version>3.5</apache.commons.lang.version>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <!-- <repositories>
@@ -65,9 +67,6 @@
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>4.3.0</version>
-                <!-- <configuration>
-                    <repoToken>yourcoverallsprojectrepositorytoken</repoToken>
-                </configuration> -->
             </plugin>
         </plugins>
     </build>
