@@ -30,6 +30,9 @@ after_success:
   - mvn clean test jacoco:report coveralls:report
 #  - mvn coveralls:report
 
+# https://coveralls.io/github/open-erp-systems/erp-backend
+# https://github.com/trautonen/coveralls-maven-plugin
+
 #script:
 #- ./gradlew clean assemble
 #- ./gradlew check build
