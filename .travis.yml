@@ -27,7 +27,7 @@ script:
   - mvn test jacoco:report
 
 after_success:
-  - mvn clean test jacoco:report coveralls:report
+  - mvn clean test -Pjacoco jacoco:report -DdryRun=true coveralls:report
 #  - mvn coveralls:report
 
 # https://coveralls.io/github/open-erp-systems/erp-backend
