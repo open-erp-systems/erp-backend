@@ -108,6 +108,14 @@
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>4.3.0</version>
+                <configuration>
+                    <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+
+                    <sourceDirectories>
+                        <sourceDirectory>${basedir}/erp-core/src/main/scala</sourceDirectory>
+                        <sourceDirectory>${basedir}/erp-server/src/main/scala</sourceDirectory>
+                    </sourceDirectories>
+                </configuration>
                 <!-- travis CI doesnt requires an rep token -->
                 <!-- <configuration>
                     <repoToken>repoToken</repoToken>
