@@ -1,7 +1,8 @@
 # ERP Backend
 
+[![Build Status](https://travis-ci.org/leeks-and-dragons/leeks-and-dragons.svg?branch=master)](https://travis-ci.org/leeks-and-dragons/leeks-and-dragons) 
 [![Coverage Status](https://coveralls.io/repos/github/open-erp-systems/erp-backend/badge.svg?branch=master)](https://coveralls.io/github/open-erp-systems/erp-backend?branch=master)
-
+\
 **Backend** of open source ERP (Enterprise-Resource-Planning) system, written in Java.\
 \
 **License**: Apache 2.0 License (Open Source)\
