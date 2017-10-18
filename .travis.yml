@@ -18,12 +18,16 @@ cache:
 before_install:
 # - chmod +x gradlew
 
-#script:
+script:
 - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 - mvn clean verify
 - mvn clean install
+- mvn test jacoco:report
 
-script:
+after_success:
+  - mvn coveralls:report
+
+#script:
 #- ./gradlew clean assemble
 #- ./gradlew check build
 #- ./gradlew sonarqube -Dsonar.host.url=https://sonarqube.com -Dsonar.organization=OpenSourceGameDev-github -Dsonar.login=token1234
