@@ -31,6 +31,7 @@ after_success:
 #  - mvn coveralls:report
 
 # https://coveralls.io/github/open-erp-systems/erp-backend
+
 # https://github.com/trautonen/coveralls-maven-plugin
 
 #script:
