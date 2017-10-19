@@ -48,6 +48,9 @@ public class ERPServer implements IServer {
         //create new vertx.io options
         this.vertxOptions = new VertxOptions();
 
+        //use clustered mode of vert.x
+        this.vertxOptions.setClustered(true);
+
         //set cluster manager
         this.vertxOptions.setClusterManager(this.clusterManager);
 
