@@ -8,6 +8,7 @@ import com.jukusoft.erp.server.message.ResponseGenerator;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
@@ -102,8 +103,11 @@ public class ERPServer implements IServer {
     }
 
     public void startHTTPServer (int port) {
+        HttpServerOptions options = new HttpServerOptions();
+        options.setPort(port);
+
         //create new http server
-        HttpServer server = vertx.createHttpServer();
+        HttpServer server = vertx.createHttpServer(options);
 
         server.requestHandler(request -> {
 
@@ -118,7 +122,16 @@ public class ERPServer implements IServer {
             response.end(str);
         });
 
-        server.listen(port);
+        //start http server
+        server.listen(res -> {
+            if (res.succeeded()) {
+                System.out.println("HTTP Server is now listening on port " + res.result().actualPort());
+            } else {
+                System.err.println("Couldnt start HTTP server: " + res.cause());
+
+                System.exit(1);
+            }
+        });
     }
 
     public void stutdown() {
