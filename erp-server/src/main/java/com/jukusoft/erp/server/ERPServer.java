@@ -7,6 +7,7 @@ import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.server.message.ResponseGenerator;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerResponse;
@@ -115,11 +116,17 @@ public class ERPServer implements IServer {
             HttpServerResponse response = request.response();
             response.putHeader("content-type", "application/json");
 
+            //get event name
+            String event = request.path();
+
+            if (request.method() == HttpMethod.POST) {
+                if (request.formAttributes().contains("event")) {
+                    event = request.formAttributes().get("event");
+                }
+            }
+
             //generate response string
             String str = ResponseGenerator.generateResponse("test", ResponseType.OK);
-
-            //get uri
-            System.out.println(request.path());
 
             // Write to the response and end it
             response.end(str);
