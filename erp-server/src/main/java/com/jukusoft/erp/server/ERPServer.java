@@ -5,6 +5,8 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.spi.cluster.ClusterManager;
@@ -92,6 +94,26 @@ public class ERPServer implements IServer {
                 System.exit(1);
             }
         });
+
+        //start http server (for debugging and rest api)
+        this.startHTTPServer(8080);
+    }
+
+    public void startHTTPServer (int port) {
+        //create new http server
+        HttpServer server = vertx.createHttpServer();
+
+        server.requestHandler(request -> {
+
+            // This handler gets called for each request that arrives on the server
+            HttpServerResponse response = request.response();
+            response.putHeader("content-type", "text/plain");
+
+            // Write to the response and end it
+            response.end("Hello World!");
+        });
+
+        server.listen(port);
     }
 
     public void stutdown() {
