@@ -118,6 +118,9 @@ public class ERPServer implements IServer {
             //generate response string
             String str = ResponseGenerator.generateResponse("test", ResponseType.OK);
 
+            //get uri
+            System.out.println(request.path());
+
             // Write to the response and end it
             response.end(str);
         });
