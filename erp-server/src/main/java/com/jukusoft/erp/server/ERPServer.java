@@ -107,10 +107,10 @@ public class ERPServer implements IServer {
 
             // This handler gets called for each request that arrives on the server
             HttpServerResponse response = request.response();
-            response.putHeader("content-type", "text/plain");
+            response.putHeader("content-type", "application/json");
 
             // Write to the response and end it
-            response.end("Hello World!");
+            response.end("{\"type\":\"test\"}");
         });
 
         server.listen(port);
