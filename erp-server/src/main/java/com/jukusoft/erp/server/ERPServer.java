@@ -112,7 +112,7 @@ public class ERPServer implements IServer {
             response.putHeader("content-type", "application/json");
 
             //generate response string
-            String str = ResponseGenerator.generateResponse(ResponseType.OK);
+            String str = ResponseGenerator.generateResponse("test", ResponseType.OK);
 
             // Write to the response and end it
             response.end(str);

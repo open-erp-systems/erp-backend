@@ -8,13 +8,16 @@ public class ResponseGenerator {
     /**
     * generate response data
      *
+     * @param event event name
      * @param jsonData json data
      * @param type response type
      *
      * @return json string
     */
-    public static String generateResponse (JSONObject jsonData, ResponseType type) {
+    public static String generateResponse (String event, JSONObject jsonData, ResponseType type) {
         JSONObject json = new JSONObject();
+
+        json.put("event", event);
 
         //set status code
         json.put("statusCode", type.name().toLowerCase());
@@ -28,12 +31,13 @@ public class ResponseGenerator {
     /**
      * generate response data
      *
+     * @param event event name
      * @param type response type
      *
      * @return json string
      */
-    public static String generateResponse (ResponseType type) {
-        return generateResponse(new JSONObject(), type);
+    public static String generateResponse (String event, ResponseType type) {
+        return generateResponse(event, new JSONObject(), type);
     }
 
 }
