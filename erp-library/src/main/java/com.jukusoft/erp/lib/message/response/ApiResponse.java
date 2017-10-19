@@ -1,0 +1,41 @@
+package com.jukusoft.erp.lib.message.response;
+
+import com.jukusoft.erp.lib.message.ResponseType;
+import org.json.JSONObject;
+
+public class ApiResponse {
+
+    //name of event
+    protected String eventName = "";
+
+    //json data
+    protected JSONObject data = null;
+
+    protected String ackID = "";
+
+    protected ResponseType statusCode = ResponseType.OK;
+
+    protected long messageID = 0;
+
+    public ApiResponse (long messageID) {
+        this.messageID = messageID;
+    }
+
+    public String getEvent () {
+        return this.eventName;
+    }
+
+    public JSONObject getData () {
+        return this.data;
+    }
+
+    public ResponseType getStatusCode () {
+        return this.statusCode;
+    }
+
+    @Override
+    public String toString () {
+        return "api response (event: " + eventName + ", messageID: " + messageID + ", statusCode: " + statusCode.name() + ", data: " + this.data.toString() + ")";
+    }
+
+}

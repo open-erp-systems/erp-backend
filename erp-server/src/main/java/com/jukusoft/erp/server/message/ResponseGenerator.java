@@ -15,6 +15,10 @@ public class ResponseGenerator {
      * @return json string
     */
     public static String generateResponse (String event, JSONObject jsonData, ResponseType type) {
+        if (jsonData == null) {
+            throw new NullPointerException("json data cannot be null.");
+        }
+
         JSONObject json = new JSONObject();
 
         json.put("event", event);
