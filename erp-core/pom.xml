@@ -19,6 +19,20 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- common library module -->
+        <dependency>
+            <groupId>com.jukusoft</groupId>
+            <artifactId>erp-library</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- JSON -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -3,6 +3,8 @@ package com.jukusoft.erp.server;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.jukusoft.erp.lib.message.ResponseType;
+import com.jukusoft.erp.server.message.ResponseGenerator;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.http.HttpServer;
@@ -109,8 +111,11 @@ public class ERPServer implements IServer {
             HttpServerResponse response = request.response();
             response.putHeader("content-type", "application/json");
 
+            //generate response string
+            String str = ResponseGenerator.generateResponse(ResponseType.OK);
+
             // Write to the response and end it
-            response.end("{\"type\":\"test\"}");
+            response.end(str);
         });
 
         server.listen(port);

@@ -20,6 +20,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- common library module -->
+        <dependency>
+            <groupId>com.jukusoft</groupId>
+            <artifactId>erp-library</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- erp core features -->
         <dependency>
             <groupId>com.jukusoft</groupId>
@@ -55,9 +62,7 @@
             <version>${vertx.version}</version>
         </dependency>
 
-
-
-        <!-- json -->
+        <!-- JSON -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
