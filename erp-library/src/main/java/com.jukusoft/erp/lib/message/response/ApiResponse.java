@@ -33,6 +33,10 @@ public class ApiResponse {
         return this.statusCode;
     }
 
+    public long getMessageID () {
+        return this.messageID;
+    }
+
     @Override
     public String toString () {
         return "api response (event: " + eventName + ", messageID: " + messageID + ", statusCode: " + statusCode.name() + ", data: " + this.data.toString() + ")";

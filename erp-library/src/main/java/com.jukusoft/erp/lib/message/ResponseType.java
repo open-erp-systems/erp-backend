@@ -10,6 +10,35 @@ public enum ResponseType {
 
     WRONG_PERMISSIONS,
 
-    SERVICE_UUNAVAILABLE
+    SERVICE_UUNAVAILABLE,
+
+    UNKNOWN;
+
+    public static ResponseType getByString (String str) {
+        switch (str.trim().toUpperCase()) {
+            case "NOT_FOUND":
+                return NOT_FOUND;
+
+            case "OK":
+
+                return OK;
+
+            case "BAD_REQUEST":
+
+                return BAD_REQUEST;
+
+            case "WRONG_PERMISSIONS":
+
+                return WRONG_PERMISSIONS;
+
+            case "SERVICE_UNAVAILABLE":
+
+                return SERVICE_UUNAVAILABLE;
+
+            default:
+
+                return UNKNOWN;
+        }
+    }
 
 }
