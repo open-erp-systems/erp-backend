@@ -80,9 +80,9 @@ public class HzLogger implements ILogging {
 
         //also log to console
         if (messageID == -1) {
-            System.out.println("[nodeID=" + this.nodeID + ",messageID=null] " + logLevel.toUpperCase() + ": " + tag + ": " + message);
+            System.out.println("messageID=null,[nodeID=" + this.nodeID + "] " + logLevel.toUpperCase() + ": " + tag + ": " + message);
         } else {
-            System.out.println("[nodeID=" + this.nodeID + "messageID=" + messageID + "]" + logLevel.toUpperCase() + ": " + tag + ": " + message);
+            System.out.println("messageID=" + messageID + ",[nodeID=" + this.nodeID + "]" + logLevel.toUpperCase() + ": " + tag + ": " + message);
         }
     }
 
