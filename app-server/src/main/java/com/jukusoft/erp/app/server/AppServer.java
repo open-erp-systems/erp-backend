@@ -15,14 +15,14 @@ public interface AppServer {
      * @param module instance of module
      * @param cls class name of module
     */
-    public <T extends IModule> void addModule (T module, Class<T> cls);
+    public <T extends IModule> void deployModule (T module, Class<T> cls);
 
     /**
      * stop and remove module
      *
      * @param cls class name of module
      */
-    public <T extends IModule> void removeModule (Class<T> cls);
+    public <T extends IModule> void undeployModule (Class<T> cls);
 
     /**
     * shutdown microservice application server
