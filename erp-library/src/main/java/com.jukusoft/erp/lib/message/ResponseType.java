@@ -2,17 +2,27 @@ package com.jukusoft.erp.lib.message;
 
 public enum ResponseType {
 
-    NOT_FOUND,
+    NOT_FOUND(404),
 
-    OK,
+    OK(200),
 
-    BAD_REQUEST,
+    BAD_REQUEST(400),
 
-    WRONG_PERMISSIONS,
+    WRONG_PERMISSIONS(403),
 
-    SERVICE_UNAVAILABLE,
+    SERVICE_UNAVAILABLE(503),
 
-    UNKNOWN;
+    UNKNOWN(500);
+
+    private final int value;
+
+    private ResponseType (int value) {
+        this.value = value;
+    }
+
+    public int getValue () {
+        return this.value;
+    }
 
     public static ResponseType getByString (String str) {
         switch (str.trim().toUpperCase()) {

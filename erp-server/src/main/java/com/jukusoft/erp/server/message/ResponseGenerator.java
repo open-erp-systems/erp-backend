@@ -24,7 +24,8 @@ public class ResponseGenerator {
         json.put("event", event);
 
         //set status code
-        json.put("statusCode", type.name().toLowerCase());
+        json.put("statusCode", type.getValue());
+        json.put("status", type.name().toLowerCase());
 
         //put data
         json.put("data", jsonData);
