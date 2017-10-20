@@ -13,6 +13,7 @@
         <module>erp-library</module>
         <module>erp-core</module>
         <module>erp-server</module>
+        <module>app-server</module>
     </modules>
 
     <properties>

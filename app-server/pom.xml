@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>erp-library</artifactId>
+    <artifactId>microservice-server</artifactId>
 
     <dependencies>
         <!-- JUnit tests -->
@@ -20,11 +20,18 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JSON -->
+        <!-- common library module -->
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>${json.version}</version>
+            <groupId>com.jukusoft</groupId>
+            <artifactId>erp-library</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- erp core features -->
+        <dependency>
+            <groupId>com.jukusoft</groupId>
+            <artifactId>erp-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- vert.x -->
@@ -39,6 +46,20 @@
             <groupId>com.hazelcast</groupId>
             <artifactId>hazelcast</artifactId>
             <version>${hazelcast.version}</version>
+        </dependency>
+
+        <!-- Vert.x Cluster-Management with Hazelcast -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-hazelcast</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
+
+        <!-- JSON -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
         </dependency>
     </dependencies>
 

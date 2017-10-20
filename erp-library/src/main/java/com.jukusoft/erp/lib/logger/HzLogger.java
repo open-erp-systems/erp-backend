@@ -1,4 +1,4 @@
-package com.jukusoft.erp.server.logger;
+package com.jukusoft.erp.lib.logger;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ITopic;
@@ -12,10 +12,15 @@ public class HzLogger implements ILogging {
     //logger topic
     protected ITopic<String> loggerTopic = null;
 
-    public HzLogger (HazelcastInstance hazelcastInstance) {
+    //node id
+    protected String nodeID = "";
+
+    public HzLogger (HazelcastInstance hazelcastInstance, String nodeID) {
         this.hazelcastInstance = hazelcastInstance;
 
         this.loggerTopic = hazelcastInstance.getReliableTopic("logger");
+
+        this.nodeID = nodeID;
     }
 
     @Override
@@ -75,9 +80,9 @@ public class HzLogger implements ILogging {
 
         //also log to console
         if (messageID == -1) {
-            System.out.println("[messageID=null] " + logLevel.toUpperCase() + ": " + tag + ": " + message);
+            System.out.println("[nodeID=" + this.nodeID + ",messageID=null] " + logLevel.toUpperCase() + ": " + tag + ": " + message);
         } else {
-            System.out.println("[messageID=" + messageID + "]" + logLevel.toUpperCase() + ": " + tag + ": " + message);
+            System.out.println("[nodeID=" + this.nodeID + "messageID=" + messageID + "]" + logLevel.toUpperCase() + ": " + tag + ": " + message);
         }
     }
 

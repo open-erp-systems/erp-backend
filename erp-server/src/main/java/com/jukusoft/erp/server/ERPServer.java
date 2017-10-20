@@ -11,9 +11,8 @@ import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.server.gateway.DefaultApiGateway;
-import com.jukusoft.erp.server.logger.HzLogger;
+import com.jukusoft.erp.lib.logger.HzLogger;
 import com.jukusoft.erp.server.message.ResponseGenerator;
-import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.http.HttpMethod;
@@ -26,7 +25,6 @@ import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 import org.json.JSONObject;
 
-import javax.transaction.xa.XAException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -64,9 +62,6 @@ public class ERPServer implements IServer {
 
         this.idGenerator = this.hazelcastInstance.getIdGenerator("message-id-generator");
 
-        //create logger
-        this.logger = new HzLogger(this.hazelcastInstance);
-
         //create new vert.x cluster manager
         this.clusterManager = new HazelcastClusterManager(this.hazelcastInstance);
 
@@ -94,6 +89,9 @@ public class ERPServer implements IServer {
     }
 
     protected void postStart () {
+        //create logger
+        this.logger = new HzLogger(this.hazelcastInstance, this.clusterManager.getNodeID());
+
         //create api gateway
         this.gateway = new DefaultApiGateway(this.vertx, this.logger);
 
