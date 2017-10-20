@@ -11,6 +11,7 @@ import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.server.gateway.DefaultApiGateway;
+import com.jukusoft.erp.server.logger.HzLogger;
 import com.jukusoft.erp.server.message.ResponseGenerator;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -62,6 +63,9 @@ public class ERPServer implements IServer {
         //http://vertx.io/docs/vertx-hazelcast/java/
 
         this.idGenerator = this.hazelcastInstance.getIdGenerator("message-id-generator");
+
+        //create logger
+        this.logger = new HzLogger(this.hazelcastInstance);
 
         //create new vert.x cluster manager
         this.clusterManager = new HazelcastClusterManager(this.hazelcastInstance);
