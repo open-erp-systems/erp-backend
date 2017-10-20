@@ -10,7 +10,7 @@ public enum ResponseType {
 
     WRONG_PERMISSIONS,
 
-    SERVICE_UUNAVAILABLE,
+    SERVICE_UNAVAILABLE,
 
     UNKNOWN;
 
@@ -33,7 +33,7 @@ public enum ResponseType {
 
             case "SERVICE_UNAVAILABLE":
 
-                return SERVICE_UUNAVAILABLE;
+                return SERVICE_UNAVAILABLE;
 
             default:
 
