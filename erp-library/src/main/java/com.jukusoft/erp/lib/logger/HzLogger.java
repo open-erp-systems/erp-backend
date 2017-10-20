@@ -71,6 +71,7 @@ public class HzLogger implements ILogging {
         }
 
         json.put("timestamp", System.currentTimeMillis());
+        json.put("nodeID", this.nodeID);
         json.put("log_level", logLevel);
         json.put("messageID", message);
         json.put("tag", tag);
