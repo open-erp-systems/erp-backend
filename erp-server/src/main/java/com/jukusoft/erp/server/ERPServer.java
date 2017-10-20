@@ -190,12 +190,12 @@ public class ERPServer implements IServer {
                     @Override
                     public void responseFailed() {
                         //generate response string
-                        String str = ResponseGenerator.generateResponse(event, ResponseType.SERVICE_UUNAVAILABLE);
+                        String str = ResponseGenerator.generateResponse(event, ResponseType.SERVICE_UNAVAILABLE);
 
                         //write to the response and end it
                         socket.write(str);
 
-                        logger.warn(messageID, "request_failed", req.toString() + ", cause: " + ResponseType.SERVICE_UUNAVAILABLE.name() + ".");
+                        logger.warn(messageID, "request_failed", req.toString() + ", cause: " + ResponseType.SERVICE_UNAVAILABLE.name() + ".");
                     }
                 });
             });
@@ -271,12 +271,12 @@ public class ERPServer implements IServer {
                 @Override
                 public void responseFailed() {
                     //generate response string
-                    String str = ResponseGenerator.generateResponse(eventName, ResponseType.SERVICE_UUNAVAILABLE);
+                    String str = ResponseGenerator.generateResponse(eventName, ResponseType.SERVICE_UNAVAILABLE);
 
                     //write to the response and end it
                     response.end(str);
 
-                    logger.warn(messageID, "request_failed", req.toString() + ", cause: " + ResponseType.SERVICE_UUNAVAILABLE.name() + ".");
+                    logger.warn(messageID, "request_failed", req.toString() + ", cause: " + ResponseType.SERVICE_UNAVAILABLE.name() + ".");
                 }
             });
         });
