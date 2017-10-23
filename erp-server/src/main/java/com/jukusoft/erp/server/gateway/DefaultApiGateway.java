@@ -8,6 +8,7 @@ import com.jukusoft.erp.lib.message.request.ApiRequestCodec;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.message.response.ApiResponseCodec;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import org.json.JSONObject;
 
@@ -22,6 +23,8 @@ public class DefaultApiGateway implements ApiGateway {
     //logger
     protected ILogging logger = null;
 
+    protected DeliveryOptions deliveryOptions = null;
+
     /**
     * default constructor
      *
@@ -30,6 +33,11 @@ public class DefaultApiGateway implements ApiGateway {
     public DefaultApiGateway (Vertx vertx, ILogging logger) {
         this.vertx = vertx;
         this.logger = logger;
+
+        this.deliveryOptions = new DeliveryOptions();
+
+        //set timeout of 3 seconds
+        this.deliveryOptions.setSendTimeout(3 * 1000);
 
         //get eventbus
         this.eventBus = vertx.eventBus();
