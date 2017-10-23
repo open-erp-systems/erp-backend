@@ -13,8 +13,6 @@ public class Main {
         //start app server
         server.start((AppServer server1, boolean success) -> {
             if (success) {
-                System.out.println("server started successfully!");
-
                 //add modules
                 server.deployModule(new TestModule(), TestModule.class);
             } else {

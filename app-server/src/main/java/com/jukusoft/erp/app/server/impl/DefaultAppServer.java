@@ -103,29 +103,27 @@ public class DefaultAppServer implements AppServer {
         //TODO: create new app context
         AppContext context = new AppContextImpl(this.vertx, this.logger);
 
-        System.err.println("init module.");
-
         //first, initialize module
         module.init(this.vertx, context, this.logger);
 
         //start module
         try {
-            module.start(Future.future(res -> {
+            module.start(future -> {
                 try {
-                    if (res.succeeded()) {
+                    if (future.succeeded()) {
                         logger.info("deploy_module", "Module '" + cls.getSimpleName() + "' was deployed successfully.");
 
                         //add module to list and map
                         this.deployedModules.add(module);
                         this.moduleMap.put(cls, module);
                     } else {
-                        logger.warn("deploy_module_error", "Module '" + cls.getSimpleName() + "' couldnt be deployed, cause: " + res.cause());
+                        logger.warn("deploy_module_error", "Module '" + cls.getSimpleName() + "' couldnt be deployed, cause: " + future.cause());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(1);
                 }
-            }));
+            });
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("deploy_module_exception", "Cannot deploy module '" + cls.getCanonicalName() + "': " + e.getLocalizedMessage());
@@ -148,13 +146,13 @@ public class DefaultAppServer implements AppServer {
 
         //stop module
         try {
-            module.stop(Future.future(res -> {
+            module.stop(res -> {
                 if (res.succeeded()) {
                     logger.info("undeploy_module", "Module '" + cls.getSimpleName() + "' was undeployed successfully.");
                 } else {
                     logger.warn("undeploy_module_error", "Module '" + cls.getSimpleName() + "' couldnt be undeployed, cause: " + res.cause());
                 }
-            }));
+            });
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("undeploy_module_exception", "Cannot undeploy module '" + cls.getCanonicalName() + "': " + e.getLocalizedMessage());

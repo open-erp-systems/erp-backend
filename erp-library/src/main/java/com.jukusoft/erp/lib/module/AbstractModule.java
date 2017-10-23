@@ -3,6 +3,7 @@ package com.jukusoft.erp.lib.module;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.logging.ILogging;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 
 public abstract class AbstractModule implements IModule {
@@ -46,8 +47,8 @@ public abstract class AbstractModule implements IModule {
     }
 
     @Override
-    public void start(Future<Void> startFuture) throws Exception {
-        if (startFuture == null) {
+    public void start(Handler<Future<IModule>> handler) throws Exception {
+        if (handler == null) {
             throw new NullPointerException("start future cannot be null.");
         }
 
@@ -55,16 +56,21 @@ public abstract class AbstractModule implements IModule {
             this.start();
         } catch (Exception e) {
             e.printStackTrace();
-            startFuture.fail(e);
+            handler.handle(Future.failedFuture(e));
         }
 
-        startFuture.complete();
+        handler.handle(Future.succeededFuture(this));
+        //startFuture.complete(AbstractModule.this);
     }
 
     @Override
-    public void stop(Future<Void> stopFuture) throws Exception {
-        this.stop();
-        stopFuture.complete();
+    public void stop(Handler<Future<Void>> handler) throws Exception {
+        try {
+            this.stop();
+            handler.handle(Future.succeededFuture());
+        } catch (Exception e) {
+            handler.handle(Future.failedFuture(e));
+        }
     }
 
     /**

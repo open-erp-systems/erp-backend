@@ -3,6 +3,7 @@ package com.jukusoft.erp.lib.module;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.logging.ILogging;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 
 public interface IModule {
@@ -27,11 +28,11 @@ public interface IModule {
     /**
     * start module
     */
-    public void start (Future<Void> startFuture) throws Exception;
+    public void start (Handler<Future<IModule>> handler) throws Exception;
 
     /**
     * stop module
     */
-    public void stop (Future<Void> stopFuture) throws Exception;
+    public void stop (Handler<Future<Void>> handler) throws Exception;
 
 }
