@@ -8,14 +8,10 @@ import io.vertx.core.eventbus.Message;
 public class TestPage {
 
     @Route(routes = "/")
-    public void homePage (Message<ApiRequest> event, ApiRequest req) {
-        //send new api answer
-        ApiResponse res = new ApiResponse(req.getMessageID());
-
+    public ApiResponse homePage (Message<ApiRequest> event, ApiRequest req, ApiResponse res) {
         res.getData().put("content", "Hi! This is an internal api.");
 
-        //reply to api request
-        event.reply(res);
+        return res;
     }
 
     @Route(routes = {"/metrics", "/metrics/"})

@@ -2,13 +2,17 @@ package com.jukusoft.erp.lib.module;
 
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.logging.ILogging;
+import com.jukusoft.erp.lib.message.request.ApiRequest;
+import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public abstract class AbstractModule implements IModule {
@@ -80,9 +84,56 @@ public abstract class AbstractModule implements IModule {
             if (method.isAnnotationPresent(Route.class)) {
                 for (String route : method.getAnnotation(Route.class).routes()) {
                     getLogger().debug("module_route_detected", "new route found: " + route + " --> " + cls.getCanonicalName());
+
+                    registerHandler(route, page, method);
                 }
             }
         }
+    }
+
+    private <T> void registerHandler (String event, T page, Method method) {
+        //register handler
+        getEventBus().consumer(event, new Handler<Message<ApiRequest>>() {
+            @Override
+            public void handle(Message<ApiRequest> event) {
+                getLogger().debug(event.body().getMessageID(), "consume_message", "consume message: " + event.body());
+
+                //get message
+                ApiRequest req = event.body();
+
+                if (method.getReturnType() == ApiResponse.class) {
+                    //create new api answer
+                    ApiResponse res = new ApiResponse(req.getMessageID());
+
+                    try {
+                        res = (ApiResponse) method.invoke(page, event, req, res);
+
+                        //reply to api request
+                        event.reply(res);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                        event.fail(500, e.getLocalizedMessage());
+
+                        return;
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                        event.fail(500, e.getLocalizedMessage());
+
+                        return;
+                    }
+                } else {
+                    try {
+                        method.invoke(page, event, req);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                        event.fail(500, e.getLocalizedMessage());
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                        event.fail(500, e.getLocalizedMessage());
+                    }
+                }
+            }
+        });
     }
 
     @Override
