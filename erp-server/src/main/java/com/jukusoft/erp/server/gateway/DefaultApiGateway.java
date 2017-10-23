@@ -36,8 +36,8 @@ public class DefaultApiGateway implements ApiGateway {
 
         this.deliveryOptions = new DeliveryOptions();
 
-        //set timeout of 3 seconds
-        this.deliveryOptions.setSendTimeout(3 * 1000);
+        //set timeout of 5 seconds
+        this.deliveryOptions.setSendTimeout(5 * 1000);
 
         //get eventbus
         this.eventBus = vertx.eventBus();
