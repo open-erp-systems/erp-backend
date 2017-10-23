@@ -3,5 +3,7 @@ module erp.core {
 
     requires java.logging;
 
+    requires erp.library;
+
     exports com.jukusoft.erp.core.exception;
 }

@@ -1,7 +1,6 @@
 package com.jukusoft.erp.lib.message.response;
 
 import com.jukusoft.erp.lib.message.ResponseType;
-import com.jukusoft.erp.lib.message.request.ApiRequest;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.MessageCodec;
 import org.json.JSONObject;
