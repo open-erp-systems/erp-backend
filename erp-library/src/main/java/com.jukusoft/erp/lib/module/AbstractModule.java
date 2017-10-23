@@ -2,10 +2,14 @@ package com.jukusoft.erp.lib.module;
 
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.logging.ILogging;
+import com.jukusoft.erp.lib.route.Route;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 public abstract class AbstractModule implements IModule {
 
@@ -54,6 +58,31 @@ public abstract class AbstractModule implements IModule {
         this.vertx = vertx;
         this.context = context;
         this.logger = logger;
+    }
+
+    protected <T> void addApi (T page) {
+        getLogger().debug("search_api_routes", "search for new routes in class " + page.getClass().getSimpleName());
+
+        //get class of object
+        Class cls = page.getClass();
+
+        //list all available methods in class
+        Method[] methods = cls.getDeclaredMethods();
+
+        for (Method method : methods) {
+            /*System.out.println("method: " + method.getName());
+
+            for (Annotation annotation : method.getDeclaredAnnotations()) {
+                System.out.println("annotation found: " + annotation.getClass());
+            }*/
+
+            //check, if method has annotation @Route
+            if (method.isAnnotationPresent(Route.class)) {
+                for (String route : method.getAnnotation(Route.class).routes()) {
+                    getLogger().debug("module_route_detected", "new route found: " + route + " --> " + cls.getCanonicalName());
+                }
+            }
+        }
     }
 
     @Override

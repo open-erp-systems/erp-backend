@@ -1,5 +1,6 @@
 package com.jukusoft.erp.core.module;
 
+import com.jukusoft.erp.core.module.test.TestPage;
 import com.jukusoft.erp.lib.logging.ILogging;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
@@ -12,7 +13,7 @@ public class TestModule extends AbstractModule {
     @Override
     public void start() throws Exception {
         //register handler
-        getEventBus().consumer("/test", new Handler<Message<ApiRequest>>() {
+        /*getEventBus().consumer("/test", new Handler<Message<ApiRequest>>() {
             @Override
             public void handle(Message<ApiRequest> event) {
                 getLogger().debug(event.body().getMessageID(), "test_module_handle", "handle received message (event: " + event.address() + "): " + event.body());
@@ -28,7 +29,9 @@ public class TestModule extends AbstractModule {
                 //reply to api request
                 event.reply(res);
             }
-        });
+        });*/
+
+        addApi(new TestPage());
     }
 
     @Override
