@@ -4,6 +4,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.jukusoft.erp.app.server.AppServer;
+import com.jukusoft.erp.app.server.AppStartListener;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.logger.HzLogger;
 import com.jukusoft.erp.lib.logging.ILogging;
@@ -41,7 +42,7 @@ public class DefaultAppServer implements AppServer {
     protected Map<Class<?>,IModule> moduleMap = new HashMap<>();
 
     @Override
-    public void start() {
+    public void start(AppStartListener listener) {
         System.out.println("start local hazelcast instance now...");
 
         //create an new hazelcast instance
@@ -71,10 +72,13 @@ public class DefaultAppServer implements AppServer {
 
                 //initialize application
                 initApp();
+
+                listener.afterStartup(this, true);
             } else {
                 // failed!
 
-                System.exit(1);
+                listener.afterStartup(null, false);
+                //startFuture.fail(res.cause());
             }
         });
     }

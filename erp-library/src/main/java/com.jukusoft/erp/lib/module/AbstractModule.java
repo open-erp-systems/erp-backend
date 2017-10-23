@@ -51,8 +51,6 @@ public abstract class AbstractModule implements IModule {
             throw new NullPointerException("start future cannot be null.");
         }
 
-        System.err.println("try to start abstract module.");
-
         try {
             this.start();
         } catch (Exception e) {

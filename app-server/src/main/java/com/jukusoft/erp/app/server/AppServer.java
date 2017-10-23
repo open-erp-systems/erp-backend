@@ -1,13 +1,14 @@
 package com.jukusoft.erp.app.server;
 
 import com.jukusoft.erp.lib.module.IModule;
+import io.vertx.core.Future;
 
 public interface AppServer {
 
     /**
     * start microservice application server
     */
-    public void start ();
+    public void start (AppStartListener listener);
 
     /**
     * add and start module

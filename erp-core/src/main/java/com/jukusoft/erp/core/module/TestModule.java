@@ -6,7 +6,7 @@ public class TestModule extends AbstractModule {
 
     @Override
     public void start() throws Exception {
-        System.err.println("start test module.");
+        //
     }
 
     @Override
