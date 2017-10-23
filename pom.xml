@@ -83,6 +83,26 @@
                 <version>3.0.4</version>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} -Xmx2048m</argLine>
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -102,13 +122,20 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.7.9</version>
                 <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+
                     <!-- Prepares the property pointing to the JaCoCo
                     runtime agent which is passed as VM argument when Maven the Surefire plugin
                     is executed. -->
                     <execution>
                         <id>pre-unit-test</id>
                         <goals>
-                            <goal>prepare-agent-integration</goal>
+                            <!-- <goal>prepare-agent-integration</goal> -->
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
@@ -123,7 +150,26 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
+
+                    <execution>
+                        <id>default-report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- <execution>
+                        <id>default-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution> -->
                 </executions>
+
+                <configuration>
+                    <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+                </configuration>
             </plugin>
 
             <plugin>
