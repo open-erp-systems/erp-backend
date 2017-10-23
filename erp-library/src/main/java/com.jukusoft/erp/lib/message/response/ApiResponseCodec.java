@@ -47,7 +47,7 @@ public class ApiResponseCodec implements MessageCodec<ApiResponse, ApiResponse> 
         String jsonStr = buffer.getString(_pos+=4, _pos+=length);
         JSONObject json = new JSONObject(jsonStr);
 
-        ApiResponse res = new ApiResponse(json.getLong("cluster-message-id"));
+        ApiResponse res = new ApiResponse(json.getLong("cluster-message-id"), json.getString("event"));
 
         res.eventName = json.getString("event");
         res.data = json.getJSONObject("data");

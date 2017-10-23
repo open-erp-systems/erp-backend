@@ -103,7 +103,7 @@ public abstract class AbstractModule implements IModule {
 
                 if (method.getReturnType() == ApiResponse.class) {
                     //create new api answer
-                    ApiResponse res = new ApiResponse(req.getMessageID());
+                    ApiResponse res = new ApiResponse(req.getMessageID(), req.getEvent());
 
                     try {
                         res = (ApiResponse) method.invoke(page, event, req, res);

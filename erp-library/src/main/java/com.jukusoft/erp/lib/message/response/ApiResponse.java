@@ -17,8 +17,9 @@ public class ApiResponse {
 
     protected long messageID = 0;
 
-    public ApiResponse (long messageID) {
+    public ApiResponse (long messageID, String eventName) {
         this.messageID = messageID;
+        this.eventName = eventName;
     }
 
     public String getEvent () {
