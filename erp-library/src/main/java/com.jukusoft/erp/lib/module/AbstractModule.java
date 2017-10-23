@@ -108,6 +108,8 @@ public abstract class AbstractModule implements IModule {
                     try {
                         res = (ApiResponse) method.invoke(page, event, req, res);
 
+                        getLogger().debug(req.getMessageID(), "reply_message", "reply to message: " + res);
+
                         //reply to api request
                         event.reply(res);
                     } catch (IllegalAccessException e) {
