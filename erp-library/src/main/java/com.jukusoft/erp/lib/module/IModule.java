@@ -5,6 +5,7 @@ import com.jukusoft.erp.lib.logging.ILogging;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.EventBus;
 
 public interface IModule {
 
@@ -19,6 +20,13 @@ public interface IModule {
     * get instance of logger
     */
     public ILogging getLogger ();
+
+    /**
+    * get instance of event bus
+     *
+     * @return instance of event bus
+    */
+    public EventBus getEventBus ();
 
     /**
     * initialize module

@@ -5,6 +5,7 @@ import com.jukusoft.erp.lib.logging.ILogging;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.EventBus;
 
 public abstract class AbstractModule implements IModule {
 
@@ -20,6 +21,15 @@ public abstract class AbstractModule implements IModule {
     @Override
     public Vertx getVertx() {
         return this.vertx;
+    }
+
+    /**
+     * get instance of event bus
+     *
+     * @return instance of event bus
+     */
+    public EventBus getEventBus () {
+        return this.vertx.eventBus();
     }
 
     @Override

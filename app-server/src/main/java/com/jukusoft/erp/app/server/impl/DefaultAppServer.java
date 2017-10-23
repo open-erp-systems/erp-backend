@@ -8,10 +8,15 @@ import com.jukusoft.erp.app.server.AppStartListener;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.logger.HzLogger;
 import com.jukusoft.erp.lib.logging.ILogging;
+import com.jukusoft.erp.lib.message.request.ApiRequest;
+import com.jukusoft.erp.lib.message.request.ApiRequestCodec;
+import com.jukusoft.erp.lib.message.response.ApiResponse;
+import com.jukusoft.erp.lib.message.response.ApiResponseCodec;
 import com.jukusoft.erp.lib.module.IModule;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
@@ -40,6 +45,8 @@ public class DefaultAppServer implements AppServer {
     //list & map with deployed modules
     protected List<IModule> deployedModules = new ArrayList<>();
     protected Map<Class<?>,IModule> moduleMap = new HashMap<>();
+
+    protected EventBus eventBus = null;
 
     @Override
     public void start(AppStartListener listener) {
@@ -88,6 +95,13 @@ public class DefaultAppServer implements AppServer {
         this.logger = new HzLogger(this.hazelcastInstance, this.clusterManager.getNodeID());
 
         this.logger.info("start_app_server", "Start application server: " + this.clusterManager.getNodeID());
+
+        //get eventbus
+        this.eventBus = vertx.eventBus();
+
+        //register codec for api request & response message
+        eventBus.registerDefaultCodec(ApiRequest.class, new ApiRequestCodec());
+        eventBus.registerDefaultCodec(ApiResponse.class, new ApiResponseCodec());
     }
 
     @Override

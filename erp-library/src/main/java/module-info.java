@@ -4,5 +4,8 @@ module erp.library {
     requires vertx.core;
 
     exports com.jukusoft.erp.lib.module;
+    exports com.jukusoft.erp.lib.gateway;
+    exports com.jukusoft.erp.lib.message.request;
+    exports com.jukusoft.erp.lib.message.response;
 
 }
