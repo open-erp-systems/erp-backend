@@ -27,7 +27,9 @@ script:
   - mvn test jacoco:report
 
 after_success:
-  - mvn clean test -Pjacoco jacoco:report-aggregate -DdryRun=true -Daggregate=true coveralls:report
+  - mvn test -Pjacoco jacoco:report-aggregate -DdryRun=true -Daggregate=true coveralls:report
+
+#  - mvn clean test -Pjacoco jacoco:report-aggregate -DdryRun=true -Daggregate=true coveralls:report
 #  - mvn coveralls:report
 # jacoco:report-aggregate
 
