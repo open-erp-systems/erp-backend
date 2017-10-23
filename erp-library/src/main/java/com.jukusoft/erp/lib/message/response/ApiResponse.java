@@ -9,7 +9,7 @@ public class ApiResponse {
     protected String eventName = "";
 
     //json data
-    protected JSONObject data = null;
+    protected JSONObject data = new JSONObject();
 
     protected String ackID = "";
 
@@ -27,6 +27,10 @@ public class ApiResponse {
 
     public JSONObject getData () {
         return this.data;
+    }
+
+    public void setData (JSONObject json) {
+        this.data = json;
     }
 
     public ResponseType getStatusCode () {

@@ -7,5 +7,6 @@ module erp.library {
     exports com.jukusoft.erp.lib.gateway;
     exports com.jukusoft.erp.lib.message.request;
     exports com.jukusoft.erp.lib.message.response;
+    exports com.jukusoft.erp.lib.logging;
 
 }

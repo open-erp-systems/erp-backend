@@ -12,6 +12,10 @@ public class ApiResponseCodec implements MessageCodec<ApiResponse, ApiResponse> 
         //create new json object
         JSONObject json = new JSONObject();
 
+        if (res.data == null) {
+            throw new NullPointerException("json data of api response '" + res.getClass().getSimpleName() + "' cannot be null.");
+        }
+
         //put data
         json.put("event", res.eventName);
         json.put("data", res.data);
