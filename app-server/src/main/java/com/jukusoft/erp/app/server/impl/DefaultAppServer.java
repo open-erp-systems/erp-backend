@@ -87,9 +87,19 @@ public class DefaultAppServer implements AppServer {
     }
 
     @Override
-    public <T extends IModule> void deployModule(T module, Class<T> cls) {
+    public <T extends IModule> void deployModule(final T module, final Class<T> cls) {
+        if (module == null) {
+            throw new NullPointerException("module cannot be null.");
+        }
+
+        if (this.vertx == null) {
+            throw new IllegalStateException("vertx isnt initialized yet, start server first (maybe server is starting asynchronous and hasnt finished loading?).");
+        }
+
         //TODO: create new app context
-        AppContext context = null;
+        AppContext context = new AppContextImpl(this.vertx, this.logger);
+
+        System.err.println("init module.");
 
         //first, initialize module
         module.init(this.vertx, context, this.logger);
@@ -97,14 +107,19 @@ public class DefaultAppServer implements AppServer {
         //start module
         try {
             module.start(Future.future(res -> {
-                if (res.succeeded()) {
-                    logger.info("deploy_module", "Module '" + cls.getSimpleName() + "' was deployed successfully.");
+                try {
+                    if (res.succeeded()) {
+                        logger.info("deploy_module", "Module '" + cls.getSimpleName() + "' was deployed successfully.");
 
-                    //add module to list and map
-                    this.deployedModules.add(module);
-                    this.moduleMap.put(cls, module);
-                } else {
-                    logger.warn("deploy_module_error", "Module '" + cls.getSimpleName() + "' couldnt be deployed, cause: " + res.cause());
+                        //add module to list and map
+                        this.deployedModules.add(module);
+                        this.moduleMap.put(cls, module);
+                    } else {
+                        logger.warn("deploy_module_error", "Module '" + cls.getSimpleName() + "' couldnt be deployed, cause: " + res.cause());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.exit(1);
                 }
             }));
         } catch (Exception e) {

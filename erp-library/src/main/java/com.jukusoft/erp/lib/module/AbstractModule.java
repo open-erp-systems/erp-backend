@@ -28,6 +28,18 @@ public abstract class AbstractModule implements IModule {
 
     @Override
     public void init(Vertx vertx, AppContext context, ILogging logger) {
+        if (vertx == null) {
+            throw new NullPointerException("vertx cannot be null.");
+        }
+
+        if (context == null) {
+            throw new NullPointerException("app context cannot be null.");
+        }
+
+        if (logger == null) {
+            throw new NullPointerException("logger cannot be null.");
+        }
+
         this.vertx = vertx;
         this.context = context;
         this.logger = logger;
@@ -35,7 +47,19 @@ public abstract class AbstractModule implements IModule {
 
     @Override
     public void start(Future<Void> startFuture) throws Exception {
-        this.start();
+        if (startFuture == null) {
+            throw new NullPointerException("start future cannot be null.");
+        }
+
+        System.err.println("try to start abstract module.");
+
+        try {
+            this.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            startFuture.fail(e);
+        }
+
         startFuture.complete();
     }
 
