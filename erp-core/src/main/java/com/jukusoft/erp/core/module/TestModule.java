@@ -23,6 +23,8 @@ public class TestModule extends AbstractModule {
                 //send new api answer
                 ApiResponse res = new ApiResponse(req.getMessageID());
 
+                res.getData().put("test-key", "test-value");
+
                 //reply to api request
                 event.reply(res);
             }

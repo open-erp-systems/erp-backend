@@ -56,6 +56,10 @@ public class ERPServer implements IServer {
     public void start() {
         //create an new hazelcast instance
         Config config = new Config();
+
+        //disable hazelcast logging
+        config.setProperty("hazelcast.logging.type", "none");
+
         this.hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 
         //http://vertx.io/docs/vertx-hazelcast/java/
