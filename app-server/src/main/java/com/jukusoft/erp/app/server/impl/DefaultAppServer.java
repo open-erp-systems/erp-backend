@@ -42,8 +42,14 @@ public class DefaultAppServer implements AppServer {
 
     @Override
     public void start() {
+        System.out.println("start local hazelcast instance now...");
+
         //create an new hazelcast instance
         Config config = new Config();
+
+        //disable hazelcast logging
+        config.setProperty("hazelcast.logging.type", "none");
+
         this.hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 
         //create new vert.x cluster manager
