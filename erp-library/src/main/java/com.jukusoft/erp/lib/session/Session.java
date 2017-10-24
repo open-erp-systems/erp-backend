@@ -16,6 +16,9 @@ public class Session implements JSONSerializable, JSONLoadable {
     //session attributes
     protected Map<String,Object> attributes = new HashMap<>();
 
+    //created unix timestamp
+    protected long created = 0;
+
     /**
     * default constructor
      *
@@ -23,6 +26,8 @@ public class Session implements JSONSerializable, JSONLoadable {
     */
     public Session (String sessionID) {
         this.sessionID = sessionID;
+
+        this.created = System.currentTimeMillis();
     }
 
     /**
@@ -76,6 +81,9 @@ public class Session implements JSONSerializable, JSONLoadable {
         //add session ID
         json.put("session-id", this.sessionID);
 
+        //add created timestamp
+        json.put("created", this.created);
+
         //add meta information
         JSONArray jsonArray = new JSONArray();
 
@@ -93,6 +101,8 @@ public class Session implements JSONSerializable, JSONLoadable {
     @Override
     public void loadFromJSON(JSONObject json) {
         //this.sessionID = json.getString("session-id");
+
+        this.created = json.getLong("created");
 
         JSONArray jsonArray = json.getJSONArray("meta");
 
