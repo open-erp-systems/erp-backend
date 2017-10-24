@@ -74,11 +74,11 @@ public class HzSessionManager implements ChangeableSessionManager {
         Cache<Long,String> cache = null;
 
         try {
-            cache = cacheManager.createCache("sessionCache", configuration);
+            cache = cacheManager.createCache("session-cache", configuration);
         } catch (Exception e) {
             e.printStackTrace();
 
-            cache = cacheManager.getCache("sessionCache");
+            cache = cacheManager.getCache("session-cache");
 
             //enable jcache management and statistics, so jcache is shown in hazelcast mancenter
             cache.getConfiguration(MutableConfiguration.class).setManagementEnabled(true);

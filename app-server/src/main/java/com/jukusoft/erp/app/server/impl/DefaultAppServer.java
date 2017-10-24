@@ -1,5 +1,6 @@
 package com.jukusoft.erp.app.server.impl;
 
+import com.hazelcast.config.CacheSimpleConfig;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -19,10 +20,13 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
+import javax.cache.expiry.AccessedExpiryPolicy;
+import javax.cache.expiry.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class DefaultAppServer implements AppServer {
 
@@ -56,6 +60,9 @@ public class DefaultAppServer implements AppServer {
 
         //disable hazelcast logging
         config.setProperty("hazelcast.logging.type", "none");
+
+        CacheSimpleConfig cacheConfig = new CacheSimpleConfig();
+        config.getCacheConfigs().put("session-cache", cacheConfig);
 
         this.hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 

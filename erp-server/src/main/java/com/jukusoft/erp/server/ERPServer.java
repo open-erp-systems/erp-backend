@@ -1,5 +1,6 @@
 package com.jukusoft.erp.server;
 
+import com.hazelcast.config.CacheSimpleConfig;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -68,6 +69,9 @@ public class ERPServer implements IServer {
 
         //disable hazelcast logging
         config.setProperty("hazelcast.logging.type", "none");
+
+        CacheSimpleConfig cacheConfig = new CacheSimpleConfig();
+        config.getCacheConfigs().put("session-cache", cacheConfig);
 
         this.hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 
