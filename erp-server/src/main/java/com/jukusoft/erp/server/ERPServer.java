@@ -152,7 +152,7 @@ public class ERPServer implements IServer {
                     logger.warn(messageID, "bad_request", "invalide json message: " + str);
 
                     //generate response string
-                    String str1 = ResponseGenerator.generateResponse("error", ResponseType.BAD_REQUEST);
+                    String str1 = ResponseGenerator.generateResponse("error", "", ResponseType.BAD_REQUEST);
 
                     //write to the response and end it
                     socket.write(str1);
@@ -165,7 +165,7 @@ public class ERPServer implements IServer {
                     logger.warn(messageID, "bad_request", "event doesnt exists in message: " + json.toString());
 
                     //generate response string
-                    String str1 = ResponseGenerator.generateResponse("error", ResponseType.BAD_REQUEST);
+                    String str1 = ResponseGenerator.generateResponse("error", "", ResponseType.BAD_REQUEST);
 
                     //write to the response and end it
                     socket.write(str1);
@@ -179,8 +179,14 @@ public class ERPServer implements IServer {
                 //get data
                 JSONObject data = json.getJSONObject("data");
 
-                //generate new session ID
-                String sessionID = SessionIDGenerator.generateSessionID();
+                String sessionID = "";
+
+                if (data.has("ssid")) {
+                    sessionID = data.getString("ssid");
+                } else {
+                    //generate new session ID
+                    sessionID = SessionIDGenerator.generateSessionID();
+                }
 
                 //create api request
                 ApiRequest req = new ApiRequest(event, data, messageID, sessionID);
@@ -192,7 +198,7 @@ public class ERPServer implements IServer {
                     @Override
                     public void handleResponse(ApiResponse res) {
                         //send response
-                        String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getStatusCode());
+                        String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getStatusCode());
 
                         //write to the response and end it
                         socket.write(str);
@@ -203,7 +209,7 @@ public class ERPServer implements IServer {
                     @Override
                     public void responseFailed() {
                         //generate response string
-                        String str = ResponseGenerator.generateResponse(event, ResponseType.SERVICE_UNAVAILABLE);
+                        String str = ResponseGenerator.generateResponse(event, req.getSessionID(), ResponseType.SERVICE_UNAVAILABLE);
 
                         //write to the response and end it
                         socket.write(str);
@@ -319,7 +325,7 @@ public class ERPServer implements IServer {
                 @Override
                 public void handleResponse(ApiResponse res) {
                     //send response
-                    String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getStatusCode());
+                    String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getStatusCode());
 
                     //write to the response and end it
                     response.end(str);
@@ -330,7 +336,7 @@ public class ERPServer implements IServer {
                 @Override
                 public void responseFailed() {
                     //generate response string
-                    String str = ResponseGenerator.generateResponse(eventName, ResponseType.SERVICE_UNAVAILABLE);
+                    String str = ResponseGenerator.generateResponse(eventName, req.getSessionID(), ResponseType.SERVICE_UNAVAILABLE);
 
                     //write to the response and end it
                     response.end(str);
