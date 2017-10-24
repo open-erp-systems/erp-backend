@@ -94,6 +94,10 @@ public class Session implements JSONSerializable, JSONLoadable {
         return this.isLoggedIn;
     }
 
+    public long getUserID () {
+        return this.userID;
+    }
+
     @Override
     public JSONObject toJSON() {
         //create new json object
@@ -104,6 +108,10 @@ public class Session implements JSONSerializable, JSONLoadable {
 
         //add created timestamp
         json.put("created", this.created);
+
+        //add user information
+        json.put("is-logged-in", this.isLoggedIn);
+        json.put("user-id", this.userID);
 
         //add meta information
         JSONArray jsonArray = new JSONArray();
@@ -126,6 +134,10 @@ public class Session implements JSONSerializable, JSONLoadable {
         this.created = json.getLong("created");
 
         JSONArray jsonArray = json.getJSONArray("meta");
+
+        //get user information
+        this.isLoggedIn = json.getBoolean("is-logged-in");
+        this.userID = json.getLong("user-id");
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject json1 = jsonArray.getJSONObject(i);

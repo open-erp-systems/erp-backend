@@ -19,6 +19,8 @@ public class ApiRequest {
     //meta information
     protected JSONObject meta = new JSONObject();
     protected String sessionID = "";
+    protected boolean isLoggedIn = false;
+    protected long userID = -1;
 
     /**
     * default constructor
@@ -26,11 +28,13 @@ public class ApiRequest {
      * @param event event name
      * @param data json data
     */
-    public ApiRequest (String event, JSONObject data, long messageID, String sessionID) {
+    public ApiRequest (String event, JSONObject data, long messageID, String sessionID, boolean isLoggedIn, long userID) {
         this.eventName = event;
         this.data = data;
         this.messageID = messageID;
         this.sessionID = sessionID;
+        this.isLoggedIn = isLoggedIn;
+        this.userID = userID;
     }
 
     protected ApiRequest () {

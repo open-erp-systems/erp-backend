@@ -214,7 +214,7 @@ public class ERPServer implements IServer {
                 sessionID = session.getSessionID();
 
                 //create api request
-                ApiRequest req = new ApiRequest(event, data, messageID, sessionID);
+                ApiRequest req = new ApiRequest(event, data, messageID, sessionID, session.isLoggedIn(), session.getUserID());
 
                 //log request
                 this.logger.debug(messageID, "new_tcp_request", req.toString());
@@ -377,7 +377,7 @@ public class ERPServer implements IServer {
             sessionID = session.getSessionID();
 
             //create api request
-            ApiRequest req = new ApiRequest(event, data, messageID, sessionID);
+            ApiRequest req = new ApiRequest(event, data, messageID, sessionID, session.isLoggedIn(), session.getUserID());
 
             //log request
             this.logger.debug(messageID, "new_http_request", req.toString());
