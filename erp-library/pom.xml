@@ -40,6 +40,13 @@
             <artifactId>hazelcast</artifactId>
             <version>${hazelcast.version}</version>
         </dependency>
+
+        <!-- bouncy castle for SSL self-signed certificate generation -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

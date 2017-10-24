@@ -30,6 +30,9 @@
 
         <apache.commons.lang.version>3.5</apache.commons.lang.version>
 
+        <!-- bouncycastle for SSL certificate generation -->
+        <bouncycastle.version>1.58</bouncycastle.version>
+
         <!-- Overwritten by the test configuration,otherwise the JaCoCo agent cannot be attached.Details see http://www.eclemma.org/jacoco/trunk/doc/prepare-agent-mojo.html -->
         <argLine>-Xms512m -Xmx1024m</argLine>
 
