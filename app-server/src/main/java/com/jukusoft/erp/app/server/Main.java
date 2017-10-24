@@ -2,7 +2,8 @@ package com.jukusoft.erp.app.server;
 
 import com.jukusoft.erp.app.server.impl.DefaultAppServer;
 import com.jukusoft.erp.core.module.TestModule;
-import com.jukusoft.erp.core.module.loginform.LoginFormModule;
+import com.jukusoft.erp.core.module.base.BaseModule;
+import com.jukusoft.erp.core.module.loginform.LoginFormService;
 
 public class Main {
 
@@ -15,7 +16,7 @@ public class Main {
             if (success) {
                 //add modules
                 server.deployModule(new TestModule(), TestModule.class);
-                server.deployModule(new LoginFormModule(), LoginFormModule.class);
+                server.deployModule(new BaseModule(), BaseModule.class);
             } else {
                 System.err.println("Couldnt start app server.");
 
