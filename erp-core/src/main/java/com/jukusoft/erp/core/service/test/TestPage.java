@@ -1,4 +1,4 @@
-package com.jukusoft.erp.core.module.test;
+package com.jukusoft.erp.core.service.test;
 
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;

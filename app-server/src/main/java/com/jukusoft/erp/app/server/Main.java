@@ -1,8 +1,7 @@
 package com.jukusoft.erp.app.server;
 
 import com.jukusoft.erp.app.server.impl.DefaultAppServer;
-import com.jukusoft.erp.core.module.TestModule;
-import io.vertx.core.Future;
+import com.jukusoft.erp.core.service.TestService;
 
 public class Main {
 
@@ -14,7 +13,7 @@ public class Main {
         server.start((AppServer server1, boolean success) -> {
             if (success) {
                 //add modules
-                server.deployModule(new TestModule(), TestModule.class);
+                server.deployModule(new TestService(), TestService.class);
             } else {
                 System.err.println("Couldnt start app server.");
 

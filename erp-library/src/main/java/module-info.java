@@ -7,7 +7,7 @@ module erp.library {
     requires bcprov.jdk15on;
     requires cache.api;
 
-    exports com.jukusoft.erp.lib.module;
+    exports com.jukusoft.erp.lib.service;
     exports com.jukusoft.erp.lib.gateway;
     exports com.jukusoft.erp.lib.message.request;
     exports com.jukusoft.erp.lib.message.response;

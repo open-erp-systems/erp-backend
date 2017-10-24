@@ -1,7 +1,6 @@
 package com.jukusoft.erp.app.server;
 
-import com.jukusoft.erp.lib.module.IModule;
-import io.vertx.core.Future;
+import com.jukusoft.erp.lib.service.IService;
 
 public interface AppServer {
 
@@ -16,14 +15,14 @@ public interface AppServer {
      * @param module instance of module
      * @param cls class name of module
     */
-    public <T extends IModule> void deployModule (T module, Class<T> cls);
+    public <T extends IService> void deployModule (T module, Class<T> cls);
 
     /**
      * stop and remove module
      *
      * @param cls class name of module
      */
-    public <T extends IModule> void undeployModule (Class<T> cls);
+    public <T extends IService> void undeployModule (Class<T> cls);
 
     /**
     * shutdown microservice application server

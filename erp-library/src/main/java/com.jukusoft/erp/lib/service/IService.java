@@ -1,4 +1,4 @@
-package com.jukusoft.erp.lib.module;
+package com.jukusoft.erp.lib.service;
 
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.logging.ILogging;
@@ -7,7 +7,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 
-public interface IModule {
+public interface IService {
 
     /**
      * get a reference to the Vert.x instance that deployed this verticle
@@ -36,7 +36,7 @@ public interface IModule {
     /**
     * start module
     */
-    public void start (Handler<Future<IModule>> handler) throws Exception;
+    public void start (Handler<Future<IService>> handler) throws Exception;
 
     /**
     * stop module

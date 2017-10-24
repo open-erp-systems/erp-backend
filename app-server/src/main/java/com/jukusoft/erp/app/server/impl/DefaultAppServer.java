@@ -12,8 +12,7 @@ import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.request.ApiRequestCodec;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.message.response.ApiResponseCodec;
-import com.jukusoft.erp.lib.module.IModule;
-import io.vertx.core.Future;
+import com.jukusoft.erp.lib.service.IService;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
@@ -43,8 +42,8 @@ public class DefaultAppServer implements AppServer {
     protected ILogging logger = null;
 
     //list & map with deployed modules
-    protected List<IModule> deployedModules = new ArrayList<>();
-    protected Map<Class<?>,IModule> moduleMap = new HashMap<>();
+    protected List<IService> deployedModules = new ArrayList<>();
+    protected Map<Class<?>,IService> moduleMap = new HashMap<>();
 
     protected EventBus eventBus = null;
 
@@ -105,7 +104,7 @@ public class DefaultAppServer implements AppServer {
     }
 
     @Override
-    public <T extends IModule> void deployModule(final T module, final Class<T> cls) {
+    public <T extends IService> void deployModule(final T module, final Class<T> cls) {
         if (module == null) {
             throw new NullPointerException("module cannot be null.");
         }
@@ -145,14 +144,14 @@ public class DefaultAppServer implements AppServer {
     }
 
     @Override
-    public <T extends IModule> void undeployModule(Class<T> cls) {
+    public <T extends IService> void undeployModule(Class<T> cls) {
         //check, if module exists
         if (!this.moduleMap.containsKey(cls)) {
             return;
         }
 
         //get module
-        IModule module = this.moduleMap.get(cls);
+        IService module = this.moduleMap.get(cls);
 
         //remove module from list and map
         this.deployedModules.remove(module);
