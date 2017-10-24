@@ -307,6 +307,22 @@ public class ERPServer implements IServer {
 
             String sessionID = "";
 
+            //parse GET attributes
+            String[] array1 = request.absoluteURI().split("\\?");
+
+            if (array1.length > 1) {
+                //request has get attributes
+
+                for (String str : array1[1].split("&")) {
+                    String[] array2 = str.split("=");
+                    String key = array2[0];
+                    String value = array2[1];
+
+                    //TODO: find a better solution
+                    request.formAttributes().add(key, value);
+                }
+            }
+
             //check, if session ID exists
             if (request.formAttributes().contains("ssid")) {
                 sessionID = request.formAttributes().get("ssid");
