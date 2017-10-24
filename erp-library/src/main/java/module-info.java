@@ -12,5 +12,7 @@ module erp.library {
     exports com.jukusoft.erp.lib.message.response;
     exports com.jukusoft.erp.lib.logging;
     exports com.jukusoft.erp.lib.route;
+    exports com.jukusoft.erp.lib.annotation;
+    exports com.jukusoft.erp.lib.session;
 
 }

@@ -11,6 +11,7 @@ import com.jukusoft.erp.lib.logging.ILogging;
 import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
+import com.jukusoft.erp.lib.session.SessionIDGenerator;
 import com.jukusoft.erp.server.gateway.DefaultApiGateway;
 import com.jukusoft.erp.lib.logger.HzLogger;
 import com.jukusoft.erp.server.message.ResponseGenerator;
@@ -178,8 +179,11 @@ public class ERPServer implements IServer {
                 //get data
                 JSONObject data = json.getJSONObject("data");
 
+                //generate new session ID
+                String sessionID = SessionIDGenerator.generateSessionID();
+
                 //create api request
-                ApiRequest req = new ApiRequest(event, data, messageID);
+                ApiRequest req = new ApiRequest(event, data, messageID, sessionID);
 
                 //log request
                 this.logger.debug(messageID, "new_tcp_request", req.toString());
@@ -282,8 +286,11 @@ public class ERPServer implements IServer {
             //generate cluster-wide unique message id
             final long messageID = generateMessageID();
 
+            //generate new session ID
+            String sessionID = SessionIDGenerator.generateSessionID();
+
             //create api request
-            ApiRequest req = new ApiRequest(event, data, messageID);
+            ApiRequest req = new ApiRequest(event, data, messageID, sessionID);
 
             //log request
             this.logger.debug(messageID, "new_http_request", req.toString());

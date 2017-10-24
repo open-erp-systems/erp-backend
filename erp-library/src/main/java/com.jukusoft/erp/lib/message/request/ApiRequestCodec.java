@@ -16,6 +16,8 @@ public class ApiRequestCodec implements MessageCodec<ApiRequest, ApiRequest> {
         json.put("data", req.data);
         json.put("ackID", req.ackID);
         json.put("cluster-message-id", req.getMessageID());
+        json.put("meta", req.meta);
+        json.put("session-id", req.sessionID);
 
         //encode json object to string
         String jsonToStr = json.toString();
@@ -47,6 +49,8 @@ public class ApiRequestCodec implements MessageCodec<ApiRequest, ApiRequest> {
         req.data = json.getJSONObject("data");
         req.ackID = json.getString("ackID");
         req.messageID = json.getLong("cluster-message-id");
+        req.meta = json.getJSONObject("meta");
+        req.sessionID = json.getString("session-id");
 
         return req;
     }

@@ -16,16 +16,21 @@ public class ApiRequest {
     //cluster wide unique message id for logging
     protected long messageID = 0;
 
+    //meta information
+    protected JSONObject meta = new JSONObject();
+    protected String sessionID = "";
+
     /**
     * default constructor
      *
      * @param event event name
      * @param data json data
     */
-    public ApiRequest (String event, JSONObject data, long messageID) {
+    public ApiRequest (String event, JSONObject data, long messageID, String sessionID) {
         this.eventName = event;
         this.data = data;
         this.messageID = messageID;
+        this.sessionID = sessionID;
     }
 
     protected ApiRequest () {
@@ -42,6 +47,10 @@ public class ApiRequest {
 
     public long getMessageID () {
         return this.messageID;
+    }
+
+    public JSONObject getMetaInformation () {
+        return this.meta;
     }
 
     @Override
