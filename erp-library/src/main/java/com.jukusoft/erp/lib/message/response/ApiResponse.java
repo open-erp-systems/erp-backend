@@ -20,6 +20,12 @@ public class ApiResponse {
     //meta information
     protected String sessionID = "";
 
+    public enum RESPONSE_TYPE {
+        JSON, RAW
+    }
+
+    protected RESPONSE_TYPE type = RESPONSE_TYPE.JSON;
+
     public ApiResponse (long messageID, String sessionID, String eventName) {
         this.messageID = messageID;
         this.sessionID = sessionID;
@@ -48,6 +54,27 @@ public class ApiResponse {
 
     public String getSessionID () {
         return this.sessionID;
+    }
+
+    public RESPONSE_TYPE getType() {
+        return this.type;
+    }
+
+    public void setType (RESPONSE_TYPE type) {
+        this.type = type;
+    }
+
+    public static RESPONSE_TYPE getTypeByString (String str) {
+        switch (str.toLowerCase()) {
+            case "json":
+                return RESPONSE_TYPE.JSON;
+
+            case "raw":
+                return RESPONSE_TYPE.RAW;
+
+            default:
+                throw new IllegalArgumentException("Unknown type: " + str);
+        }
     }
 
     @Override

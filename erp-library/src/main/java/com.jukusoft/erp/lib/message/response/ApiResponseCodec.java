@@ -23,6 +23,7 @@ public class ApiResponseCodec implements MessageCodec<ApiResponse, ApiResponse> 
         json.put("statusCode", res.getStatusCode());
         json.put("cluster-message-id", res.getMessageID());
         json.put("session-id", res.getSessionID());
+        json.put("type", res.getType());
 
         //encode json object to string
         String jsonToStr = json.toString();
@@ -55,6 +56,7 @@ public class ApiResponseCodec implements MessageCodec<ApiResponse, ApiResponse> 
         res.ackID = json.getString("ackID");
         res.statusCode = ResponseType.getByString(json.getString("statusCode"));
         res.messageID = json.getLong("cluster-message-id");
+        res.type = ApiResponse.getTypeByString(json.getString("type"));
 
         return res;
     }
