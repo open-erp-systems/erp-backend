@@ -6,6 +6,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IdGenerator;
 import com.jukusoft.erp.lib.gateway.ApiGateway;
 import com.jukusoft.erp.lib.gateway.ResponseHandler;
+import com.jukusoft.erp.lib.keystore.KeyStoreGenerator;
 import com.jukusoft.erp.lib.logging.ILogging;
 import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
@@ -19,13 +20,19 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.net.JksOptions;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.Map;
 
 public class ERPServer implements IServer {
@@ -221,6 +228,29 @@ public class ERPServer implements IServer {
     public void startHTTPServer (int port) {
         HttpServerOptions options = new HttpServerOptions();
         options.setPort(port);
+
+        //use application layer protocol negotiation (only HTTP/2!)
+        //https://de.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation
+        //options.setUseAlpn(true);
+
+        String certPassword = "test";
+        String certPath = ".keystore.jks";
+
+        //check if certificate exists
+        if (!new File(certPath).exists()) {
+            //generate new certificate
+            try {
+                logger.warn("ssl_encryption", "no key store exists, generate an new one.");
+                KeyStoreGenerator.generateJKSKeyStore(certPath, certPassword, 1024);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
+
+        //use SSL encryption
+        //options.setKeyCertOptions(new JksOptions().setPath(certPath).setPassword(certPath));
+        //options.setSsl(true);
 
         //create new http server
         HttpServer server = vertx.createHttpServer(options);

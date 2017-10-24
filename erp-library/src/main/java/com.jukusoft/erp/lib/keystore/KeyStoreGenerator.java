@@ -15,6 +15,10 @@ import java.util.Calendar;
 
 public class KeyStoreGenerator {
 
+    static {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    }
+
     /**
     * generate an X.509 RSA256WithRSA certificate for SSL
      *
@@ -22,7 +26,7 @@ public class KeyStoreGenerator {
      * @param password password for key store
      * @param keySize number of bits, by default 1024
     */
-    public static void generateJKSKeyStore (String savePath, String password, int keySize) throws NoSuchAlgorithmException, KeyStoreException, IOException, CertificateException {
+    public static void generateJKSKeyStore (String savePath, String password, int keySize) throws NoSuchAlgorithmException, KeyStoreException, IOException, CertificateException, InvalidKeyException, NoSuchProviderException, SignatureException {
         //create a key store of type "Java Key Store"
         KeyStore store = KeyStore.getInstance("JKS");
 
@@ -30,7 +34,7 @@ public class KeyStoreGenerator {
         store.load(null, null);
 
         //generate an key pair
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("SHA256WithRSA");
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(/*"SHA256WithRSAEncryption"*/"RSA");
         keyPairGenerator.initialize(keySize);
         KeyPair kPair = keyPairGenerator.generateKeyPair();
 
@@ -51,13 +55,14 @@ public class KeyStoreGenerator {
         store.store(new FileOutputStream(".keystore"), "changeit".toCharArray());*/
 
         X509Certificate[] chain = new X509Certificate[1];
+        chain[0] = generateCertificate(kPair);
 
         //store key
         store.setKeyEntry("selfsigned", privKey, password.toCharArray(), chain);
         store.store(new FileOutputStream(savePath), password.toCharArray());
     }
 
-    public X509Certificate generateCertificate(KeyPair keyPair) throws NoSuchAlgorithmException, CertificateEncodingException, NoSuchProviderException, InvalidKeyException, SignatureException {
+    public static X509Certificate generateCertificate(KeyPair keyPair) throws NoSuchAlgorithmException, CertificateEncodingException, NoSuchProviderException, InvalidKeyException, SignatureException {
         final Calendar calendar = Calendar.getInstance();
 
         X509V3CertificateGenerator cert = new X509V3CertificateGenerator();
