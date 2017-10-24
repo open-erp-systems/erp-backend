@@ -21,7 +21,7 @@ public class ApiResponse {
     protected String sessionID = "";
 
     public enum RESPONSE_TYPE {
-        JSON, RAW
+        JSON, CONTENT
     }
 
     protected RESPONSE_TYPE type = RESPONSE_TYPE.JSON;
@@ -70,7 +70,7 @@ public class ApiResponse {
                 return RESPONSE_TYPE.JSON;
 
             case "raw":
-                return RESPONSE_TYPE.RAW;
+                return RESPONSE_TYPE.CONTENT;
 
             default:
                 throw new IllegalArgumentException("Unknown type: " + str);

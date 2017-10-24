@@ -222,13 +222,17 @@ public class ERPServer implements IServer {
                 this.gateway.handleRequestAsync(req, new ResponseHandler() {
                     @Override
                     public void handleResponse(ApiResponse res) {
-                        //send response
-                        String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getStatusCode());
+                        if (res.getType() == ApiResponse.RESPONSE_TYPE.JSON) {
+                            //send response
+                            String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getStatusCode());
 
-                        //write to the response and end it
-                        socket.write(str);
+                            //write to the response and end it
+                            socket.write(str);
 
-                        logger.debug(messageID, "request_succedded", res.toString());
+                            logger.debug(messageID, "request_succedded", res.toString());
+                        } else {
+                            socket.write(res.getData().getString("content"));
+                        }
                     }
 
                     @Override
@@ -385,13 +389,17 @@ public class ERPServer implements IServer {
             this.gateway.handleRequestAsync(req, new ResponseHandler() {
                 @Override
                 public void handleResponse(ApiResponse res) {
-                    //send response
-                    String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getStatusCode());
+                    if (res.getType() == ApiResponse.RESPONSE_TYPE.JSON) {
+                        //send response
+                        String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getStatusCode());
 
-                    //write to the response and end it
-                    response.end(str);
+                        //write to the response and end it
+                        response.end(str);
 
-                    logger.debug(messageID, "request_succedded", res.toString());
+                        logger.debug(messageID, "request_succedded", res.toString());
+                    } else {
+                        response.end(res.getData().getString("content"));
+                    }
                 }
 
                 @Override
