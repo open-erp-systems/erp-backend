@@ -27,3 +27,15 @@ Short Mindmap:
       * Cassandra Support is planned
   - Caching
       * [Hazelcast](http://hazelcast.org) (Open Source - free)
+      
+## Why use OS ERP system?
+
+  - its free & open source!
+  - you can customize it!
+  - its very fast!
+  - this erp system uses newest technologies
+      * Java 9
+      * Microservices architecture
+      * service-orientated architecture (SOA)
+  - this erp system can scale out and so balance with your needs of performance
+  - active development
