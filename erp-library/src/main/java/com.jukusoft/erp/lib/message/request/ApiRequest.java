@@ -53,6 +53,10 @@ public class ApiRequest {
         return this.meta;
     }
 
+    public String getSessionID () {
+        return this.sessionID;
+    }
+
     @Override
     public String toString () {
         return "api request (event: " + eventName + ", messageID: " + messageID + ", data: " + this.data.toString() + ")";

@@ -17,7 +17,7 @@ public class TestPage {
     @Route(routes = {"/metrics", "/metrics/"})
     public void metrics (Message<ApiRequest> event, ApiRequest req) {
         //send new api answer
-        ApiResponse res = new ApiResponse(req.getMessageID(), req.getEvent());
+        ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
 
         res.getData().put("content", "Metrics");
 

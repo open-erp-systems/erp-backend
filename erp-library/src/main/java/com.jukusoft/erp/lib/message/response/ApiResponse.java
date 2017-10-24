@@ -17,8 +17,12 @@ public class ApiResponse {
 
     protected long messageID = 0;
 
-    public ApiResponse (long messageID, String eventName) {
+    //meta information
+    protected String sessionID = "";
+
+    public ApiResponse (long messageID, String sessionID, String eventName) {
         this.messageID = messageID;
+        this.sessionID = sessionID;
         this.eventName = eventName;
     }
 
@@ -40,6 +44,10 @@ public class ApiResponse {
 
     public long getMessageID () {
         return this.messageID;
+    }
+
+    public String getSessionID () {
+        return this.sessionID;
     }
 
     @Override
