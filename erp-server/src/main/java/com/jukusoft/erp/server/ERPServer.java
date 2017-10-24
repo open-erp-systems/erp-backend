@@ -211,6 +211,8 @@ public class ERPServer implements IServer {
                     }
                 }
 
+                sessionID = session.getSessionID();
+
                 //create api request
                 ApiRequest req = new ApiRequest(event, data, messageID, sessionID);
 
@@ -371,6 +373,8 @@ public class ERPServer implements IServer {
                     throw new IllegalStateException("cannot find session ID: " + sessionID);
                 }
             }
+
+            sessionID = session.getSessionID();
 
             //create api request
             ApiRequest req = new ApiRequest(event, data, messageID, sessionID);
