@@ -5,6 +5,7 @@ module erp.library {
 
     //bouncy castle, for SSL self-signed certificate generation
     requires bcprov.jdk15on;
+    requires cache.api;
 
     exports com.jukusoft.erp.lib.module;
     exports com.jukusoft.erp.lib.gateway;

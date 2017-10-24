@@ -1,5 +1,7 @@
 package com.jukusoft.erp.lib.session;
 
+import com.jukusoft.erp.lib.session.impl.Session;
+
 public interface SessionManager {
 
     /**

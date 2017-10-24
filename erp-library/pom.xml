@@ -47,6 +47,13 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <version>${bouncycastle.version}</version>
         </dependency>
+
+        <!-- JCache -->
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>${jcache.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

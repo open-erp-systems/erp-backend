@@ -1,7 +1,9 @@
-package com.jukusoft.erp.lib.session;
+package com.jukusoft.erp.lib.session.impl;
 
 import com.jukusoft.erp.lib.json.JSONLoadable;
 import com.jukusoft.erp.lib.json.JSONSerializable;
+import com.jukusoft.erp.lib.session.ChangeableSessionManager;
+import com.jukusoft.erp.lib.session.SessionManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,6 +20,8 @@ public class Session implements JSONSerializable, JSONLoadable {
 
     //created unix timestamp
     protected long created = 0;
+
+    private ChangeableSessionManager sessionManager = null;
 
     /**
     * default constructor
@@ -73,6 +77,13 @@ public class Session implements JSONSerializable, JSONLoadable {
         return this.attributes.containsKey(key);
     }
 
+    /**
+    * writes session attributes to cache
+    */
+    public void flush () {
+        this.sessionManager.putSession(this.sessionID, this);
+    }
+
     @Override
     public JSONObject toJSON() {
         //create new json object
@@ -114,12 +125,14 @@ public class Session implements JSONSerializable, JSONLoadable {
         }
     }
 
-    public static Session createFromJSON (JSONObject json) {
+    public static Session createFromJSON (JSONObject json, ChangeableSessionManager sessionManager) {
         //create new session with session id
         Session session = new Session(json.getString("session-id"));
 
         //load meta information
         session.loadFromJSON(json);
+
+        session.sessionManager = sessionManager;
 
         return session;
     }
