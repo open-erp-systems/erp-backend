@@ -1,4 +1,4 @@
-package com.jukusoft.erp.lib.service;
+package com.jukusoft.erp.lib.module;
 
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.logging.ILogging;
@@ -14,7 +14,7 @@ import io.vertx.core.eventbus.Message;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public abstract class AbstractService implements IService {
+public abstract class AbstractModule implements IModule {
 
     //instance of vertx
     protected Vertx vertx = null;
@@ -138,7 +138,7 @@ public abstract class AbstractService implements IService {
     }
 
     @Override
-    public void start(Handler<Future<IService>> handler) throws Exception {
+    public void start(Handler<Future<IModule>> handler) throws Exception {
         if (handler == null) {
             throw new NullPointerException("start future cannot be null.");
         }
@@ -151,7 +151,7 @@ public abstract class AbstractService implements IService {
         }
 
         handler.handle(Future.succeededFuture(this));
-        //startFuture.complete(AbstractService.this);
+        //startFuture.complete(AbstractModule.this);
     }
 
     @Override
