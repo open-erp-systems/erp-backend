@@ -4,8 +4,6 @@ import com.hazelcast.cache.HazelcastCachingProvider;
 import com.hazelcast.cache.ICache;
 import com.hazelcast.core.HazelcastInstance;
 import com.jukusoft.erp.lib.session.ChangeableSessionManager;
-import com.jukusoft.erp.lib.session.SessionIDGenerator;
-import com.jukusoft.erp.lib.session.SessionManager;
 import org.json.JSONObject;
 
 import javax.cache.Cache;

@@ -23,6 +23,12 @@ public class Session implements JSONSerializable, JSONLoadable {
 
     private ChangeableSessionManager sessionManager = null;
 
+    //flag, if user is logged in
+    protected boolean isLoggedIn = false;
+
+    //userID of -1, if user isnt logged in
+    protected long userID = -1;
+
     /**
     * default constructor
      *
@@ -82,6 +88,10 @@ public class Session implements JSONSerializable, JSONLoadable {
     */
     public void flush () {
         this.sessionManager.putSession(this.sessionID, this);
+    }
+
+    public boolean isLoggedIn () {
+        return this.isLoggedIn;
     }
 
     @Override

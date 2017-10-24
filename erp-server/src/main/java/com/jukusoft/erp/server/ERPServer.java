@@ -11,7 +11,10 @@ import com.jukusoft.erp.lib.logging.ILogging;
 import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
-import com.jukusoft.erp.lib.session.SessionIDGenerator;
+import com.jukusoft.erp.lib.session.SessionManager;
+import com.jukusoft.erp.lib.session.impl.HzSessionManager;
+import com.jukusoft.erp.lib.session.impl.Session;
+import com.jukusoft.erp.lib.session.impl.SessionIDGenerator;
 import com.jukusoft.erp.server.gateway.DefaultApiGateway;
 import com.jukusoft.erp.lib.logger.HzLogger;
 import com.jukusoft.erp.server.message.ResponseGenerator;
@@ -21,7 +24,6 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.core.net.JksOptions;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.spi.cluster.ClusterManager;
@@ -29,11 +31,7 @@ import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.Map;
 
 public class ERPServer implements IServer {
@@ -61,6 +59,9 @@ public class ERPServer implements IServer {
     //hazelcast ID generator for cluster-wide unique IDs
     protected IdGenerator idGenerator = null;
 
+    //instance of session manager
+    protected SessionManager sessionManager = null;
+
     public void start() {
         //create an new hazelcast instance
         Config config = new Config();
@@ -69,6 +70,9 @@ public class ERPServer implements IServer {
         config.setProperty("hazelcast.logging.type", "none");
 
         this.hazelcastInstance = Hazelcast.newHazelcastInstance(config);
+
+        //create new session manager
+        this.sessionManager = SessionManager.createHzSessionManager(hazelcastInstance);//new HzSessionManager(this.hazelcastInstance);
 
         //http://vertx.io/docs/vertx-hazelcast/java/
 
@@ -183,9 +187,28 @@ public class ERPServer implements IServer {
 
                 if (data.has("ssid")) {
                     sessionID = data.getString("ssid");
+                }
+
+                Session session = null;
+
+                if (sessionID.isEmpty()) {
+                    //create new session
+                    session = this.sessionManager.generateNewSession();
                 } else {
-                    //generate new session ID
-                    sessionID = SessionIDGenerator.generateSessionID();
+                    //get session by session manager
+                    session = this.sessionManager.getSession(sessionID);
+
+                    if (session == null) {
+                        //generate response string
+                        String str1 = ResponseGenerator.generateResponse(event, sessionID, ResponseType.BAD_REQUEST);
+
+                        //write to the response and end it
+                        socket.write(str1);
+
+                        logger.warn(messageID, "wrong_session_id", "Couldnt find session ID: " + sessionID + " (IP: " + socket.remoteAddress().host() + ":"  + socket.remoteAddress().port() + ").");
+
+                        throw new IllegalStateException("cannot find session ID: " + sessionID);
+                    }
                 }
 
                 //create api request
@@ -326,9 +349,27 @@ public class ERPServer implements IServer {
             //check, if session ID exists
             if (request.formAttributes().contains("ssid")) {
                 sessionID = request.formAttributes().get("ssid");
+            }
+
+            Session session = null;
+
+            if (sessionID.isEmpty()) {
+                //generate new session
+                session = this.sessionManager.generateNewSession();
             } else {
-                //generate new session ID
-                sessionID = SessionIDGenerator.generateSessionID();
+                session = this.sessionManager.getSession(sessionID);
+
+                if (session == null) {
+                    //generate response string
+                    String str1 = ResponseGenerator.generateResponse(event, sessionID, ResponseType.BAD_REQUEST);
+
+                    //write to the response and end it
+                    response.end(str1);
+
+                    logger.warn(messageID, "wrong_session_id", "Couldnt find session ID: " + sessionID + " (IP: " + request.remoteAddress().host() + ":"  + request.remoteAddress().port() + ").");
+
+                    throw new IllegalStateException("cannot find session ID: " + sessionID);
+                }
             }
 
             //create api request
