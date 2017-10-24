@@ -113,4 +113,15 @@ public class Session implements JSONSerializable, JSONLoadable {
             String value = json1.getString("value");
         }
     }
+
+    public static Session createFromJSON (JSONObject json) {
+        //create new session with session id
+        Session session = new Session(json.getString("session-id"));
+
+        //load meta information
+        session.loadFromJSON(json);
+
+        return session;
+    }
+
 }
