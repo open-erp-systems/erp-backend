@@ -1,7 +1,9 @@
 package com.jukusoft.erp.lib.module;
 
+import com.jukusoft.erp.lib.annotation.LoginRequired;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.logging.ILogging;
+import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
@@ -99,6 +101,22 @@ public abstract class AbstractModule implements IModule {
 
                 //get message
                 ApiRequest req = event.body();
+
+                //check, if login is required
+                if (method.isAnnotationPresent(LoginRequired.class)) {
+                    //check, if user is logged in
+                    if (!req.isLoggedIn()) {
+                        ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
+
+                        //set forbidden status code
+                        res.setStatusCode(ResponseType.FORBIDDEN);
+
+                        //reply to api request
+                        event.reply(res);
+
+                        return;
+                    }
+                }
 
                 if (method.getReturnType() == ApiResponse.class) {
                     //create new api answer

@@ -61,6 +61,14 @@ public class ApiRequest {
         return this.sessionID;
     }
 
+    public boolean isLoggedIn () {
+        return this.isLoggedIn;
+    }
+
+    public long getUserID () {
+        return this.userID;
+    }
+
     @Override
     public String toString () {
         return "api request (event: " + eventName + ", messageID: " + messageID + ", data: " + this.data.toString() + ")";

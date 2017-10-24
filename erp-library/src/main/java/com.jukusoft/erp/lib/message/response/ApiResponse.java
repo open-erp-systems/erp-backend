@@ -48,6 +48,10 @@ public class ApiResponse {
         return this.statusCode;
     }
 
+    public void setStatusCode (ResponseType type) {
+        this.statusCode = type;
+    }
+
     public long getMessageID () {
         return this.messageID;
     }

@@ -8,6 +8,8 @@ public enum ResponseType {
 
     BAD_REQUEST(400),
 
+    FORBIDDEN(403),
+
     WRONG_PERMISSIONS(403),
 
     SERVICE_UNAVAILABLE(503),
@@ -36,6 +38,10 @@ public enum ResponseType {
             case "BAD_REQUEST":
 
                 return BAD_REQUEST;
+
+            case "FORBIDDEN":
+
+                return FORBIDDEN;
 
             case "WRONG_PERMISSIONS":
 
