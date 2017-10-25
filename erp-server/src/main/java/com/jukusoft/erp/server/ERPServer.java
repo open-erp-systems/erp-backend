@@ -301,6 +301,8 @@ public class ERPServer implements IServer {
         HttpServer server = vertx.createHttpServer(options);
 
         server.requestHandler(request -> {
+            request.setExpectMultipart(true);
+
             // This handler gets called for each request that arrives on the server
             HttpServerResponse response = request.response();
 
@@ -331,11 +333,6 @@ public class ERPServer implements IServer {
                 }
             }
 
-            //converts all form attributes to json object
-            for (Map.Entry<String,String> entry : request.formAttributes().entries()) {
-                data.put(entry.getKey(), entry.getValue());
-            }
-
             final String eventName = event;
 
             //generate cluster-wide unique message id
@@ -357,6 +354,28 @@ public class ERPServer implements IServer {
                     //TODO: find a better solution
                     request.formAttributes().add(key, value);
                 }
+            }
+
+            for (String key : request.formAttributes().names()) {
+                logger.debug(messageID, "form_attr_found", key);
+            }
+
+            //converts all form attributes to json object
+            for (Map.Entry<String,String> entry : request.formAttributes().entries()) {
+                String value = entry.getValue();
+
+                if (entry.getKey().contains("password")) {
+                    int length = value.length();
+                    value = "";
+
+                    for (int i = 0; i < length; i++) {
+                        value += "*";
+                    }
+                }
+
+                logger.debug(messageID, "form_attribute_found", "form attribute '" + entry.getKey() + "': " + value);
+
+                data.put(entry.getKey(), entry.getValue());
             }
 
             //check, if session ID exists
