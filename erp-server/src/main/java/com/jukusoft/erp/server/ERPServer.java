@@ -13,9 +13,7 @@ import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.session.SessionManager;
-import com.jukusoft.erp.lib.session.impl.HzSessionManager;
 import com.jukusoft.erp.lib.session.impl.Session;
-import com.jukusoft.erp.lib.session.impl.SessionIDGenerator;
 import com.jukusoft.erp.server.gateway.DefaultApiGateway;
 import com.jukusoft.erp.lib.logger.HzLogger;
 import com.jukusoft.erp.server.message.ResponseGenerator;
@@ -76,7 +74,7 @@ public class ERPServer implements IServer {
         this.hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 
         //create new session manager
-        this.sessionManager = SessionManager.createHzSessionManager(hazelcastInstance);//new HzSessionManager(this.hazelcastInstance);
+        this.sessionManager = SessionManager.createHzSessionManager(hazelcastInstance);//new HzJCacheSessionManager(this.hazelcastInstance);
 
         //http://vertx.io/docs/vertx-hazelcast/java/
 

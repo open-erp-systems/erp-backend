@@ -18,12 +18,12 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-public class HzSessionManager implements ChangeableSessionManager {
+public class HzJCacheSessionManager implements ChangeableSessionManager {
 
     //session cache
     private ICache<String,String> sessionCache = null;
 
-    public HzSessionManager (HazelcastInstance hazelcastInstance) {
+    public HzJCacheSessionManager(HazelcastInstance hazelcastInstance) {
         //initialize cache
         this.initCache(hazelcastInstance);
     }

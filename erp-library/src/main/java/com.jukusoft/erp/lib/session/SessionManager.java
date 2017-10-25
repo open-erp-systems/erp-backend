@@ -1,7 +1,7 @@
 package com.jukusoft.erp.lib.session;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.jukusoft.erp.lib.session.impl.HzSessionManager;
+import com.jukusoft.erp.lib.session.impl.HzJCacheSessionManager;
 import com.jukusoft.erp.lib.session.impl.Session;
 
 public interface SessionManager {
@@ -28,7 +28,7 @@ public interface SessionManager {
     public Session generateNewSession ();
 
     public static SessionManager createHzSessionManager (HazelcastInstance hazelcastInstance) {
-        return new HzSessionManager(hazelcastInstance);
+        return new HzJCacheSessionManager(hazelcastInstance);
     }
 
 }
