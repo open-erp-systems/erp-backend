@@ -401,6 +401,8 @@ public class ERPServer implements IServer {
                         logger.debug(messageID, "request_succedded", res.toString());
                     } else {
                         response.end(res.getData().getString("content"));
+
+                        logger.debug(messageID, "request_succedded", res.getData().getString("content"));
                     }
                 }
 

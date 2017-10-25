@@ -73,7 +73,7 @@ public class ApiResponse {
             case "json":
                 return RESPONSE_TYPE.JSON;
 
-            case "raw":
+            case "content":
                 return RESPONSE_TYPE.CONTENT;
 
             default:
