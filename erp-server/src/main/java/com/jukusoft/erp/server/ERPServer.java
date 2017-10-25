@@ -299,7 +299,6 @@ public class ERPServer implements IServer {
         server.requestHandler(request -> {
             // This handler gets called for each request that arrives on the server
             HttpServerResponse response = request.response();
-            response.putHeader("content-type", "application/json");
 
             //do not allow proxies to cache the data
             response.putHeader("Cache-Control", "no-store, no-cache");
@@ -395,11 +394,15 @@ public class ERPServer implements IServer {
                         //send response
                         String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getStatusCode());
 
+                        response.putHeader("content-type", "application/json");
+
                         //write to the response and end it
                         response.end(str);
 
                         logger.debug(messageID, "request_succedded", res.toString());
                     } else {
+                        response.putHeader("content-type", "text/html; charset=utf-8");
+
                         response.end(res.getData().getString("content"));
 
                         logger.debug(messageID, "request_succedded", res.getData().getString("content"));
