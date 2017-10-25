@@ -67,6 +67,11 @@ public abstract class AbstractModule implements IModule {
     }
 
     protected <T extends IService> void addApi (T page) {
+        getLogger().debug("init_service", "Initialize service '" + page.getClass().getSimpleName() + "'.");
+
+        //initialize service
+        page.init(getVertx(), this.context, getLogger());
+
         getLogger().debug("search_api_routes", "search for new routes in class " + page.getClass().getSimpleName());
 
         //get class of object
@@ -93,7 +98,7 @@ public abstract class AbstractModule implements IModule {
         }
     }
 
-    private <T> void registerHandler (String event, T page, Method method) {
+    private <T extends IService> void registerHandler (String event, T page, Method method) {
         //register handler
         getEventBus().consumer(event, new Handler<Message<ApiRequest>>() {
             @Override
@@ -140,13 +145,23 @@ public abstract class AbstractModule implements IModule {
                         event.fail(500, e.getLocalizedMessage());
 
                         return;
+                    } catch (Exception e) {
+                        getLogger().warn(req.getMessageID(), "handler_exception", "Exception in " + page.getClass().getSimpleName() + "::" + method.getName() + ": " + e.getLocalizedMessage());
+
+                        e.printStackTrace();
+
+                        event.fail(500, e.getLocalizedMessage());
                     }
                 } else {
                     //create new api answer
                     ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
 
                     try {
-                        method.invoke(page, event, req, res);
+                        if (method.getParameterCount() > 2) {
+                            method.invoke(page, event, req, res);
+                        } else {
+                            method.invoke(page, event, req);
+                        }
 
                         getLogger().debug(req.getMessageID(), "reply_message", "reply to message: " + res);
 
@@ -158,6 +173,10 @@ public abstract class AbstractModule implements IModule {
                     } catch (InvocationTargetException e) {
                         e.printStackTrace();
                         event.fail(500, e.getLocalizedMessage());
+                    } catch (Exception e) {
+                        getLogger().warn(req.getMessageID(), "handler_exception", "Exception in " + page.getClass().getSimpleName() + "::" + method.getName() + ": " + e.getLocalizedMessage());
+
+                        e.printStackTrace();
                     }
                 }
             }

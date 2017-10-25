@@ -32,6 +32,10 @@ public class AbstractService implements IService {
 
     @Override
     public ILogging getLogger() {
+        if (this.logger == null) {
+            throw new IllegalStateException("service isnt initialized.");
+        }
+
         return this.logger;
     }
 
