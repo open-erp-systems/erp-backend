@@ -14,6 +14,7 @@ import com.jukusoft.erp.lib.message.request.ApiRequestCodec;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.message.response.ApiResponseCodec;
 import com.jukusoft.erp.lib.module.IModule;
+import com.jukusoft.erp.lib.session.SessionManager;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
@@ -49,7 +50,14 @@ public class DefaultAppServer implements AppServer {
     protected List<IModule> deployedModules = new ArrayList<>();
     protected Map<Class<?>,IModule> moduleMap = new HashMap<>();
 
+    //vertx eventbus
     protected EventBus eventBus = null;
+
+    //app context
+    protected AppContext context = null;
+
+    //instance of session manager
+    protected SessionManager sessionManager = null;
 
     @Override
     public void start(AppStartListener listener) {
@@ -108,6 +116,12 @@ public class DefaultAppServer implements AppServer {
         //register codec for api request & response message
         eventBus.registerDefaultCodec(ApiRequest.class, new ApiRequestCodec());
         eventBus.registerDefaultCodec(ApiResponse.class, new ApiResponseCodec());
+
+        //create new session manager
+        this.sessionManager = SessionManager.createHzMapSessionManager(this.hazelcastInstance);
+
+        //create app content
+        this.context = new AppContextImpl(this.vertx, this.logger, this.hazelcastInstance, this.sessionManager);
     }
 
     @Override
@@ -119,9 +133,6 @@ public class DefaultAppServer implements AppServer {
         if (this.vertx == null) {
             throw new IllegalStateException("vertx isnt initialized yet, start server first (maybe server is starting asynchronous and hasnt finished loading?).");
         }
-
-        //TODO: create new app context
-        AppContext context = new AppContextImpl(this.vertx, this.logger);
 
         //first, initialize module
         module.init(this.vertx, context, this.logger);

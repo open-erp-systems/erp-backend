@@ -3,9 +3,10 @@ package com.jukusoft.erp.core.module.test;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
+import com.jukusoft.erp.lib.service.AbstractService;
 import io.vertx.core.eventbus.Message;
 
-public class TestPage {
+public class TestService extends AbstractService {
 
     @Route(routes = "/")
     public ApiResponse homePage (Message<ApiRequest> event, ApiRequest req, ApiResponse res) {

@@ -53,7 +53,7 @@ public class ApiRequest {
         return this.messageID;
     }
 
-    public JSONObject getMetaInformation () {
+    public JSONObject getMeta () {
         return this.meta;
     }
 
@@ -67,6 +67,14 @@ public class ApiRequest {
 
     public long getUserID () {
         return this.userID;
+    }
+
+    public String getIP () {
+        return getMeta().getString("host");
+    }
+
+    public int getPort () {
+        return getMeta().getInt("port");
     }
 
     @Override

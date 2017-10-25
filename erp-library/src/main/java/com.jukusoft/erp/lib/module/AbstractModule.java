@@ -7,6 +7,7 @@ import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
+import com.jukusoft.erp.lib.service.IService;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -65,7 +66,7 @@ public abstract class AbstractModule implements IModule {
         this.logger = logger;
     }
 
-    protected <T> void addApi (T page) {
+    protected <T extends IService> void addApi (T page) {
         getLogger().debug("search_api_routes", "search for new routes in class " + page.getClass().getSimpleName());
 
         //get class of object
@@ -141,8 +142,16 @@ public abstract class AbstractModule implements IModule {
                         return;
                     }
                 } else {
+                    //create new api answer
+                    ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
+
                     try {
-                        method.invoke(page, event, req);
+                        method.invoke(page, event, req, res);
+
+                        getLogger().debug(req.getMessageID(), "reply_message", "reply to message: " + res);
+
+                        //reply to api request
+                        event.reply(res);
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                         event.fail(500, e.getLocalizedMessage());

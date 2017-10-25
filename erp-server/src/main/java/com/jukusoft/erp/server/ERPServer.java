@@ -218,6 +218,10 @@ public class ERPServer implements IServer {
                 //create api request
                 ApiRequest req = new ApiRequest(event, data, messageID, sessionID, session.isLoggedIn(), session.getUserID());
 
+                //add meta information
+                req.getMeta().put("host", socket.remoteAddress().host());
+                req.getMeta().put("port", socket.remoteAddress().port());
+
                 //log request
                 this.logger.debug(messageID, "new_tcp_request", req.toString());
 
@@ -323,11 +327,11 @@ public class ERPServer implements IServer {
                 if (request.formAttributes().contains("event")) {
                     event = request.formAttributes().get("event");
                 }
+            }
 
-                //converts all form attributes to json object
-                for (Map.Entry<String,String> entry : request.formAttributes().entries()) {
-                    data.put(entry.getKey(), entry.getValue());
-                }
+            //converts all form attributes to json object
+            for (Map.Entry<String,String> entry : request.formAttributes().entries()) {
+                data.put(entry.getKey(), entry.getValue());
             }
 
             final String eventName = event;
@@ -383,6 +387,11 @@ public class ERPServer implements IServer {
 
             //create api request
             ApiRequest req = new ApiRequest(event, data, messageID, sessionID, session.isLoggedIn(), session.getUserID());
+
+            //add meta information
+            req.getMeta().put("host", request.remoteAddress().host());
+            req.getMeta().put("port", request.remoteAddress().port());
+            //req.getMeta().put("path", request.remoteAddress().path());
 
             //log request
             this.logger.debug(messageID, "new_http_request", req.toString());

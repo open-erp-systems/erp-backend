@@ -3,7 +3,6 @@ package com.jukusoft.erp.app.server;
 import com.jukusoft.erp.app.server.impl.DefaultAppServer;
 import com.jukusoft.erp.core.module.TestModule;
 import com.jukusoft.erp.core.module.base.BaseModule;
-import com.jukusoft.erp.core.module.loginform.LoginFormService;
 
 public class Main {
 
