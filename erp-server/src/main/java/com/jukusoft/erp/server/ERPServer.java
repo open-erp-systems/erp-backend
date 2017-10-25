@@ -304,6 +304,8 @@ public class ERPServer implements IServer {
             // This handler gets called for each request that arrives on the server
             HttpServerResponse response = request.response();
 
+            response.putHeader("content-type", "application/json");
+
             //do not allow proxies to cache the data
             response.putHeader("Cache-Control", "no-store, no-cache");
             // prevents Internet Explorer from MIME - sniffing a
