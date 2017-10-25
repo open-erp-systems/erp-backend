@@ -61,5 +61,5 @@ public class HzMapSessionManager implements ChangeableSessionManager {
     public void putSession(String ssid, Session session) {
         this.sessionMap.put(ssid, session.toJSON().toString());
     }
-    
+
 }

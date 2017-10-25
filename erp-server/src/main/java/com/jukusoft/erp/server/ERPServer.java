@@ -74,7 +74,7 @@ public class ERPServer implements IServer {
         this.hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 
         //create new session manager
-        this.sessionManager = SessionManager.createHzSessionManager(hazelcastInstance);//new HzJCacheSessionManager(this.hazelcastInstance);
+        this.sessionManager = SessionManager.createHzMapSessionManager(hazelcastInstance);//new HzJCacheSessionManager(this.hazelcastInstance);
 
         //http://vertx.io/docs/vertx-hazelcast/java/
 

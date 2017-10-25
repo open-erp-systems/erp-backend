@@ -2,6 +2,7 @@ package com.jukusoft.erp.lib.session;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.jukusoft.erp.lib.session.impl.HzJCacheSessionManager;
+import com.jukusoft.erp.lib.session.impl.HzMapSessionManager;
 import com.jukusoft.erp.lib.session.impl.Session;
 
 public interface SessionManager {
@@ -27,8 +28,12 @@ public interface SessionManager {
     */
     public Session generateNewSession ();
 
-    public static SessionManager createHzSessionManager (HazelcastInstance hazelcastInstance) {
+    public static SessionManager createHzJCacheSessionManager (HazelcastInstance hazelcastInstance) {
         return new HzJCacheSessionManager(hazelcastInstance);
+    }
+
+    public static SessionManager createHzMapSessionManager (HazelcastInstance hazelcastInstance) {
+        return new HzMapSessionManager(hazelcastInstance);
     }
 
 }
