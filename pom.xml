@@ -35,6 +35,8 @@
 
         <jcache.version>1.0.0</jcache.version>
 
+        <mysql.connector.version>6.0.6</mysql.connector.version>
+
         <!-- Overwritten by the test configuration,otherwise the JaCoCo agent cannot be attached.Details see http://www.eclemma.org/jacoco/trunk/doc/prepare-agent-mojo.html -->
         <argLine>-Xms512m -Xmx1024m</argLine>
 

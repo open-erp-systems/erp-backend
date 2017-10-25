@@ -5,6 +5,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IdGenerator;
+import com.jukusoft.erp.lib.database.MySQLDatabase;
 import com.jukusoft.erp.lib.gateway.ApiGateway;
 import com.jukusoft.erp.lib.gateway.ResponseHandler;
 import com.jukusoft.erp.lib.keystore.KeyStoreGenerator;
@@ -17,19 +18,26 @@ import com.jukusoft.erp.lib.session.impl.Session;
 import com.jukusoft.erp.server.gateway.DefaultApiGateway;
 import com.jukusoft.erp.lib.logger.HzLogger;
 import com.jukusoft.erp.server.message.ResponseGenerator;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.spi.cluster.ClusterManager;
+import io.vertx.ext.jdbc.JDBCClient;
+import io.vertx.ext.sql.SQLClient;
+import io.vertx.ext.sql.SQLConnection;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -60,6 +68,9 @@ public class ERPServer implements IServer {
 
     //instance of session manager
     protected SessionManager sessionManager = null;
+
+    //instance of database
+    protected MySQLDatabase database = null;
 
     public void start() {
         //create an new hazelcast instance
@@ -97,7 +108,25 @@ public class ERPServer implements IServer {
             if (res.succeeded()) {
                 this.vertx = res.result();
 
-                postStart();
+                //create logger
+                this.logger = new HzLogger(this.hazelcastInstance, this.clusterManager.getNodeID());
+
+                //create database client and connect to database
+                try {
+                    this.connectToMySQL(res1 -> {
+                        if (!res1.succeeded()) {
+                            logger.error("database_error", "Couldnt connect to database: " + res1.cause());
+                            System.exit(1);
+                        }
+
+                        logger.info("database_connection", "Connected to database successfully.");
+
+                        postStart();
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             } else {
                 // failed!
 
@@ -107,9 +136,6 @@ public class ERPServer implements IServer {
     }
 
     protected void postStart () {
-        //create logger
-        this.logger = new HzLogger(this.hazelcastInstance, this.clusterManager.getNodeID());
-
         //create api gateway
         this.gateway = new DefaultApiGateway(this.vertx, this.logger);
 
@@ -467,6 +493,15 @@ public class ERPServer implements IServer {
 
     protected long generateMessageID () {
         return this.idGenerator.newId();
+    }
+
+    protected void connectToMySQL (Handler<Future<Void>> handler) throws IOException {
+        this.database = new MySQLDatabase(this.vertx);
+
+        logger.info("database_connection", "try to connect to database...");
+
+        //connect to database asynchronous
+        this.database.connect("./config/mysql.cfg", handler);
     }
 
     public void stutdown() {
