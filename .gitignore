@@ -5,6 +5,9 @@
 !.gitignore
 !.travis.yml
 
+.cfg
+*.cfg
+
 ### Windows ###
 # Windows image file caches
 Thumbs.db
