@@ -302,153 +302,154 @@ public class ERPServer implements IServer {
 
         server.requestHandler(request -> {
             request.setExpectMultipart(true);
+            request.endHandler(handler -> {
+                // This handler gets called for each request that arrives on the server
+                HttpServerResponse response = request.response();
 
-            // This handler gets called for each request that arrives on the server
-            HttpServerResponse response = request.response();
+                response.putHeader("content-type", "application/json");
 
-            response.putHeader("content-type", "application/json");
+                //do not allow proxies to cache the data
+                response.putHeader("Cache-Control", "no-store, no-cache");
+                // prevents Internet Explorer from MIME - sniffing a
+                //response away from the declared content-type
+                response.putHeader("X-Content-Type-Options", "nosniff");
+                // Strict HTTPS (for about ~6Months)
+                //.putHeader("Strict-Transport-Security", "max-age=" + 15768000)
+                // IE8+ do not allow opening of attachments in the context of this resource
+                response.putHeader("X-Download-Options", "noopen");
+                // enable XSS for IE
+                response.putHeader("X-XSS-Protection", "1; mode=block");
+                // deny frames
+                response.putHeader("X-FRAME-OPTIONS", "DENY");
 
-            //do not allow proxies to cache the data
-            response.putHeader("Cache-Control", "no-store, no-cache");
-            // prevents Internet Explorer from MIME - sniffing a
-            //response away from the declared content-type
-            response.putHeader("X-Content-Type-Options", "nosniff");
-            // Strict HTTPS (for about ~6Months)
-            //.putHeader("Strict-Transport-Security", "max-age=" + 15768000)
-            // IE8+ do not allow opening of attachments in the context of this resource
-            response.putHeader("X-Download-Options", "noopen");
-            // enable XSS for IE
-            response.putHeader("X-XSS-Protection", "1; mode=block");
-            // deny frames
-            response.putHeader("X-FRAME-OPTIONS", "DENY");
+                //get event name
+                String event = request.path();
 
-            //get event name
-            String event = request.path();
+                JSONObject data = new JSONObject();
 
-            JSONObject data = new JSONObject();
-
-            if (request.method() == HttpMethod.POST) {
-                if (request.formAttributes().contains("event")) {
-                    event = request.formAttributes().get("event");
-                }
-            }
-
-            final String eventName = event;
-
-            //generate cluster-wide unique message id
-            final long messageID = generateMessageID();
-
-            String sessionID = "";
-
-            //parse GET attributes
-            String[] array1 = request.absoluteURI().split("\\?");
-
-            if (array1.length > 1) {
-                //request has get attributes
-
-                for (String str : array1[1].split("&")) {
-                    String[] array2 = str.split("=");
-                    String key = array2[0];
-                    String value = array2[1];
-
-                    //TODO: find a better solution
-                    request.formAttributes().add(key, value);
-                }
-            }
-
-            for (String key : request.formAttributes().names()) {
-                logger.debug(messageID, "form_attr_found", key);
-            }
-
-            //converts all form attributes to json object
-            for (Map.Entry<String,String> entry : request.formAttributes().entries()) {
-                String value = entry.getValue();
-
-                if (entry.getKey().contains("password")) {
-                    int length = value.length();
-                    value = "";
-
-                    for (int i = 0; i < length; i++) {
-                        value += "*";
+                if (request.method() == HttpMethod.POST) {
+                    if (request.formAttributes().contains("event")) {
+                        event = request.formAttributes().get("event");
                     }
                 }
 
-                logger.debug(messageID, "form_attribute_found", "form attribute '" + entry.getKey() + "': " + value);
+                final String eventName = event;
 
-                data.put(entry.getKey(), entry.getValue());
-            }
+                //generate cluster-wide unique message id
+                final long messageID = generateMessageID();
 
-            //check, if session ID exists
-            if (request.formAttributes().contains("ssid")) {
-                sessionID = request.formAttributes().get("ssid");
-            }
+                String sessionID = "";
 
-            Session session = null;
+                //parse GET attributes
+                String[] array1 = request.absoluteURI().split("\\?");
 
-            if (sessionID.isEmpty()) {
-                //generate new session
-                session = this.sessionManager.generateNewSession();
-            } else {
-                session = this.sessionManager.getSession(sessionID);
+                if (array1.length > 1) {
+                    //request has get attributes
 
-                if (session == null) {
-                    //generate response string
-                    String str1 = ResponseGenerator.generateResponse(event, sessionID, ResponseType.BAD_REQUEST);
+                    for (String str : array1[1].split("&")) {
+                        String[] array2 = str.split("=");
+                        String key = array2[0];
+                        String value = array2[1];
 
-                    //write to the response and end it
-                    response.end(str1);
-
-                    logger.warn(messageID, "wrong_session_id", "Couldnt find session ID: " + sessionID + " (IP: " + request.remoteAddress().host() + ":"  + request.remoteAddress().port() + ").");
-
-                    throw new IllegalStateException("cannot find session ID: " + sessionID);
+                        //TODO: find a better solution
+                        request.formAttributes().add(key, value);
+                    }
                 }
-            }
 
-            sessionID = session.getSessionID();
+                /*for (String key : request.formAttributes().names()) {
+                    logger.debug(messageID, "form_attr_found", key);
+                }*/
 
-            //create api request
-            ApiRequest req = new ApiRequest(event, data, messageID, sessionID, session.isLoggedIn(), session.getUserID());
+                //converts all form attributes to json object
+                for (Map.Entry<String,String> entry : request.formAttributes().entries()) {
+                    /*String value = entry.getValue();
 
-            //add meta information
-            req.getMeta().put("host", request.remoteAddress().host());
-            req.getMeta().put("port", request.remoteAddress().port());
-            //req.getMeta().put("path", request.remoteAddress().path());
+                    if (entry.getKey().contains("password")) {
+                        int length = value.length();
+                        value = "";
 
-            //log request
-            this.logger.debug(messageID, "new_http_request", req.toString());
+                        for (int i = 0; i < length; i++) {
+                            value += "*";
+                        }
+                    }
 
-            this.gateway.handleRequestAsync(req, new ResponseHandler() {
-                @Override
-                public void handleResponse(ApiResponse res) {
-                    if (res.getType() == ApiResponse.RESPONSE_TYPE.JSON) {
-                        //send response
-                        String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getStatusCode());
+                    logger.debug(messageID, "form_attribute_found", "form attribute '" + entry.getKey() + "': " + value);*/
 
-                        response.putHeader("content-type", "application/json");
+                    data.put(entry.getKey(), entry.getValue());
+                }
+
+                //check, if session ID exists
+                if (request.formAttributes().contains("ssid")) {
+                    sessionID = request.formAttributes().get("ssid");
+                }
+
+                Session session = null;
+
+                if (sessionID.isEmpty()) {
+                    //generate new session
+                    session = this.sessionManager.generateNewSession();
+                } else {
+                    session = this.sessionManager.getSession(sessionID);
+
+                    if (session == null) {
+                        //generate response string
+                        String str1 = ResponseGenerator.generateResponse(event, sessionID, ResponseType.BAD_REQUEST);
+
+                        //write to the response and end it
+                        response.end(str1);
+
+                        logger.warn(messageID, "wrong_session_id", "Couldnt find session ID: " + sessionID + " (IP: " + request.remoteAddress().host() + ":"  + request.remoteAddress().port() + ").");
+
+                        throw new IllegalStateException("cannot find session ID: " + sessionID);
+                    }
+                }
+
+                sessionID = session.getSessionID();
+
+                //create api request
+                ApiRequest req = new ApiRequest(event, data, messageID, sessionID, session.isLoggedIn(), session.getUserID());
+
+                //add meta information
+                req.getMeta().put("host", request.remoteAddress().host());
+                req.getMeta().put("port", request.remoteAddress().port());
+                //req.getMeta().put("path", request.remoteAddress().path());
+
+                //log request
+                this.logger.debug(messageID, "new_http_request", req.toString());
+
+                this.gateway.handleRequestAsync(req, new ResponseHandler() {
+                    @Override
+                    public void handleResponse(ApiResponse res) {
+                        if (res.getType() == ApiResponse.RESPONSE_TYPE.JSON) {
+                            //send response
+                            String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getStatusCode());
+
+                            response.putHeader("content-type", "application/json");
+
+                            //write to the response and end it
+                            response.end(str);
+
+                            logger.debug(messageID, "request_succedded", res.toString());
+                        } else {
+                            response.putHeader("content-type", "text/html; charset=utf-8");
+
+                            response.end(res.getData().getString("content"));
+
+                            logger.debug(messageID, "request_succedded", res.getData().getString("content"));
+                        }
+                    }
+
+                    @Override
+                    public void responseFailed() {
+                        //generate response string
+                        String str = ResponseGenerator.generateResponse(eventName, req.getSessionID(), ResponseType.SERVICE_UNAVAILABLE);
 
                         //write to the response and end it
                         response.end(str);
 
-                        logger.debug(messageID, "request_succedded", res.toString());
-                    } else {
-                        response.putHeader("content-type", "text/html; charset=utf-8");
-
-                        response.end(res.getData().getString("content"));
-
-                        logger.debug(messageID, "request_succedded", res.getData().getString("content"));
+                        logger.warn(messageID, "request_failed", req.toString() + ", cause: " + ResponseType.SERVICE_UNAVAILABLE.name() + ".");
                     }
-                }
-
-                @Override
-                public void responseFailed() {
-                    //generate response string
-                    String str = ResponseGenerator.generateResponse(eventName, req.getSessionID(), ResponseType.SERVICE_UNAVAILABLE);
-
-                    //write to the response and end it
-                    response.end(str);
-
-                    logger.warn(messageID, "request_failed", req.toString() + ", cause: " + ResponseType.SERVICE_UNAVAILABLE.name() + ".");
-                }
+                });
             });
         });
 
