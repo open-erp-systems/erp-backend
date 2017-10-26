@@ -58,7 +58,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         }
 
         //initialize repository
-        if (repository instanceof MySQLRepository) {
+        if (repository instanceof MySQLRepository || repository instanceof AbstractMySQLRepository) {
             ((MySQLRepository) repository).init(this.vertx, this.mySQLDatabase);
         }
 
