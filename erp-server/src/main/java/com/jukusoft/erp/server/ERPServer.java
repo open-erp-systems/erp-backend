@@ -5,7 +5,9 @@ import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IdGenerator;
+import com.jukusoft.erp.lib.database.DatabaseManager;
 import com.jukusoft.erp.lib.database.MySQLDatabase;
+import com.jukusoft.erp.lib.database.impl.DatabaseManagerImpl;
 import com.jukusoft.erp.lib.gateway.ApiGateway;
 import com.jukusoft.erp.lib.gateway.ResponseHandler;
 import com.jukusoft.erp.lib.keystore.KeyStoreGenerator;
@@ -72,6 +74,9 @@ public class ERPServer implements IServer {
     //instance of database
     protected MySQLDatabase database = null;
 
+    //database manager
+    protected DatabaseManager dbManager = null;
+
     public void start() {
         //create an new hazelcast instance
         Config config = new Config();
@@ -120,6 +125,9 @@ public class ERPServer implements IServer {
                         }
 
                         logger.info("database_connection", "Connected to database successfully.");
+
+                        //create database manager
+                        this.dbManager = new DatabaseManagerImpl(this.vertx, this.database, this.hazelcastInstance);
 
                         postStart();
                     });

@@ -1,6 +1,8 @@
 package com.jukusoft.erp.lib.context;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.jukusoft.erp.lib.database.DatabaseManager;
+import com.jukusoft.erp.lib.database.MySQLDatabase;
 import com.jukusoft.erp.lib.logging.ILogging;
 import com.jukusoft.erp.lib.session.SessionManager;
 import io.vertx.core.Vertx;
@@ -24,5 +26,12 @@ public interface AppContext {
      * @return instance of session manager
     */
     public SessionManager getSessionManager ();
+
+    /**
+    * get instance of database manager
+     *
+     * @return instance of database manager
+    */
+    public DatabaseManager getDatabaseManager ();
 
 }

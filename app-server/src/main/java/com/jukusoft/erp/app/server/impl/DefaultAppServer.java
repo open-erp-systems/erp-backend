@@ -7,6 +7,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.jukusoft.erp.app.server.AppServer;
 import com.jukusoft.erp.app.server.AppStartListener;
 import com.jukusoft.erp.lib.context.AppContext;
+import com.jukusoft.erp.lib.context.AppContextImpl;
 import com.jukusoft.erp.lib.logger.HzLogger;
 import com.jukusoft.erp.lib.logging.ILogging;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
@@ -21,13 +22,10 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
-import javax.cache.expiry.AccessedExpiryPolicy;
-import javax.cache.expiry.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class DefaultAppServer implements AppServer {
 
