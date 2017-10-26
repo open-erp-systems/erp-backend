@@ -53,8 +53,8 @@ public class MySQLDatabase {
             maxPoolSize = json.getInt("max_pool_size");
         }
 
-        String urlAdd = "?profileSQL=true";
-        boolean logging = true;
+        String urlAdd = "&profileSQL=true";
+        boolean logging = false;
 
         if (json.has("logging")) {
             logging = json.getBoolean("logging");
@@ -68,7 +68,7 @@ public class MySQLDatabase {
         JsonObject config = new JsonObject();
 
         //https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-configuration-properties.html
-        config.put("url", "jdbc:mysql://" + host + ":" + port + "/" + database + urlAdd);
+        config.put("url", "jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC" + urlAdd);
         config.put("driver_class", "com.mysql.cj.jdbc.Driver");
         config.put("max_pool_size", maxPoolSize);
         config.put("user", username);
