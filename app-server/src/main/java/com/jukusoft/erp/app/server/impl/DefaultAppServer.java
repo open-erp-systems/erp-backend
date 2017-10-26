@@ -8,6 +8,9 @@ import com.jukusoft.erp.app.server.AppServer;
 import com.jukusoft.erp.app.server.AppStartListener;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.context.AppContextImpl;
+import com.jukusoft.erp.lib.database.DatabaseManager;
+import com.jukusoft.erp.lib.database.MySQLDatabase;
+import com.jukusoft.erp.lib.database.impl.DatabaseManagerImpl;
 import com.jukusoft.erp.lib.logger.HzLogger;
 import com.jukusoft.erp.lib.logging.ILogging;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
@@ -16,12 +19,15 @@ import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.message.response.ApiResponseCodec;
 import com.jukusoft.erp.lib.module.IModule;
 import com.jukusoft.erp.lib.session.SessionManager;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +63,12 @@ public class DefaultAppServer implements AppServer {
     //instance of session manager
     protected SessionManager sessionManager = null;
 
+    //instance of mysql database
+    protected MySQLDatabase database = null;
+
+    //database manager
+    protected DatabaseManager dbManager = null;
+
     @Override
     public void start(AppStartListener listener) {
         System.out.println("start local hazelcast instance now...");
@@ -89,10 +101,35 @@ public class DefaultAppServer implements AppServer {
             if (res.succeeded()) {
                 this.vertx = res.result();
 
-                //initialize application
-                initApp();
+                if (this.vertx == null) {
+                    throw new NullPointerException("vertx cannot be null.");
+                }
 
-                listener.afterStartup(this, true);
+                //create logger
+                this.logger = new HzLogger(this.hazelcastInstance, this.clusterManager.getNodeID());
+
+                //create database client and connect to database
+                try {
+                    this.connectToMySQL(res1 -> {
+                        if (!res1.succeeded()) {
+                            logger.error("database_error", "Couldnt connect to database: " + res1.cause());
+                            System.exit(1);
+                        }
+
+                        logger.info("database_connection", "Connected to database successfully.");
+
+                        //create database manager
+                        this.dbManager = new DatabaseManagerImpl(this.vertx, this.database, this.hazelcastInstance);
+
+                        //initialize application
+                        initApp();
+
+                        listener.afterStartup(this, true);
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             } else {
                 // failed!
 
@@ -103,9 +140,6 @@ public class DefaultAppServer implements AppServer {
     }
 
     protected void initApp () {
-        //create logger
-        this.logger = new HzLogger(this.hazelcastInstance, this.clusterManager.getNodeID());
-
         this.logger.info("start_app_server", "Start application server: " + this.clusterManager.getNodeID());
 
         //get eventbus
@@ -119,7 +153,7 @@ public class DefaultAppServer implements AppServer {
         this.sessionManager = SessionManager.createHzMapSessionManager(this.hazelcastInstance);
 
         //create app content
-        this.context = new AppContextImpl(this.vertx, this.logger, this.hazelcastInstance, this.sessionManager);
+        this.context = new AppContextImpl(this.vertx, this.logger, this.hazelcastInstance, this.sessionManager, this.dbManager);
     }
 
     @Override
@@ -186,6 +220,15 @@ public class DefaultAppServer implements AppServer {
             e.printStackTrace();
             logger.error("undeploy_module_exception", "Cannot undeploy module '" + cls.getCanonicalName() + "': " + e.getLocalizedMessage());
         }
+    }
+
+    protected void connectToMySQL (Handler<Future<Void>> handler) throws IOException {
+        this.database = new MySQLDatabase(this.vertx);
+
+        logger.info("database_connection", "try to connect to database...");
+
+        //connect to database asynchronous
+        this.database.connect("./config/mysql.cfg", handler);
     }
 
     @Override

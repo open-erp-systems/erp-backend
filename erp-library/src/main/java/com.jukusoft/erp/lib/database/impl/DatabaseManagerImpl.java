@@ -29,15 +29,15 @@ public class DatabaseManagerImpl implements DatabaseManager {
      * @param hazelcastInstance instance of hazelcast
     */
     public DatabaseManagerImpl (Vertx vertx, MySQLDatabase mySQLDatabase, HazelcastInstance hazelcastInstance) {
-        if (this.vertx == null) {
+        if (vertx == null) {
             throw new NullPointerException("vertx instance cannot be null.");
         }
 
-        if (this.mySQLDatabase == null) {
+        if (mySQLDatabase == null) {
             throw new NullPointerException("mysql database cannot be null.");
         }
 
-        if (!this.mySQLDatabase.isConnected()) {
+        if (!mySQLDatabase.isConnected()) {
             throw new IllegalStateException("mysql connection isnt established yet.");
         }
 
