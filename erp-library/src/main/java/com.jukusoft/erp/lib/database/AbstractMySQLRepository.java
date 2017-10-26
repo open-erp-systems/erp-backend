@@ -1,4 +1,4 @@
-package com.jukusoft.erp.lib.database.repository;
+package com.jukusoft.erp.lib.database;
 
 import com.jukusoft.erp.lib.database.MySQLDatabase;
 import com.jukusoft.erp.lib.database.MySQLRepository;
