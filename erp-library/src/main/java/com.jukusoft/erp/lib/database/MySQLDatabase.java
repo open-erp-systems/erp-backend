@@ -6,6 +6,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
+import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.SQLConnection;
 import org.json.JSONObject;
@@ -70,10 +71,12 @@ public class MySQLDatabase {
         config.put("url", "jdbc:mysql://" + host + ":" + port + "/" + database + urlAdd);
         config.put("driver_class", "com.mysql.cj.jdbc.Driver");
         config.put("max_pool_size", maxPoolSize);
-        config.put("username", username);
+        config.put("user", username);
         config.put("password", password);
 
         this.client = JDBCClient.createShared(this.vertx, config);
+
+        System.out.println("try to connect to database: " + config.getString("url"));
 
         this.client.getConnection(res -> {
             if (res.succeeded()) {
@@ -101,6 +104,26 @@ public class MySQLDatabase {
 
     public SQLConnection getConnection() {
         return this.connection;
+    }
+
+    public void startTransation (Handler<ResultSet> done) {
+        this.connection.setAutoCommit(false, res -> {
+            if (res.failed()) {
+                throw new RuntimeException(res.cause());
+            }
+
+            done.handle(null);
+        });
+    }
+
+    public void endTransation (Handler<ResultSet> done) {
+        this.connection.commit(res -> {
+            if (res.failed()) {
+                throw new RuntimeException(res.cause());
+            }
+
+            done.handle(null);
+        });
     }
 
     public void close () {
