@@ -1,5 +1,6 @@
 package com.jukusoft.erp.core.module.test;
 
+import com.jukusoft.erp.lib.annotation.LoginRequired;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
@@ -15,6 +16,7 @@ public class TestService extends AbstractService {
         return res;
     }
 
+    @LoginRequired
     @Route(routes = {"/metrics", "/metrics/"})
     public void metrics (Message<ApiRequest> event, ApiRequest req) {
         //send new api answer

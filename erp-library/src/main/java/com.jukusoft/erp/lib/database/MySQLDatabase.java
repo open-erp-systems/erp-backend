@@ -27,6 +27,9 @@ public class MySQLDatabase {
     //sql connection
     protected SQLConnection connection = null;
 
+    //table prefix
+    protected String prefix = "";
+
     public MySQLDatabase (Vertx vertx) {
         this.vertx = vertx;
     }
@@ -63,6 +66,8 @@ public class MySQLDatabase {
                 urlAdd = "";
             }
         }
+
+        this.prefix = json.getString("prefix");
 
         //mysql config
         JsonObject config = new JsonObject();
@@ -104,6 +109,14 @@ public class MySQLDatabase {
 
     public SQLConnection getConnection() {
         return this.connection;
+    }
+
+    public String getPrefix () {
+        return this.prefix;
+    }
+
+    public String getTableName (String tableName) {
+        return getPrefix() + tableName;
     }
 
     public void startTransation (Handler<ResultSet> done) {
