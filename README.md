@@ -12,7 +12,7 @@
 ## Goals of system
 
 The **main goal** of this system is to provide an intuitive, easy to use ERP system for small and middle companies.\
-Open ERP System should be free and very fast.\
+Open Source (OS) ERP System should be free and very fast.\
 Backend is Microservice-orientated and uses [vertx.io](http://vertx.io) for networking and distribution.\
 It should be easy to **scale-out** (distributed system).\
 
