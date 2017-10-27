@@ -4,6 +4,7 @@ import com.hazelcast.cache.HazelcastCachingProvider;
 import com.hazelcast.cache.ICache;
 import com.hazelcast.core.HazelcastInstance;
 import com.jukusoft.erp.lib.session.ChangeableSessionManager;
+import io.vertx.core.json.JsonObject;
 import org.json.JSONObject;
 
 import javax.cache.Cache;
@@ -97,7 +98,7 @@ public class HzJCacheSessionManager implements ChangeableSessionManager {
 
         //create session instance from cache
         String jsonStr = this.sessionCache.get(ssid);
-        Session session = Session.createFromJSON(new JSONObject(jsonStr), this);
+        Session session = Session.createFromJSON(new JsonObject(jsonStr), this);
 
         return session;
     }

@@ -1,6 +1,5 @@
 package com.jukusoft.erp.lib.message.request;
 
-import com.jukusoft.erp.lib.json.JSONSerializable;
 import org.json.JSONObject;
 
 public class ApiRequest {

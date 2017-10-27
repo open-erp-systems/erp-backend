@@ -3,8 +3,7 @@ package com.jukusoft.erp.lib.session.impl;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.jukusoft.erp.lib.session.ChangeableSessionManager;
-import com.jukusoft.erp.lib.session.SessionManager;
-import org.json.JSONObject;
+import io.vertx.core.json.JsonObject;
 
 public class HzMapSessionManager implements ChangeableSessionManager {
 
@@ -29,7 +28,7 @@ public class HzMapSessionManager implements ChangeableSessionManager {
 
         //create session instance from cache
         String jsonStr = this.sessionMap.get(ssid);
-        Session session = Session.createFromJSON(new JSONObject(jsonStr), this);
+        Session session = Session.createFromJSON(new JsonObject(jsonStr), this);
 
         return session;
     }

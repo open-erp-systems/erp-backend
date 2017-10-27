@@ -12,6 +12,14 @@
     <artifactId>erp-data</artifactId>
 
     <dependencies>
+        <!-- JUnit tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.jukusoft</groupId>
             <artifactId>erp-library</artifactId>

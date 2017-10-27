@@ -1,16 +1,16 @@
 package com.jukusoft.erp.lib.session.impl;
 
-import com.jukusoft.erp.lib.json.JSONLoadable;
-import com.jukusoft.erp.lib.json.JSONSerializable;
+import com.jukusoft.erp.lib.json.JsonLoadable;
+import com.jukusoft.erp.lib.json.JsonSerializable;
 import com.jukusoft.erp.lib.session.ChangeableSessionManager;
-import com.jukusoft.erp.lib.session.SessionManager;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Session implements JSONSerializable, JSONLoadable {
+public class Session implements JsonSerializable, JsonLoadable {
 
     //unique id of session
     protected final String sessionID;
@@ -99,9 +99,9 @@ public class Session implements JSONSerializable, JSONLoadable {
     }
 
     @Override
-    public JSONObject toJSON() {
+    public JsonObject toJSON() {
         //create new json object
-        JSONObject json = new JSONObject();
+        JsonObject json = new JsonObject();
 
         //add session ID
         json.put("session-id", this.sessionID);
@@ -117,9 +117,11 @@ public class Session implements JSONSerializable, JSONLoadable {
         JSONArray jsonArray = new JSONArray();
 
         for (Map.Entry<String,Object> entry : attributes.entrySet()) {
-            JSONObject json1 = new JSONObject();
+            JsonObject json1 = new JsonObject();
             json1.put("key", entry.getKey());
             json1.put("value", entry.getValue());
+
+            jsonArray.put(json1);
         }
 
         json.put("meta", jsonArray);
@@ -128,26 +130,26 @@ public class Session implements JSONSerializable, JSONLoadable {
     }
 
     @Override
-    public void loadFromJSON(JSONObject json) {
+    public void loadFromJSON(JsonObject json) {
         //this.sessionID = json.getString("session-id");
 
         this.created = json.getLong("created");
 
-        JSONArray jsonArray = json.getJSONArray("meta");
+        JsonArray jsonArray = json.getJsonArray("meta");
 
         //get user information
         this.isLoggedIn = json.getBoolean("is-logged-in");
         this.userID = json.getLong("user-id");
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject json1 = jsonArray.getJSONObject(i);
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JsonObject json1 = jsonArray.getJsonObject(i);
 
             String key = json1.getString("key");
             String value = json1.getString("value");
         }
     }
 
-    public static Session createFromJSON (JSONObject json, ChangeableSessionManager sessionManager) {
+    public static Session createFromJSON (JsonObject json, ChangeableSessionManager sessionManager) {
         //create new session with session id
         Session session = new Session(json.getString("session-id"));
 
