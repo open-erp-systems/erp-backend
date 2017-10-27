@@ -117,6 +117,7 @@ public abstract class AbstractModule implements IModule {
             InjectRepository annotation = field.getAnnotation(InjectRepository.class);
 
             if (annotation != null && Repository.class.isAssignableFrom(field.getType())) {
+                getLogger().debug("inject_repository", "try to inject repository '" + field.getType().getSimpleName() + "' in service: " + target.getClass().getSimpleName());
                 injectField(target, field, annotation.nullable());
             }
         }
@@ -139,8 +140,20 @@ public abstract class AbstractModule implements IModule {
             field.setAccessible(true);
 
             try {
-                //set value of field
-                field.set(target, context.getDatabaseManager().getRepositoryAsObject(field.getType()));
+                Object value = context.getDatabaseManager().getRepositoryAsObject(field.getType());
+
+                if (value == null) {
+                    if (nullable) {
+                        getLogger().debug("inject_repository", "Repository '" + field.getType().getSimpleName() + "' doesnt exists.");
+                    } else {
+                        throw new NullPointerException("injected object cannot be null.");
+                    }
+                } else {
+                    //set value of field
+                    field.set(target, value);
+
+                    getLogger().debug("inject_repository", "set value successfully: " + field.getType());
+                }
             } catch (IllegalArgumentException | IllegalAccessException e) {
                 e.printStackTrace();
 
@@ -150,6 +163,8 @@ public abstract class AbstractModule implements IModule {
         } else if (!nullable) {
             throw new RequiredRepositoryNotFoundException("Repository '" + field.getType()
                     + "' is required by service '" + field.getDeclaringClass().getName() + "' but does not exist.");
+        } else {
+            getLogger().warn("inject_repository", "Repository doesnt exists: " + field.getType().getSimpleName());
         }
     }
 

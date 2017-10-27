@@ -86,8 +86,14 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public <T extends Repository> T getRepositoryAsObject(Class<?> cls) {
-        return null;
+    public Object getRepositoryAsObject(Class<?> cls) {
+        Repository repository = this.repositories.get(cls);
+
+        if (repository == null) {
+            return null;
+        }
+
+        return repository;
     }
 
     @Override

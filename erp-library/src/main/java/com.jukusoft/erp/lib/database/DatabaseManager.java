@@ -29,7 +29,7 @@ public interface DatabaseManager {
      *
      * @return instance of repository or null, if repository doesnt exists
      */
-    public <T extends Repository> T getRepositoryAsObject (Class<?> cls);
+    public Object getRepositoryAsObject (Class<?> cls);
 
     /**
     * check if database manager contains repository type
