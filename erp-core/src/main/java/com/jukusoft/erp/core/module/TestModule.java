@@ -8,7 +8,7 @@ public class TestModule extends AbstractModule {
     @Override
     public void start() throws Exception {
         //register handler
-        addApi(new TestService());
+        addService(new TestService());
     }
 
     @Override

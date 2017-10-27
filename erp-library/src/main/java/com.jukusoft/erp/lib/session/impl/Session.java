@@ -114,14 +114,14 @@ public class Session implements JsonSerializable, JsonLoadable {
         json.put("user-id", this.userID);
 
         //add meta information
-        JSONArray jsonArray = new JSONArray();
+        JsonArray jsonArray = new JsonArray();
 
         for (Map.Entry<String,Object> entry : attributes.entrySet()) {
             JsonObject json1 = new JsonObject();
             json1.put("key", entry.getKey());
             json1.put("value", entry.getValue());
 
-            jsonArray.put(json1);
+            jsonArray.add(json1);
         }
 
         json.put("meta", jsonArray);

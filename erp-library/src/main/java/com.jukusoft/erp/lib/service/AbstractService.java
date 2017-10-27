@@ -30,6 +30,10 @@ public class AbstractService implements IService {
         return this.vertx.eventBus();
     }
 
+    public AppContext getContext () {
+        return this.context;
+    }
+
     @Override
     public ILogging getLogger() {
         if (this.logger == null) {

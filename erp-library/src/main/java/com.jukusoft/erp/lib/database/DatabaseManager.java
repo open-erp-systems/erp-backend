@@ -24,4 +24,18 @@ public interface DatabaseManager {
     */
     public <T extends Repository> T getRepository (Class<T> cls);
 
+    /**
+     * get repository by class
+     *
+     * @return instance of repository or null, if repository doesnt exists
+     */
+    public <T extends Repository> T getRepositoryAsObject (Class<?> cls);
+
+    /**
+    * check if database manager contains repository type
+     *
+     * @param cls repository class
+    */
+    public boolean contains (Class<?> cls);
+
 }

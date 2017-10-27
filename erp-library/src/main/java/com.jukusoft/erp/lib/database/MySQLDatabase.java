@@ -1,20 +1,24 @@
 package com.jukusoft.erp.lib.database;
 
 import com.jukusoft.erp.lib.utils.FileUtils;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.SQLConnection;
+import io.vertx.ext.sql.UpdateResult;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class MySQLDatabase {
 
@@ -117,6 +121,84 @@ public class MySQLDatabase {
 
     public String getTableName (String tableName) {
         return getPrefix() + tableName;
+    }
+
+    public void getRow (String sql, Handler<AsyncResult<JsonObject>> handler) {
+        this.connection.query(sql, res -> {
+            if (!res.succeeded()) {
+                handler.handle(Future.failedFuture(res.cause()));
+                throw new IllegalStateException("Couldnt execute query to read row: " + sql);
+            }
+
+            //get result set
+            ResultSet rs = res.result();
+
+            //check, if no row was found
+            if (rs.getRows().isEmpty()) {
+                handler.handle(Future.succeededFuture(null));
+                return;
+            }
+
+            //get first row
+            JsonObject row = rs.getRows().get(0);
+
+            handler.handle(Future.succeededFuture(row));
+        });
+    }
+
+    public void getRow (String sql, JsonArray params, Handler<AsyncResult<JsonObject>> handler) {
+        this.connection.queryWithParams(sql, params, res -> {
+            if (!res.succeeded()) {
+                handler.handle(Future.failedFuture(res.cause()));
+                throw new IllegalStateException("Couldnt execute query to read row: " + sql);
+            }
+
+            //get result set
+            ResultSet rs = res.result();
+
+            //check, if no row was found
+            if (rs.getRows().isEmpty()) {
+                handler.handle(Future.succeededFuture(null));
+                return;
+            }
+
+            //get first row
+            JsonObject row = rs.getRows().get(0);
+
+            handler.handle(Future.succeededFuture(row));
+        });
+    }
+
+    public void query (String sql, JsonArray params, Handler<AsyncResult<ResultSet>> handler) {
+        this.connection.queryWithParams(sql, params, handler);
+    }
+
+    public void listRows (String sql, Handler<AsyncResult<List<JsonObject>>> handler) {
+        this.connection.query(sql, res -> {
+            if (!res.succeeded()) {
+                throw new IllegalStateException("Couldnt execute query to read row: " + sql);
+            }
+
+            //get result set
+            ResultSet rs = res.result();
+
+            //get first row
+            List<JsonObject> rows = rs.getRows();
+
+            handler.handle(Future.succeededFuture(rows));
+        });
+    }
+
+    public void update (String sql, Handler<AsyncResult<UpdateResult>> handler) {
+        this.connection.update(sql, handler);
+    }
+
+    public void setAutoCommit (boolean value) {
+        this.connection.setAutoCommit(value, res -> {
+            if (!res.succeeded()) {
+                throw new IllegalStateException("Couldnt set auto commit.");
+            }
+        });
     }
 
     public void startTransation (Handler<ResultSet> done) {

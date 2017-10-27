@@ -5,6 +5,7 @@ module erp.core {
 
     requires erp.library;
     requires vertx.core;
+    requires erp.data;
 
     exports com.jukusoft.erp.core.exception;
 }

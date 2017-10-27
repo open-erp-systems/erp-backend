@@ -85,4 +85,34 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return cls.cast(repository);
     }
 
+    @Override
+    public <T extends Repository> T getRepositoryAsObject(Class<?> cls) {
+        return null;
+    }
+
+    @Override
+    public boolean contains(Class<?> cls) {
+        if (!cls.isInstance(Repository.class)) {
+            //check, if parent classes implements this interface
+            Class<?> cls2 = cls;
+            boolean interfaceFound = false;
+
+            while (cls2.getSuperclass() != null) {
+                cls2 = cls2.getSuperclass();
+
+                //check, if interface is implemented
+                if (cls2.isInstance(Repository.class)) {
+                    interfaceFound = true;
+                    break;
+                }
+            }
+
+            if (!interfaceFound) {
+                throw new IllegalArgumentException("class has to implements interface Repository.");
+            }
+        }
+
+        return this.repositories.containsKey(cls);
+    }
+
 }

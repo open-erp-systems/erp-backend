@@ -1,5 +1,8 @@
 package com.jukusoft.erp.core.module.base.service;
 
+import com.jukusoft.data.entity.User;
+import com.jukusoft.data.repository.UserRepository;
+import com.jukusoft.erp.lib.database.InjectRepository;
 import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
@@ -9,14 +12,17 @@ import io.vertx.core.eventbus.Message;
 
 public class LoginService extends AbstractService {
 
+    @InjectRepository
+    protected UserRepository userRepository;
+
     @Route(routes = "/try-login")
-    public ApiResponse tryLogin (Message<ApiRequest> event, ApiRequest req, ApiResponse res) {
+    public void tryLogin (Message<ApiRequest> event, ApiRequest req, ApiResponse response) {
         //validate username
         if (!req.getData().has("username")) {
             getLogger().warn(req.getMessageID(), "failed_login", "username wasnt set.");
 
-            res.setStatusCode(ResponseType.BAD_REQUEST);
-            return res;
+            response.setStatusCode(ResponseType.BAD_REQUEST);
+            return;
         }
 
         //get username
@@ -26,16 +32,51 @@ public class LoginService extends AbstractService {
         if (!req.getData().has("password")) {
             getLogger().warn(req.getMessageID(), "failed_login", "password wasnt set.");
 
-            res.setStatusCode(ResponseType.BAD_REQUEST);
-            return res;
+            response.setStatusCode(ResponseType.BAD_REQUEST);
+            return;
         }
 
         //get password
         String password = req.getData().getString("password");
 
-        getLogger().info("try_login", "try login '" + username + "' (IP: " + req.getIP() + ").");
+        getLogger().info(req.getMessageID(), "try_login", "try login '" + username + "' (IP: " + req.getIP() + ").");
 
-        return res;
+        if (userRepository == null) {
+            throw new NullPointerException("user repository cannot be null.");
+        }
+
+        //find user by username
+        userRepository.getUserByUsername(username, res -> {
+            if (!res.succeeded()) {
+                generateFailedMessage("Couldnt find user. Maybe its an internal problem, please contact administrator.", response);
+                return;
+            }
+
+            //get user
+            User user = res.result();
+
+            if (user == null) {
+                getLogger().warn(req.getMessageID(), "try_login", "Couldnt found username '" + username + "'.");
+
+                generateFailedMessage("User doesnt exists.", response);
+                return;
+            }
+
+            getLogger().info(req.getMessageID(), "try_login", "username '" + username + "' was found (userID: " + user.getUserID() + ").");
+
+            //check password
+            userRepository.checkPassword(user.getUserID(), password, result -> {
+                //TODO: add code here
+            });
+        });
+
+        //return res;
+    }
+
+    protected void generateFailedMessage (String message, ApiResponse response) {
+        response.setStatusCode(ResponseType.OK);
+        response.getData().put("login_state", "failed");
+        response.getData().put("login_message", message);
     }
 
 }

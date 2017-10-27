@@ -2,6 +2,9 @@ package com.jukusoft.erp.lib.module;
 
 import com.jukusoft.erp.lib.annotation.LoginRequired;
 import com.jukusoft.erp.lib.context.AppContext;
+import com.jukusoft.erp.lib.database.InjectRepository;
+import com.jukusoft.erp.lib.database.Repository;
+import com.jukusoft.erp.lib.exception.RequiredRepositoryNotFoundException;
 import com.jukusoft.erp.lib.logging.ILogging;
 import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
@@ -15,6 +18,7 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -67,7 +71,11 @@ public abstract class AbstractModule implements IModule {
         this.logger = logger;
     }
 
-    protected <T extends IService> void addApi (T page) {
+    protected <T extends Repository> void addRepository (T repository, Class<T> cls) {
+        context.getDatabaseManager().addRepository(repository, cls);
+    }
+
+    protected <T extends IService> void addService(T page) {
         getLogger().debug("init_service", "Initialize service '" + page.getClass().getSimpleName() + "'.");
 
         //initialize service
@@ -96,6 +104,52 @@ public abstract class AbstractModule implements IModule {
                     registerHandler(route, page, method);
                 }
             }
+        }
+
+        //inject repositories
+        this.injectRepositories(page);
+    }
+
+    protected <T extends IService> void injectRepositories (T target/*, Class<T> cls*/) {
+        //iterate through all fields in class
+        for (Field field : target.getClass().getDeclaredFields()) {
+            //get annotation
+            InjectRepository annotation = field.getAnnotation(InjectRepository.class);
+
+            if (annotation != null && Repository.class.isAssignableFrom(field.getType())) {
+                injectField(target, field, annotation.nullable());
+            }
+        }
+    }
+
+    /**
+     * Injects value of field in given service
+     *
+     * @param target
+     *            The object whose field should be injected.
+     * @param field
+     *            The field.
+     * @param nullable
+     *            Whether the field can be null.
+     */
+    private void injectField(Object target, Field field, boolean nullable) {
+        // check if component present
+        if (context.getDatabaseManager().contains(field.getType())) {
+            //set field accessible, so we can change value
+            field.setAccessible(true);
+
+            try {
+                //set value of field
+                field.set(target, context.getDatabaseManager().getRepositoryAsObject(field.getType()));
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                e.printStackTrace();
+
+                throw new RuntimeException("Couldn't inject repository '" + field.getType() + "' in '"
+                        + field.getDeclaringClass().getName() + "'. Exception: " + e.getLocalizedMessage());
+            }
+        } else if (!nullable) {
+            throw new RequiredRepositoryNotFoundException("Repository '" + field.getType()
+                    + "' is required by service '" + field.getDeclaringClass().getName() + "' but does not exist.");
         }
     }
 

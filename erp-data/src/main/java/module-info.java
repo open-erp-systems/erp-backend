@@ -5,5 +5,6 @@ module erp.data {
     requires vertx.core;
 
     exports com.jukusoft.data.repository;
+    exports com.jukusoft.data.entity;
 
 }
