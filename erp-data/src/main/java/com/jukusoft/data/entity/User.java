@@ -17,6 +17,18 @@ public class User implements JsonSerializable {
      * @param row database row of user
     */
     public User (JsonObject row) {
+        if (row == null) {
+            throw new NullPointerException("row cannot be null.");
+        }
+
+        if (!row.containsKey("userid")) {
+            for (String colName : row.fieldNames()) {
+                System.out.println("row coloum: " + colName);
+            }
+
+            throw new IllegalArgumentException("row is invalide, no column userID exists.");
+        }
+
         this.row = row;
     }
 

@@ -51,10 +51,15 @@ public class UserRepository extends AbstractMySQLRepository {
                 return;
             }
 
-            //create DAO user from row
-            User user = new User(res.result());
+            if (res.result() == null) {
+                //user doesnt exists
+                handler.handle(Future.succeededFuture(null));
+            } else {
+                //create DAO user from row
+                User user = new User(res.result());
 
-            handler.handle(Future.succeededFuture(user));
+                handler.handle(Future.succeededFuture(user));
+            }
         });
     }
 
