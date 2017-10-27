@@ -11,6 +11,7 @@ import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
 import com.jukusoft.erp.lib.service.IService;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -226,25 +227,55 @@ public abstract class AbstractModule implements IModule {
                     //create new api answer
                     ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
 
-                    try {
-                        if (method.getParameterCount() > 2) {
-                            method.invoke(page, event, req, res);
-                        } else {
-                            method.invoke(page, event, req);
+                    Handler<AsyncResult<ApiResponse>> handler = new Handler<AsyncResult<ApiResponse>>() {
+                        @Override
+                        public void handle(AsyncResult<ApiResponse> event1) {
+                            if (!event1.succeeded()) {
+                                //send error message
+                                res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+
+                                getLogger().warn(req.getMessageID(), "reply_message", "reply error message: " + res + ", cause: " + event1.cause());
+
+                                //reply to api request
+                                event.reply(res);
+                            } else {
+                                getLogger().debug(req.getMessageID(), "reply_message", "reply to message: " + res);
+
+                                //reply to api request
+                                event.reply(event1.result());
+                            }
                         }
+                    };
 
-                        getLogger().debug(req.getMessageID(), "reply_message", "reply to message: " + res);
-
-                        //reply to api request
-                        event.reply(res);
+                    try {
+                        if (method.getParameterCount() > 3) {
+                            method.invoke(page, event, req, res, handler);
+                        } else {
+                            method.invoke(page, event, req, handler);
+                            throw new IllegalStateException("method " + page.getClass().getSimpleName() + "::" + method.getName() + " has wrong parameter count (should be 3, but is " + method.getParameterCount() + ").");
+                        }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
+
+                        //reply to api request
+                        res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                        event.reply(res);
+
                         event.fail(500, e.getLocalizedMessage());
                     } catch (InvocationTargetException e) {
                         e.printStackTrace();
+
+                        //reply to api request
+                        res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                        event.reply(res);
+
                         event.fail(500, e.getLocalizedMessage());
                     } catch (Exception e) {
                         getLogger().warn(req.getMessageID(), "handler_exception", "Exception in " + page.getClass().getSimpleName() + "::" + method.getName() + ": " + e.getLocalizedMessage());
+
+                        //reply to api request
+                        res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                        event.reply(res);
 
                         e.printStackTrace();
                     }

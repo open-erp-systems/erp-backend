@@ -8,6 +8,9 @@ import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
 import com.jukusoft.erp.lib.service.AbstractService;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 
 public class LoginService extends AbstractService {
@@ -16,12 +19,13 @@ public class LoginService extends AbstractService {
     protected UserRepository userRepository;
 
     @Route(routes = "/try-login")
-    public void tryLogin (Message<ApiRequest> event, ApiRequest req, ApiResponse response) {
+    public void tryLogin (Message<ApiRequest> event, ApiRequest req, ApiResponse response, Handler<AsyncResult<ApiResponse>> handler) {
         //validate username
         if (!req.getData().has("username")) {
             getLogger().warn(req.getMessageID(), "failed_login", "username wasnt set.");
 
             response.setStatusCode(ResponseType.BAD_REQUEST);
+            handler.handle(Future.succeededFuture(response));
             return;
         }
 
@@ -33,6 +37,7 @@ public class LoginService extends AbstractService {
             getLogger().warn(req.getMessageID(), "failed_login", "password wasnt set.");
 
             response.setStatusCode(ResponseType.BAD_REQUEST);
+            handler.handle(Future.succeededFuture(response));
             return;
         }
 
@@ -49,6 +54,7 @@ public class LoginService extends AbstractService {
         userRepository.getUserByUsername(username, res -> {
             if (!res.succeeded()) {
                 generateFailedMessage("Couldnt find user. Maybe its an internal problem, please contact administrator.", response);
+                handler.handle(Future.succeededFuture(response));
                 return;
             }
 
@@ -59,6 +65,8 @@ public class LoginService extends AbstractService {
                 getLogger().warn(req.getMessageID(), "try_login", "Couldnt found username '" + username + "'.");
 
                 generateFailedMessage("User doesnt exists.", response);
+                handler.handle(Future.succeededFuture(response));
+
                 return;
             }
 

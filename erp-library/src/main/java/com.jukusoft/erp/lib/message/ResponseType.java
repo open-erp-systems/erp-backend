@@ -12,6 +12,8 @@ public enum ResponseType {
 
     WRONG_PERMISSIONS(403),
 
+    INTERNAL_SERVER_ERROR(500),
+
     SERVICE_UNAVAILABLE(503),
 
     UNKNOWN(500);

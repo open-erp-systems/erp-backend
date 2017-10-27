@@ -5,6 +5,8 @@ import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
 import com.jukusoft.erp.lib.service.AbstractService;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 
 public class TestService extends AbstractService {
@@ -18,7 +20,7 @@ public class TestService extends AbstractService {
 
     @LoginRequired
     @Route(routes = {"/metrics", "/metrics/"})
-    public void metrics (Message<ApiRequest> event, ApiRequest req) {
+    public void metrics (Message<ApiRequest> event, ApiRequest req, Handler<AsyncResult<ApiResponse>> handler) {
         //send new api answer
         ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
 
