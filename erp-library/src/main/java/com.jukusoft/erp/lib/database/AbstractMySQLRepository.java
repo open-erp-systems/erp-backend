@@ -11,7 +11,7 @@ public class AbstractMySQLRepository implements MySQLRepository {
 
     @Override
     public void init(Vertx vertx, MySQLDatabase database) {
-        this.mySQLDatabase = mySQLDatabase;
+        this.mySQLDatabase = database;
     }
 
     protected MySQLDatabase getMySQLDatabase () {
