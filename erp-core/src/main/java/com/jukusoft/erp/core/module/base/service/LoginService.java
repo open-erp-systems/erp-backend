@@ -77,8 +77,6 @@ public class LoginService extends AbstractService {
                 //TODO: add code here
             });
         });
-
-        //return res;
     }
 
     protected void generateFailedMessage (String message, ApiResponse response) {

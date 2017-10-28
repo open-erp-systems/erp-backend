@@ -149,8 +149,12 @@ public class MySQLDatabase {
     public void getRow (String sql, JsonArray params, Handler<AsyncResult<JsonObject>> handler) {
         this.connection.queryWithParams(sql, params, res -> {
             if (!res.succeeded()) {
+                if (res.cause() != null) {
+                    res.cause().printStackTrace();
+                }
+
                 handler.handle(Future.failedFuture(res.cause()));
-                throw new IllegalStateException("Couldnt execute query to read row: " + sql);
+                throw new IllegalStateException("Couldnt execute query to read row: " + sql + ", exception: " + res.cause());
             }
 
             //get result set
@@ -176,6 +180,10 @@ public class MySQLDatabase {
     public void listRows (String sql, Handler<AsyncResult<List<JsonObject>>> handler) {
         this.connection.query(sql, res -> {
             if (!res.succeeded()) {
+                if (res.cause() != null) {
+                    res.cause().printStackTrace();
+                }
+
                 throw new IllegalStateException("Couldnt execute query to read row: " + sql);
             }
 
