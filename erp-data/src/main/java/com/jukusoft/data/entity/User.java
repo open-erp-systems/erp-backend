@@ -21,7 +21,7 @@ public class User implements JsonSerializable {
             throw new NullPointerException("row cannot be null.");
         }
 
-        if (!row.containsKey("userid")) {
+        if (!row.containsKey("userID")) {
             for (String colName : row.fieldNames()) {
                 System.out.println("row coloum: " + colName);
             }

@@ -50,7 +50,7 @@ public class DefaultApiGateway implements ApiGateway {
     @Override
     public void handleRequestAsync(ApiRequest request, ResponseHandler handler) {
         //send message into cluster
-        this.eventBus.send(request.getEvent(), request, reply -> {
+        this.eventBus.send(request.getEvent(), request, this.deliveryOptions, reply -> {
             if (reply.succeeded()) {
                 handler.handleResponse((ApiResponse) reply.result().body());
             } else {
