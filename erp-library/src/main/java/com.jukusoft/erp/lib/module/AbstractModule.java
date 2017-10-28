@@ -2,6 +2,7 @@ package com.jukusoft.erp.lib.module;
 
 import com.jukusoft.erp.lib.annotation.LoginRequired;
 import com.jukusoft.erp.lib.context.AppContext;
+import com.jukusoft.erp.lib.database.InjectAppContext;
 import com.jukusoft.erp.lib.database.InjectRepository;
 import com.jukusoft.erp.lib.database.Repository;
 import com.jukusoft.erp.lib.exception.RequiredRepositoryNotFoundException;
@@ -17,7 +18,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
-import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -73,6 +73,9 @@ public abstract class AbstractModule implements IModule {
     }
 
     protected <T extends Repository> void addRepository (T repository, Class<T> cls) {
+        //inject repositories
+        this.injectAppContext(repository);
+
         context.getDatabaseManager().addRepository(repository, cls);
     }
 
@@ -91,12 +94,6 @@ public abstract class AbstractModule implements IModule {
         Method[] methods = cls.getDeclaredMethods();
 
         for (Method method : methods) {
-            /*System.out.println("method: " + method.getName());
-
-            for (Annotation annotation : method.getDeclaredAnnotations()) {
-                System.out.println("annotation found: " + annotation.getClass());
-            }*/
-
             //check, if method has annotation @Route
             if (method.isAnnotationPresent(Route.class)) {
                 for (String route : method.getAnnotation(Route.class).routes()) {
@@ -119,7 +116,32 @@ public abstract class AbstractModule implements IModule {
 
             if (annotation != null && Repository.class.isAssignableFrom(field.getType())) {
                 getLogger().debug("inject_repository", "try to inject repository '" + field.getType().getSimpleName() + "' in service: " + target.getClass().getSimpleName());
-                injectField(target, field, annotation.nullable());
+                injectRepositoryField(target, field, annotation.nullable());
+            }
+        }
+    }
+
+    protected void injectAppContext (Object target/*, Class<T> cls*/) {
+        //iterate through all fields in class
+        for (Field field : target.getClass().getDeclaredFields()) {
+            //get annotation
+            InjectAppContext annotation = field.getAnnotation(InjectAppContext.class);
+
+            if (annotation != null && AppContext.class.isAssignableFrom(field.getType())) {
+                getLogger().debug("inject_app_context", "try to inject app context '" + field.getType().getSimpleName() + "' in class: " + target.getClass().getSimpleName());
+
+                //set field accessible, so we can change value
+                field.setAccessible(true);
+
+                //set value of field
+                try {
+                    field.set(target, this.context);
+
+                    getLogger().debug("inject_app_context", "set value successfully: " + field.getType());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    getLogger().warn("inject_repository_error", "cannot set injected value: " + target.getClass().getSimpleName() + "." + field.getType());
+                }
             }
         }
     }
@@ -134,7 +156,7 @@ public abstract class AbstractModule implements IModule {
      * @param nullable
      *            Whether the field can be null.
      */
-    private void injectField(Object target, Field field, boolean nullable) {
+    private void injectRepositoryField(Object target, Field field, boolean nullable) {
         // check if component present
         if (context.getDatabaseManager().contains(field.getType())) {
             //set field accessible, so we can change value

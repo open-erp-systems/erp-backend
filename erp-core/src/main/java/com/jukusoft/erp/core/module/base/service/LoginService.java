@@ -8,6 +8,7 @@ import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
 import com.jukusoft.erp.lib.service.AbstractService;
+import com.jukusoft.erp.lib.session.Session;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -74,7 +75,35 @@ public class LoginService extends AbstractService {
 
             //check password
             userRepository.checkPassword(user.getUserID(), password, result -> {
-                //TODO: add code here
+                if (!result.succeeded()) {
+                    getLogger().warn(req.getMessageID(), "try_login", "Exception occurred: " + result.cause());
+                    generateFailedMessage("Internal Server Error! Cannot check password.", response);
+                    handler.handle(Future.succeededFuture(response));
+
+                    return;
+                }
+
+                boolean value = result.result();
+
+                if (value == true) {
+                    //login successfully
+                    getLogger().info(req.getMessageID(), "login", "Login user successfully: " + username + " (userID: " + user.getUserID() + ").");
+
+                    //get session
+                    Session session = getContext().getSessionManager().getSession(req.getSessionID());
+
+                    //set logged in state
+                    session.login(user.getUserID(), user.getUsername());
+
+                    generateSuccessMessage("Login successful!", response);
+                    handler.handle(Future.succeededFuture(response));
+                } else {
+                    //login failed
+                    getLogger().info(req.getMessageID(), "login", "Login failed (wrong password): " + username + " (userID: " + user.getUserID() + ").");
+
+                    generateFailedMessage("Wrong password!", response);
+                    handler.handle(Future.succeededFuture(response));
+                }
             });
         });
     }
@@ -82,6 +111,12 @@ public class LoginService extends AbstractService {
     protected void generateFailedMessage (String message, ApiResponse response) {
         response.setStatusCode(ResponseType.OK);
         response.getData().put("login_state", "failed");
+        response.getData().put("login_message", message);
+    }
+
+    protected void generateSuccessMessage (String message, ApiResponse response) {
+        response.setStatusCode(ResponseType.OK);
+        response.getData().put("login_state", "success");
         response.getData().put("login_message", message);
     }
 

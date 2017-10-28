@@ -1,11 +1,15 @@
 package com.jukusoft.data.repository;
 
 import com.jukusoft.data.entity.User;
+import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.database.AbstractMySQLRepository;
+import com.jukusoft.erp.lib.database.InjectAppContext;
+import com.jukusoft.erp.lib.utils.HashUtils;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 /**
 * Repository to get, create and update DAO user objects
@@ -13,6 +17,9 @@ import io.vertx.core.json.JsonArray;
  * @link http://vertx.io/docs/vertx-sql-common/java/
 */
 public class UserRepository extends AbstractMySQLRepository {
+
+    @InjectAppContext
+    protected AppContext appContext;
 
     /**
     * get user by id or return null, if user doesnt exists
@@ -73,18 +80,28 @@ public class UserRepository extends AbstractMySQLRepository {
                 return;
             }
 
-            //check, if row exists
+            if (res.result().getNumRows() == 0) {
+                handler.handle(Future.failedFuture("UserRepository::checkPassword user doesnt exists."));
+            }
 
+            //get row
+            JsonObject row = res.result().getRows().get(0);
+
+            //check, if row exists
+            String rowPassword = row.getString("password");
+            String salt = row.getString("salt");
+
+            //hash password
+            String hash = HashUtils.computeSHA256Hash(password, salt);
+
+            //check, if password is equals
+            if (rowPassword.equals(hash)) {
+                //password is equals
+                handler.handle(Future.succeededFuture(true));
+            } else {
+                handler.handle(Future.succeededFuture(false));
+            }
         });
     }
-
-    /*public static boolean checkPassword (long userID, String password) {
-        //TODO: read user from table
-
-        //hash password
-        String hash = HashUtils.computeSHA256Hash(password)
-    }*/
-
-    //
 
 }

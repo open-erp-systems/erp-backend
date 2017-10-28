@@ -3,7 +3,6 @@ package com.jukusoft.erp.lib.session;
 import com.hazelcast.core.HazelcastInstance;
 import com.jukusoft.erp.lib.session.impl.HzJCacheSessionManager;
 import com.jukusoft.erp.lib.session.impl.HzMapSessionManager;
-import com.jukusoft.erp.lib.session.impl.Session;
 
 public interface SessionManager {
 

@@ -1,11 +1,9 @@
-package com.jukusoft.erp.lib.session.impl;
+package com.jukusoft.erp.lib.session;
 
 import com.jukusoft.erp.lib.json.JsonLoadable;
 import com.jukusoft.erp.lib.json.JsonSerializable;
-import com.jukusoft.erp.lib.session.ChangeableSessionManager;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import org.json.JSONArray;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +26,9 @@ public class Session implements JsonSerializable, JsonLoadable {
 
     //userID of -1, if user isnt logged in
     protected long userID = -1;
+
+    //username
+    protected String username = "Guest";
 
     /**
     * default constructor
@@ -98,6 +99,25 @@ public class Session implements JsonSerializable, JsonLoadable {
         return this.userID;
     }
 
+    protected void setUserID (long userID) {
+        this.userID = userID;
+    }
+
+    public void login (long userID, String username) {
+        this.isLoggedIn = true;
+        this.username = username;
+        this.setUserID(userID);
+    }
+
+    public void logout () {
+        this.isLoggedIn = false;
+        this.setUserID(-1);
+    }
+
+    public String getUsername () {
+        return this.username;
+    }
+
     @Override
     public JsonObject toJSON() {
         //create new json object
@@ -112,6 +132,7 @@ public class Session implements JsonSerializable, JsonLoadable {
         //add user information
         json.put("is-logged-in", this.isLoggedIn);
         json.put("user-id", this.userID);
+        json.put("username", this.username);
 
         //add meta information
         JsonArray jsonArray = new JsonArray();
@@ -140,6 +161,7 @@ public class Session implements JsonSerializable, JsonLoadable {
         //get user information
         this.isLoggedIn = json.getBoolean("is-logged-in");
         this.userID = json.getLong("user-id");
+        this.username = json.getString("username");
 
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject json1 = jsonArray.getJsonObject(i);

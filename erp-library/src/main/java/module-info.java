@@ -21,6 +21,7 @@ module erp.library {
     exports com.jukusoft.erp.lib.service;
     exports com.jukusoft.erp.lib.utils;
     exports com.jukusoft.erp.lib.database;
+    exports com.jukusoft.erp.lib.context;
     exports com.jukusoft.erp.lib.json;
 
 }

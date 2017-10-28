@@ -3,6 +3,7 @@ package com.jukusoft.erp.lib.session.impl;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.jukusoft.erp.lib.session.ChangeableSessionManager;
+import com.jukusoft.erp.lib.session.Session;
 import io.vertx.core.json.JsonObject;
 
 public class HzMapSessionManager implements ChangeableSessionManager {
