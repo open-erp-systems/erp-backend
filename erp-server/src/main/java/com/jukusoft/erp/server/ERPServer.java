@@ -331,6 +331,8 @@ public class ERPServer implements IServer {
         HttpServer server = vertx.createHttpServer(options);
 
         server.requestHandler(request -> {
+            long startTime = System.currentTimeMillis();
+
             request.setExpectMultipart(true);
             request.endHandler(handler -> {
                 // This handler gets called for each request that arrives on the server
@@ -467,6 +469,10 @@ public class ERPServer implements IServer {
 
                             logger.debug(messageID, "request_succedded", res.getData().getString("content"));
                         }
+
+                        long endTime = System.currentTimeMillis();
+                        long diff = endTime - startTime;
+                        logger.debug(req.getMessageID(), "execution_time", "request needed " + diff + "ms to execute.");
                     }
 
                     @Override
@@ -478,6 +484,10 @@ public class ERPServer implements IServer {
                         response.end(str);
 
                         logger.warn(messageID, "request_failed", req.toString() + ", cause: " + ResponseType.SERVICE_UNAVAILABLE.name() + ".");
+
+                        long endTime = System.currentTimeMillis();
+                        long diff = endTime - startTime;
+                        logger.debug(req.getMessageID(), "execution_time", "request needed " + diff + "ms to execute.");
                     }
                 });
             });
