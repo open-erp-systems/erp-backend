@@ -12,7 +12,7 @@ public class User implements JsonSerializable {
     protected JsonObject row = null;
 
     /**
-    * default result set
+    * default constructor
      *
      * @param row database row of user
     */
