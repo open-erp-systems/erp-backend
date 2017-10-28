@@ -86,7 +86,7 @@ public class HzJCacheSessionManager implements ChangeableSessionManager {
             cache.getConfiguration(MutableConfiguration.class).setStatisticsEnabled(true);
         }
 
-        //ICache extends Cache interface, provides more functionality
+        //CacheManager extends Cache interface, provides more functionality
         this.sessionCache = cache.unwrap(ICache.class);
     }
 

@@ -6,6 +6,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.jukusoft.erp.app.server.AppServer;
 import com.jukusoft.erp.app.server.AppStartListener;
+import com.jukusoft.erp.lib.cache.CacheManager;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.context.AppContextImpl;
 import com.jukusoft.erp.lib.database.DatabaseManager;
@@ -27,6 +28,7 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,6 +71,9 @@ public class DefaultAppServer implements AppServer {
     //database manager
     protected DatabaseManager dbManager = null;
 
+    //instance of cache manager
+    protected CacheManager cacheManager = null;
+
     @Override
     public void start(AppStartListener listener) {
         System.out.println("start local hazelcast instance now...");
@@ -107,6 +112,9 @@ public class DefaultAppServer implements AppServer {
 
                 //create logger
                 this.logger = new HzLogger(this.hazelcastInstance, this.clusterManager.getNodeID());
+
+                //create new cache manager
+                this.cacheManager = CacheManager.createDefaultCacheManager(new File("./cache/"), this.hazelcastInstance, this.logger);
 
                 //create database client and connect to database
                 try {
@@ -153,7 +161,7 @@ public class DefaultAppServer implements AppServer {
         this.sessionManager = SessionManager.createHzMapSessionManager(this.hazelcastInstance);
 
         //create app content
-        this.context = new AppContextImpl(this.vertx, this.logger, this.hazelcastInstance, this.sessionManager, this.dbManager);
+        this.context = new AppContextImpl(this.vertx, this.logger, this.hazelcastInstance, this.sessionManager, this.dbManager, this.cacheManager);
     }
 
     @Override

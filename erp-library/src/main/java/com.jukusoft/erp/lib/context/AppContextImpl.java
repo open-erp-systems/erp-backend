@@ -1,6 +1,7 @@
 package com.jukusoft.erp.lib.context;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.jukusoft.erp.lib.cache.CacheManager;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.database.DatabaseManager;
 import com.jukusoft.erp.lib.logging.ILogging;
@@ -24,7 +25,10 @@ public class AppContextImpl implements AppContext {
     //instance of database manager
     protected DatabaseManager dbManager = null;
 
-    public AppContextImpl (Vertx vertx, ILogging logger, HazelcastInstance hazelcastInstance, SessionManager sessionManager, DatabaseManager dbManager) {
+    //instance of cache manager
+    protected CacheManager cacheManager = null;
+
+    public AppContextImpl (Vertx vertx, ILogging logger, HazelcastInstance hazelcastInstance, SessionManager sessionManager, DatabaseManager dbManager, CacheManager cacheManager) {
         if (vertx == null) {
             throw new NullPointerException("vertx cannot be null.");
         }
@@ -45,11 +49,16 @@ public class AppContextImpl implements AppContext {
             throw new NullPointerException("database manager cannot be null.");
         }
 
+        if (cacheManager == null) {
+            throw new NullPointerException("cache manager cannot be null.");
+        }
+
         this.vertx = vertx;
         this.logger = logger;
         this.hazelcastInstance = hazelcastInstance;
         this.sessionManager = sessionManager;
         this.dbManager = dbManager;
+        this.cacheManager = cacheManager;
     }
 
     @Override
@@ -75,6 +84,11 @@ public class AppContextImpl implements AppContext {
     @Override
     public DatabaseManager getDatabaseManager() {
         return this.dbManager;
+    }
+
+    @Override
+    public CacheManager getCacheManager() {
+        return this.cacheManager;
     }
 
 }

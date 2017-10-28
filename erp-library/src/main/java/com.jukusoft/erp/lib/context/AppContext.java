@@ -1,6 +1,7 @@
 package com.jukusoft.erp.lib.context;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.jukusoft.erp.lib.cache.CacheManager;
 import com.jukusoft.erp.lib.database.DatabaseManager;
 import com.jukusoft.erp.lib.database.MySQLDatabase;
 import com.jukusoft.erp.lib.logging.ILogging;
@@ -33,5 +34,12 @@ public interface AppContext {
      * @return instance of database manager
     */
     public DatabaseManager getDatabaseManager ();
+
+    /**
+    * get instance of cache manager
+     *
+     * @return instance of cache manager
+    */
+    public CacheManager getCacheManager ();
 
 }
