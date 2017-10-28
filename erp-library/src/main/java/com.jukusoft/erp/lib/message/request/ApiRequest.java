@@ -78,7 +78,12 @@ public class ApiRequest {
 
     @Override
     public String toString () {
-        return "api request (event: " + eventName + ", messageID: " + messageID + ", data: " + this.data.toString() + ")";
+        if (data.has("password")) {
+            //dont log data to hide password
+            return "api request (event: " + eventName + ", messageID: " + messageID + ", data: *********)";
+        } else {
+            return "api request (event: " + eventName + ", messageID: " + messageID + ", data: " + this.data.toString() + ")";
+        }
     }
 
 }
