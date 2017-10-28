@@ -427,7 +427,7 @@ public class ERPServer implements IServer {
 
                     if (session == null) {
                         //generate response string
-                        String str1 = ResponseGenerator.generateResponse(event, sessionID, ResponseType.BAD_REQUEST);
+                        String str1 = ResponseGenerator.generateResponse(event, sessionID, ResponseType.WRONG_SESSION);
 
                         //write to the response and end it
                         response.end(str1);

@@ -8,6 +8,8 @@ public enum ResponseType {
 
     BAD_REQUEST(400),
 
+    WRONG_SESSION(400),
+
     FORBIDDEN(403),
 
     WRONG_PERMISSIONS(403),
