@@ -77,7 +77,7 @@ public class MySQLDatabase {
         JsonObject config = new JsonObject();
 
         //https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-configuration-properties.html
-        config.put("url", "jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC" + urlAdd);
+        config.put("url", "jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC&zeroDateTimeBehavior=convertToNull" + urlAdd);
         config.put("driver_class", "com.mysql.cj.jdbc.Driver");
         config.put("max_pool_size", maxPoolSize);
         config.put("user", username);
