@@ -111,6 +111,16 @@ public class LoginService extends AbstractService {
         });
     }
 
+    @Route(routes = "/isloggedin")
+    public void isLoggedIn (Message<ApiRequest> event, ApiRequest req, ApiResponse response, Handler<AsyncResult<ApiResponse>> handler) {
+        //get session
+        Session session = getContext().getSessionManager().getSession(req.getSessionID());
+
+        response.getData().put("is-logged-in", session.isLoggedIn());
+
+        handler.handle(Future.succeededFuture(response));
+    }
+
     protected void generateFailedMessage (String message, ApiResponse response) {
         response.setStatusCode(ResponseType.OK);
         response.getData().put("login_state", "failed");
