@@ -95,6 +95,9 @@ public class LoginService extends AbstractService {
                     //set logged in state
                     session.login(user.getUserID(), user.getUsername());
 
+                    //save session
+                    session.flush();
+
                     generateSuccessMessage("Login successful!", response);
                     handler.handle(Future.succeededFuture(response));
                 } else {
