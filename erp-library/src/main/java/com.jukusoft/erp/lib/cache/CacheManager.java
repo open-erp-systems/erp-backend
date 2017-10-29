@@ -35,6 +35,11 @@ public interface CacheManager {
     public void removeCache (String cacheName);
 
     /**
+    * clean up outdated entries from all caches
+    */
+    public void cleanUp ();
+
+    /**
     * create default cache manager
      *
      * @param localCacheDir local cache directory

@@ -5,6 +5,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IdGenerator;
+import com.jukusoft.erp.lib.cache.ICache;
 import com.jukusoft.erp.lib.database.DatabaseManager;
 import com.jukusoft.erp.lib.database.MySQLDatabase;
 import com.jukusoft.erp.lib.database.impl.DatabaseManagerImpl;
@@ -28,6 +29,7 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.spi.cluster.ClusterManager;
@@ -142,9 +144,6 @@ public class ERPServer implements IServer {
     protected void postStart () {
         //create api gateway
         this.gateway = new DefaultApiGateway(this.vertx, this.logger);
-
-        //create new instance of vertx.io
-        //this.vertx = Vertx.clusteredVertx(this.vertxOptions, this.vertxOptions);
 
         //create options for TCP network server
         NetServerOptions netServerOptions = new NetServerOptions();
@@ -376,7 +375,7 @@ public class ERPServer implements IServer {
                 String[] array1 = request.absoluteURI().split("\\?");
 
                 if (array1.length > 1) {
-                    //request has get attributes
+                    //request has GET attributes
 
                     for (String str : array1[1].split("&")) {
                         String[] array2 = str.split("=");
@@ -388,25 +387,8 @@ public class ERPServer implements IServer {
                     }
                 }
 
-                /*for (String key : request.formAttributes().names()) {
-                    logger.debug(messageID, "form_attr_found", key);
-                }*/
-
                 //converts all form attributes to json object
                 for (Map.Entry<String,String> entry : request.formAttributes().entries()) {
-                    /*String value = entry.getValue();
-
-                    if (entry.getKey().contains("password")) {
-                        int length = value.length();
-                        value = "";
-
-                        for (int i = 0; i < length; i++) {
-                            value += "*";
-                        }
-                    }
-
-                    logger.debug(messageID, "form_attribute_found", "form attribute '" + entry.getKey() + "': " + value);*/
-
                     data.put(entry.getKey(), entry.getValue());
                 }
 

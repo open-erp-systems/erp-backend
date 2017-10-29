@@ -79,4 +79,11 @@ public class DefaultCacheManager implements CacheManager {
         }
     }
 
+    @Override
+    public void cleanUp() {
+        for (Map.Entry<String,ICache> entry : this.cacheMap.entrySet()) {
+            entry.getValue().cleanUp();
+        }
+    }
+
 }

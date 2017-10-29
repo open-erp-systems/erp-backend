@@ -7,6 +7,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.jukusoft.erp.app.server.AppServer;
 import com.jukusoft.erp.app.server.AppStartListener;
 import com.jukusoft.erp.lib.cache.CacheManager;
+import com.jukusoft.erp.lib.cache.ICache;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.context.AppContextImpl;
 import com.jukusoft.erp.lib.database.DatabaseManager;
@@ -25,6 +26,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
@@ -73,6 +75,9 @@ public class DefaultAppServer implements AppServer {
 
     //instance of cache manager
     protected CacheManager cacheManager = null;
+
+    //cleanup interval for caches
+    protected final int CACHE_CLEANUP_INTERVAL = 30000;
 
     @Override
     public void start(AppStartListener listener) {
@@ -162,6 +167,27 @@ public class DefaultAppServer implements AppServer {
 
         //create app content
         this.context = new AppContextImpl(this.vertx, this.logger, this.hazelcastInstance, this.sessionManager, this.dbManager, this.cacheManager);
+
+        //add event listeners to cleanup cache
+        this.vertx.eventBus().consumer("cleanup-cache", res -> {
+            JsonObject json = (JsonObject) res.body();
+
+            String cacheName = json.getString("cacheName");
+            String key = json.getString("key");
+
+            ICache cache = this.cacheManager.getCache(cacheName);
+
+            if (cache != null) {
+                cache.remove(key);
+            }
+        });
+
+        //cleanup cache every 30 seconds
+        vertx.setPeriodic(CACHE_CLEANUP_INTERVAL, id -> {
+            logger.debug("cache_cleanup", "cleanup cache now: " + System.currentTimeMillis());
+
+            this.cacheManager.cleanUp();
+        });
     }
 
     @Override
