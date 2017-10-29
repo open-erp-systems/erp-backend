@@ -197,6 +197,26 @@ public class MySQLDatabase {
         });
     }
 
+    public void listRows (String sql, JsonArray params, Handler<AsyncResult<List<JsonObject>>> handler) {
+        this.connection.queryWithParams(sql, params, res -> {
+            if (!res.succeeded()) {
+                if (res.cause() != null) {
+                    res.cause().printStackTrace();
+                }
+
+                throw new IllegalStateException("Couldnt execute query to read row: " + sql);
+            }
+
+            //get result set
+            ResultSet rs = res.result();
+
+            //get first row
+            List<JsonObject> rows = rs.getRows();
+
+            handler.handle(Future.succeededFuture(rows));
+        });
+    }
+
     public void update (String sql, Handler<AsyncResult<UpdateResult>> handler) {
         this.connection.update(sql, handler);
     }

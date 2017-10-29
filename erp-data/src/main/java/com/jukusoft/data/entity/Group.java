@@ -21,12 +21,12 @@ public class Group implements JsonSerializable {
             throw new NullPointerException("row cannot be null.");
         }
 
-        if (!row.containsKey("userID")) {
+        if (!row.containsKey("groupID")) {
             for (String colName : row.fieldNames()) {
                 System.out.println("row coloum: " + colName);
             }
 
-            throw new IllegalArgumentException("row is invalide, no column userID exists.");
+            throw new IllegalArgumentException("row is invalide, no column groupID exists.");
         }
 
         this.row = row;
