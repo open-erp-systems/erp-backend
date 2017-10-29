@@ -1,0 +1,1 @@
+This is an cache directory and requires write file permissions.
