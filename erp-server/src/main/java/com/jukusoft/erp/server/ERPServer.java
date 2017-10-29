@@ -371,6 +371,22 @@ public class ERPServer implements IServer {
 
                 String sessionID = "";
 
+                //check for cookies
+                if (request.headers().contains("Cookie")) {
+                    for (String str : request.headers().getAll("Cookie")) {
+                        logger.info(messageID, "cookie_found", "cookie found: " + str);
+
+                        String[] array = str.split("=");
+
+                        if (array[0].equals("sessionid")) {
+                            //session ID found
+                            sessionID = array[1];
+
+                            logger.info(messageID, "session", "session ID found: " + sessionID);
+                        }
+                    }
+                }
+
                 //parse GET attributes
                 String[] array1 = request.absoluteURI().split("\\?");
 
@@ -407,14 +423,17 @@ public class ERPServer implements IServer {
 
                     if (session == null) {
                         //generate response string
-                        String str1 = ResponseGenerator.generateResponse(event, sessionID, ResponseType.WRONG_SESSION);
+                        /*String str1 = ResponseGenerator.generateResponse(event, sessionID, ResponseType.WRONG_SESSION);
 
                         //write to the response and end it
                         response.end(str1);
 
                         logger.warn(messageID, "wrong_session_id", "Couldnt find session ID: " + sessionID + " (IP: " + request.remoteAddress().host() + ":"  + request.remoteAddress().port() + ").");
 
-                        throw new IllegalStateException("cannot find session ID: " + sessionID);
+                        throw new IllegalStateException("cannot find session ID: " + sessionID);*/
+
+                        //generate new session
+                        session = this.sessionManager.generateNewSession();
                     }
                 }
 
