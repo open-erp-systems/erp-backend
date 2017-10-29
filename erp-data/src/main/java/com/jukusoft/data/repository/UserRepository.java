@@ -1,6 +1,9 @@
 package com.jukusoft.data.repository;
 
 import com.jukusoft.data.entity.User;
+import com.jukusoft.erp.lib.cache.CacheTypes;
+import com.jukusoft.erp.lib.cache.ICache;
+import com.jukusoft.erp.lib.cache.InjectCache;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.database.AbstractMySQLRepository;
 import com.jukusoft.erp.lib.database.InjectAppContext;
@@ -21,6 +24,9 @@ public class UserRepository extends AbstractMySQLRepository {
     @InjectAppContext
     protected AppContext appContext;
 
+    @InjectCache(name = "user-cache", type = CacheTypes.LOCAL_MEMORY_CACHE)
+    protected ICache userCache;
+
     /**
     * get user by id or return null, if user doesnt exists
      *
@@ -28,7 +34,11 @@ public class UserRepository extends AbstractMySQLRepository {
      * @param handler handler which will be executed if result was received
     */
     public void getUserByID (long userID, Handler<AsyncResult<User>> handler) {
-        //TODO: check if user is in cache
+        //check if user is in cache
+        if (this.userCache.contains("user-" + userID)) {
+            handler.handle(Future.succeededFuture(new User(this.userCache.get("user-" + userID))));
+            return;
+        }
 
         getMySQLDatabase().getRow("SELECT * FROM `" + getMySQLDatabase().getTableName("users") + "` WHERE `userID` = '" + userID + "';", res -> {
             if (!res.succeeded()) {
@@ -36,8 +46,18 @@ public class UserRepository extends AbstractMySQLRepository {
                 return;
             }
 
+            if (res.result() == null) {
+                //user doesnt exists
+                handler.handle(Future.succeededFuture(null));
+
+                return;
+            }
+
             //create DAO user from row
             User user = new User(res.result());
+
+            //put user to cache
+            this.userCache.put("user-" + userID, user.toJSON());
 
             handler.handle(Future.succeededFuture(user));
         });
