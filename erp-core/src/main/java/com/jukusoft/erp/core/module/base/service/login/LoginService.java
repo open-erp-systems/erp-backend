@@ -1,4 +1,4 @@
-package com.jukusoft.erp.core.module.base.service;
+package com.jukusoft.erp.core.module.base.service.login;
 
 import com.jukusoft.data.entity.User;
 import com.jukusoft.data.repository.UserRepository;
@@ -98,7 +98,7 @@ public class LoginService extends AbstractService {
                     //save session
                     session.flush();
 
-                    generateSuccessMessage("Login successful!", response);
+                    generateSuccessMessage("Login successful!", session.getUserID(), response);
                     handler.handle(Future.succeededFuture(response));
                 } else {
                     //login failed
@@ -127,10 +127,11 @@ public class LoginService extends AbstractService {
         response.getData().put("login_message", message);
     }
 
-    protected void generateSuccessMessage (String message, ApiResponse response) {
+    protected void generateSuccessMessage (String message, long userID, ApiResponse response) {
         response.setStatusCode(ResponseType.OK);
         response.getData().put("login_state", "success");
         response.getData().put("login_message", message);
+        response.getData().put("userID", userID);
     }
 
 }

@@ -163,7 +163,7 @@ public abstract class AbstractModule implements IModule {
             InjectCache annotation = field.getAnnotation(InjectCache.class);
 
             if (annotation != null && ICache.class.isAssignableFrom(field.getType())) {
-                getLogger().debug("inject_cache", "try to inject cache '" + field.getType().getSimpleName() + "' in class: " + target.getClass().getSimpleName());
+                getLogger().debug("inject_cache", "try to inject cache '" + field.getType().getSimpleName() + "' (name: " + annotation.name() + ") in class: " + target.getClass().getSimpleName());
                 injectCacheField(target, field, annotation.name(), annotation.type(), annotation.nullable());
             }
         }
