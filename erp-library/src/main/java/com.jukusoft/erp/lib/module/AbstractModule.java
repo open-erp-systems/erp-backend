@@ -1,10 +1,14 @@
 package com.jukusoft.erp.lib.module;
 
 import com.jukusoft.erp.lib.annotation.LoginRequired;
+import com.jukusoft.erp.lib.cache.CacheTypes;
+import com.jukusoft.erp.lib.cache.ICache;
+import com.jukusoft.erp.lib.cache.InjectCache;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.database.InjectAppContext;
 import com.jukusoft.erp.lib.database.InjectRepository;
 import com.jukusoft.erp.lib.database.Repository;
+import com.jukusoft.erp.lib.exception.CacheNotFoundException;
 import com.jukusoft.erp.lib.exception.RequiredRepositoryNotFoundException;
 import com.jukusoft.erp.lib.logging.ILogging;
 import com.jukusoft.erp.lib.message.ResponseType;
@@ -73,8 +77,11 @@ public abstract class AbstractModule implements IModule {
     }
 
     protected <T extends Repository> void addRepository (T repository, Class<T> cls) {
-        //inject repositories
+        //inject app context
         this.injectAppContext(repository);
+
+        //inject caches
+        this.injectCaches(repository);
 
         context.getDatabaseManager().addRepository(repository, cls);
     }
@@ -106,6 +113,9 @@ public abstract class AbstractModule implements IModule {
 
         //inject repositories
         this.injectRepositories(page);
+
+        //inject caches
+        this.injectCaches(page);
     }
 
     protected <T extends IService> void injectRepositories (T target/*, Class<T> cls*/) {
@@ -142,6 +152,19 @@ public abstract class AbstractModule implements IModule {
                     e.printStackTrace();
                     getLogger().warn("inject_repository_error", "cannot set injected value: " + target.getClass().getSimpleName() + "." + field.getType());
                 }
+            }
+        }
+    }
+
+    protected void injectCaches (Object target) {
+        //iterate through all fields in class
+        for (Field field : target.getClass().getDeclaredFields()) {
+            //get annotation
+            InjectCache annotation = field.getAnnotation(InjectCache.class);
+
+            if (annotation != null && ICache.class.isAssignableFrom(field.getType())) {
+                getLogger().debug("inject_cache", "try to inject cache '" + field.getType().getSimpleName() + "' in class: " + target.getClass().getSimpleName());
+                injectCacheField(target, field, annotation.name(), annotation.type(), annotation.nullable());
             }
         }
     }
@@ -188,6 +211,44 @@ public abstract class AbstractModule implements IModule {
                     + "' is required by service '" + field.getDeclaringClass().getName() + "' but does not exist.");
         } else {
             getLogger().warn("inject_repository", "Repository doesnt exists: " + field.getType().getSimpleName());
+        }
+    }
+
+    private void injectCacheField (Object target, Field field, String cacheName, CacheTypes cacheType, boolean nullable) {
+        ICache cache = null;
+
+        //check, if cache is present
+        if (context.getCacheManager().containsCache(cacheName)) {
+            //get cache
+            cache = context.getCacheManager().getCache(cacheName);
+        } else {
+            //create new cache
+            cache = context.getCacheManager().createCache(cacheName, cacheType);
+        }
+
+        //set field accessible, so we can change value
+        field.setAccessible(true);
+
+        try {
+            Object value = cache;
+
+            if (value == null) {
+                if (nullable) {
+                    getLogger().debug("inject_cache", "cache '" + cacheName + "' doesnt exists.");
+                } else {
+                    throw new NullPointerException("injected object cannot be null.");
+                }
+            } else {
+                //set value of field
+                field.set(target, value);
+
+                getLogger().debug("inject_cache", "set value successfully: " + cacheName + " in class " + field.getDeclaringClass().getSimpleName() + ".");
+            }
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+
+            throw new RuntimeException("Couldn't inject cache '" + field.getType() + "' (name: " + cacheName + ", type: " + cacheType + ") in '"
+                    + field.getDeclaringClass().getName() + "'. Exception: " + e.getLocalizedMessage());
         }
     }
 

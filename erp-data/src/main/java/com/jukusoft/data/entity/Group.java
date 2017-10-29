@@ -1,11 +1,12 @@
 package com.jukusoft.data.entity;
 
+import com.jukusoft.erp.lib.json.JsonSerializable;
 import io.vertx.core.json.JsonObject;
 
 /**
  * Data Access Object (DAO) for rows of table "groups"
  */
-public class Group {
+public class Group implements JsonSerializable {
 
     //database row
     protected JsonObject row = null;
@@ -55,4 +56,13 @@ public class Group {
         return this.row.getInteger("activated") == 1;
     }
 
+    @Override
+    public JsonObject toJSON() {
+        return this.row;
+    }
+
+    @Override
+    public String toString () {
+        return toJSON().encode();
+    }
 }

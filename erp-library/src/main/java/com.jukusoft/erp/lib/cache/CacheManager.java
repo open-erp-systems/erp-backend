@@ -18,6 +18,13 @@ public interface CacheManager {
     public ICache getCache (String cacheName);
 
     /**
+    * check, if cache is present
+     *
+     * @param cacheName name of cache
+    */
+    public boolean containsCache (String cacheName);
+
+    /**
     * crate an new cache instance
      *
      * @param cacheName name of cache

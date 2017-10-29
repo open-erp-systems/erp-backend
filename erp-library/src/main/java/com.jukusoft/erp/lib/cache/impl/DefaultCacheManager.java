@@ -36,6 +36,11 @@ public class DefaultCacheManager implements CacheManager {
     }
 
     @Override
+    public boolean containsCache(String cacheName) {
+        return this.getCache(cacheName) != null;
+    }
+
+    @Override
     public ICache createCache(String cacheName, CacheTypes type) {
         //first check, if cache already exists
         if (this.getCache(cacheName) != null) {
