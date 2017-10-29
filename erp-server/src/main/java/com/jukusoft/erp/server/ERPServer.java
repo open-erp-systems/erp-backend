@@ -420,6 +420,8 @@ public class ERPServer implements IServer {
 
                 sessionID = session.getSessionID();
 
+                response.putHeader("Set-Cookie", "sessionid=" + sessionID + "; HttpOnly; Path=/");
+
                 //create api request
                 ApiRequest req = new ApiRequest(event, data, messageID, sessionID, session.isLoggedIn(), session.getUserID());
 
