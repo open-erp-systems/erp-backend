@@ -42,11 +42,11 @@ public class GroupMember {
     }
 
     public boolean isOwner () {
-        return row.getInteger("is_owner") == 1;
+        return row.getBoolean("is_owner");
     }
 
     public boolean isMainGroup () {
-        return row.getInteger("maingroup") == 1;
+        return row.getBoolean("maingroup");
     }
 
 }

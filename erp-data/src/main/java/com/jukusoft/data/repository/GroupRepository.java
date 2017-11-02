@@ -53,7 +53,7 @@ public class GroupRepository extends AbstractMySQLRepository {
         JsonArray params = new JsonArray();
         params.add(userID);
 
-        getMySQLDatabase().listRows("SELECT * FROM `" + getMySQLDatabase().getTableName("group_members") + "` WHERE `userID` = ? LEFT JOIN `" + getMySQLDatabase().getTableName("groups") + "` ON (`" + getMySQLDatabase().getTableName("group_members") + "`.`groupID` = `" + getMySQLDatabase().getTableName("groups") + "`.`groupID`); ", params, res -> {
+        getMySQLDatabase().listRows("SELECT * FROM `" + getMySQLDatabase().getTableName("group_members") + "` LEFT JOIN `" + getMySQLDatabase().getTableName("groups") + "` ON (`" + getMySQLDatabase().getTableName("group_members") + "`.`groupID` = `" + getMySQLDatabase().getTableName("groups") + "`.`groupID`) WHERE `userID` = ?; ", params, res -> {
             if (!res.succeeded()) {
                 handler.handle(Future.failedFuture(res.cause()));
                 return;
