@@ -11,6 +11,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,10 +53,29 @@ public class GroupRepository extends AbstractMySQLRepository {
         JsonArray params = new JsonArray();
         params.add(userID);
 
-        getMySQLDatabase().listRows("SELECT * FROM `" + getMySQLDatabase().getTableName("group_members") + "` WHERE `userID` = ?; ", params, res -> {
+        getMySQLDatabase().listRows("SELECT * FROM `" + getMySQLDatabase().getTableName("group_members") + "` WHERE `userID` = ? LEFT JOIN `" + getMySQLDatabase().getTableName("groups") + "` ON (`" + getMySQLDatabase().getTableName("group_members") + "`.`groupID` = `" + getMySQLDatabase().getTableName("groups") + "`.`groupID`); ", params, res -> {
+            if (!res.succeeded()) {
+                handler.handle(Future.failedFuture(res.cause()));
+                return;
+            }
+
             List<GroupMember> list = new ArrayList<>();
 
-            //TODO: add code here
+            for (JsonObject row : res.result()) {
+                GroupMember member = new GroupMember(row);
+
+                try {
+                    Group group = new Group(row);
+                    member.setGroup(group);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                //add membership to list
+                list.add(member);
+            }
+
+            handler.handle(Future.succeededFuture(list));
         });
     }
 

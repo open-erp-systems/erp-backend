@@ -29,6 +29,10 @@ public class GroupMember {
         this(row, null);
     }
 
+    public void setGroup (Group group) {
+        this.group = group;
+    }
+
     public Group getGroup() {
         if (this.group == null) {
             throw new IllegalStateException("group instance wasnt set by repository.");
