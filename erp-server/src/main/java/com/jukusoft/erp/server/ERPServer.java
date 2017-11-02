@@ -75,6 +75,10 @@ public class ERPServer implements IServer {
     //database manager
     protected DatabaseManager dbManager = null;
 
+    //number of threads
+    protected int eventLoopPoolSize = 2;
+    protected int workerPoolSize = 2;
+
     public void start() {
         //create an new hazelcast instance
         Config config = new Config();
@@ -105,6 +109,13 @@ public class ERPServer implements IServer {
 
         //set cluster manager
         this.vertxOptions.setClusterManager(this.clusterManager);
+
+        //set high availability flag
+        this.vertxOptions.setHAEnabled(true);
+
+        //set number of threads to use in thread pools
+        this.vertxOptions.setEventLoopPoolSize(this.eventLoopPoolSize);
+        this.vertxOptions.setWorkerPoolSize(this.workerPoolSize);
 
         //create clustered vertx. instance
         Vertx.clusteredVertx(this.vertxOptions, res -> {
@@ -139,6 +150,16 @@ public class ERPServer implements IServer {
                 System.exit(1);
             }
         });
+    }
+
+    @Override
+    public void setEventLoopPoolSize(int nOfThreads) {
+        this.eventLoopPoolSize = nOfThreads;
+    }
+
+    @Override
+    public void setWorkerPoolSize(int nOfThreads) {
+        this.workerPoolSize = nOfThreads;
     }
 
     protected void postStart () {
