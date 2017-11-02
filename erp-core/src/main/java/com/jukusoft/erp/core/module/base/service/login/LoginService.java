@@ -123,6 +123,28 @@ public class LoginService extends AbstractService {
         handler.handle(Future.succeededFuture(response));
     }
 
+    @Route(routes = "/logout")
+    public void logout (Message<ApiRequest> event, ApiRequest req, ApiResponse response, Handler<AsyncResult<ApiResponse>> handler) {
+        //get session
+        Session session = getContext().getSessionManager().getSession(req.getSessionID());
+
+        response.setStatusCode(ResponseType.OK);
+        response.getData().put("state", "logged-out");
+
+        //guest user doesnt need to logout
+        if (session.getUserID() == -1) {
+            return;
+        }
+
+        getLogger().info(req.getMessageID(), "logout", "Logout user '" + session.getUsername() + "' (userID: " + session.getUserID() + ").");
+
+        //reset user id and username
+        session.logout();
+
+        //save session
+        session.flush();
+    }
+
     protected void generateFailedMessage (String message, ApiResponse response) {
         response.setStatusCode(ResponseType.OK);
         response.getData().put("login_state", "failed");
