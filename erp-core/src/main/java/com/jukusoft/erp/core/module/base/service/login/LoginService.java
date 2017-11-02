@@ -133,6 +133,7 @@ public class LoginService extends AbstractService {
 
         //guest user doesnt need to logout
         if (session.getUserID() == -1) {
+            handler.handle(Future.succeededFuture(response));
             return;
         }
 
@@ -143,6 +144,8 @@ public class LoginService extends AbstractService {
 
         //save session
         session.flush();
+
+        handler.handle(Future.succeededFuture(response));
     }
 
     protected void generateFailedMessage (String message, ApiResponse response) {
