@@ -347,11 +347,15 @@ public class ERPServer implements IServer {
         //options.setKeyCertOptions(new JksOptions().setPath(certPath).setPassword(certPath));
         //options.setSsl(true);
 
+        //use gzip compression
+        options.setCompressionSupported(true);
+        options.setCompressionLevel(9);
+
         //create new http server
         HttpServer server = vertx.createHttpServer(options);
 
         server.requestHandler(request -> {
-            long startTime = System.currentTimeMillis();
+            final long startTime = System.currentTimeMillis();
 
             request.setExpectMultipart(true);
             request.endHandler(handler -> {

@@ -8,7 +8,7 @@ import io.vertx.core.json.JsonObject;
 
 public class HazelcastCache implements ICache {
 
-    protected IMap<String,JsonObject> cacheMap = null;
+    protected IMap<String,String> cacheMap = null;
 
     public HazelcastCache (HazelcastInstance hazelcastInstance, String cacheName, ILogging logger) {
         this.cacheMap = hazelcastInstance.getMap("cache-" + cacheName);
@@ -16,7 +16,7 @@ public class HazelcastCache implements ICache {
 
     @Override
     public void put(String key, JsonObject data) {
-        this.cacheMap.put(key, data);
+        this.cacheMap.put(key, data.encode());
     }
 
     @Override
@@ -31,7 +31,7 @@ public class HazelcastCache implements ICache {
 
     @Override
     public JsonObject get(String key) {
-        return this.cacheMap.get(key);
+        return new JsonObject(this.cacheMap.get(key));
     }
 
     @Override
