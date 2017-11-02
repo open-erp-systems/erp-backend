@@ -10,6 +10,20 @@ public interface AppServer {
     public void start (AppStartListener listener);
 
     /**
+    * set number of threads for event loop pool
+     *
+     * @param nOfThreads number of threads for event loop pool
+    */
+    public void setEventLoopPoolSize (int nOfThreads);
+
+    /**
+     * set number of threads for worker pool
+     *
+     * @param nOfThreads number of threads for worker pool
+     */
+    public void setWorkerPoolSize (int nOfThreads);
+
+    /**
     * add and start module
      *
      * @param module instance of module

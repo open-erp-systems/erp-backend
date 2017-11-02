@@ -79,6 +79,10 @@ public class DefaultAppServer implements AppServer {
     //cleanup interval for caches
     protected final int CACHE_CLEANUP_INTERVAL = 30000;
 
+    //number of threads
+    protected int eventLoopPoolSize = 2;
+    protected int workerPoolSize = 2;
+
     @Override
     public void start(AppStartListener listener) {
         System.out.println("start local hazelcast instance now...");
@@ -105,6 +109,13 @@ public class DefaultAppServer implements AppServer {
 
         //set cluster manager
         this.vertxOptions.setClusterManager(this.clusterManager);
+
+        //set option to activate vert.x High Availability
+        this.vertxOptions.setHAEnabled(true);
+
+        //set event loop thread count
+        this.vertxOptions.setEventLoopPoolSize(this.eventLoopPoolSize);
+        this.vertxOptions.setWorkerPoolSize(this.workerPoolSize);
 
         //create clustered vertx. instance
         Vertx.clusteredVertx(this.vertxOptions, res -> {
@@ -150,6 +161,16 @@ public class DefaultAppServer implements AppServer {
                 //startFuture.fail(res.cause());
             }
         });
+    }
+
+    @Override
+    public void setEventLoopPoolSize(int nOfThreads) {
+        this.eventLoopPoolSize = nOfThreads;
+    }
+
+    @Override
+    public void setWorkerPoolSize(int nOfThreads) {
+        this.workerPoolSize = nOfThreads;
     }
 
     protected void initApp () {
