@@ -1,6 +1,6 @@
-package com.jukusoft.erp.core.module;
+package com.jukusoft.erp.core.module.test;
 
-import com.jukusoft.erp.core.module.test.TestService;
+import com.jukusoft.erp.core.module.test.service.TestService;
 import com.jukusoft.erp.lib.module.AbstractModule;
 
 public class TestModule extends AbstractModule {

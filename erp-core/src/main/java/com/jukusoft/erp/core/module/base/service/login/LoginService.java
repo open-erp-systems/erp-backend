@@ -98,7 +98,7 @@ public class LoginService extends AbstractService {
                     //save session
                     session.flush();
 
-                    generateSuccessMessage("Login successful!", session.getUserID(), response);
+                    generateSuccessMessage("Login successful!", session.getUserID(), session.getUsername(), response);
                     handler.handle(Future.succeededFuture(response));
                 } else {
                     //login failed
@@ -111,12 +111,14 @@ public class LoginService extends AbstractService {
         });
     }
 
-    @Route(routes = "/isloggedin")
+    @Route(routes = {"/isloggedin", "/is-logged-in"})
     public void isLoggedIn (Message<ApiRequest> event, ApiRequest req, ApiResponse response, Handler<AsyncResult<ApiResponse>> handler) {
         //get session
         Session session = getContext().getSessionManager().getSession(req.getSessionID());
 
         response.getData().put("is-logged-in", session.isLoggedIn());
+        response.getData().put("userID", session.getUserID());
+        response.getData().put("username", session.getUsername());
 
         handler.handle(Future.succeededFuture(response));
     }
@@ -127,11 +129,12 @@ public class LoginService extends AbstractService {
         response.getData().put("login_message", message);
     }
 
-    protected void generateSuccessMessage (String message, long userID, ApiResponse response) {
+    protected void generateSuccessMessage (String message, long userID, String username, ApiResponse response) {
         response.setStatusCode(ResponseType.OK);
         response.getData().put("login_state", "success");
         response.getData().put("login_message", message);
         response.getData().put("userID", userID);
+        response.getData().put("username", username);
     }
 
 }

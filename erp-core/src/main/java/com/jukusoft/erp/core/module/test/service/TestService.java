@@ -1,4 +1,4 @@
-package com.jukusoft.erp.core.module.test;
+package com.jukusoft.erp.core.module.test.service;
 
 import com.jukusoft.erp.lib.annotation.LoginRequired;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
