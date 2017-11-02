@@ -21,6 +21,9 @@ public class GroupRepository extends AbstractMySQLRepository {
     @InjectCache(name = "group-cache", type = CacheTypes.LOCAL_MEMORY_CACHE)
     protected ICache groupCache;
 
+    @InjectCache(name = "group-members-cache", type = CacheTypes.HAZELCAST_CACHE)
+    protected ICache groupMembersCache;
+
     public void getGroupByID (long groupID, Handler<AsyncResult<Group>> handler) {
         if (this.groupCache == null) {
             throw new NullPointerException("group cache cannot be null.");
@@ -53,30 +56,76 @@ public class GroupRepository extends AbstractMySQLRepository {
         JsonArray params = new JsonArray();
         params.add(userID);
 
+        //check, if result is already in cache
+        if (this.groupMembersCache.contains("user-groups-" + userID)) {
+            //get cache object
+            JsonObject cacheObj = this.groupMembersCache.get("user-groups-" + userID);
+
+            //get json array
+            JsonArray jsonArray = cacheObj.getJsonArray("groups");
+
+            //convert rows to list
+            List<GroupMember> list = this.createListFromRows(jsonArray);
+
+            handler.handle(Future.succeededFuture(list));
+
+            return;
+        }
+
+        //execute sql query to list rows of table
         getMySQLDatabase().listRows("SELECT * FROM `" + getMySQLDatabase().getTableName("group_members") + "` LEFT JOIN `" + getMySQLDatabase().getTableName("groups") + "` ON (`" + getMySQLDatabase().getTableName("group_members") + "`.`groupID` = `" + getMySQLDatabase().getTableName("groups") + "`.`groupID`) WHERE `userID` = ?; ", params, res -> {
             if (!res.succeeded()) {
                 handler.handle(Future.failedFuture(res.cause()));
                 return;
             }
 
-            List<GroupMember> list = new ArrayList<>();
+            //create new json array
+            JsonArray rows = new JsonArray();
 
             for (JsonObject row : res.result()) {
-                GroupMember member = new GroupMember(row);
-
-                try {
-                    Group group = new Group(row);
-                    member.setGroup(group);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                //add membership to list
-                list.add(member);
+                //add row to json array
+                rows.add(row);
             }
+
+            //cache result
+            JsonObject cacheObj = new JsonObject();
+            cacheObj.put("groups", rows);
+            this.groupMembersCache.put("user-groups-" + userID, cacheObj);
+
+            //convert rows to list
+            List<GroupMember> list = this.createListFromRows(rows);
 
             handler.handle(Future.succeededFuture(list));
         });
+    }
+
+    /**
+    * converts rows to list with group membership instances
+     *
+     * @return list with group membership instances
+    */
+    protected List<GroupMember> createListFromRows (JsonArray rows) {
+        //create new empty list
+        List<GroupMember> list = new ArrayList<>();
+
+        for (int i = 0; i < rows.size(); i++) {
+            //get row
+            JsonObject row = rows.getJsonObject(i);
+
+            GroupMember member = new GroupMember(row);
+
+            try {
+                Group group = new Group(row);
+                member.setGroup(group);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            //add membership to list
+            list.add(member);
+        }
+
+        return list;
     }
 
     private void saveInCache (long groupID, Group group) {
