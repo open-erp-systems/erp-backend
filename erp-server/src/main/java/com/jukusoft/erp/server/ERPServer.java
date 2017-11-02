@@ -447,16 +447,6 @@ public class ERPServer implements IServer {
                     session = this.sessionManager.getSession(sessionID);
 
                     if (session == null) {
-                        //generate response string
-                        /*String str1 = ResponseGenerator.generateResponse(event, sessionID, ResponseType.WRONG_SESSION);
-
-                        //write to the response and end it
-                        response.end(str1);
-
-                        logger.warn(messageID, "wrong_session_id", "Couldnt find session ID: " + sessionID + " (IP: " + request.remoteAddress().host() + ":"  + request.remoteAddress().port() + ").");
-
-                        throw new IllegalStateException("cannot find session ID: " + sessionID);*/
-
                         //generate new session
                         session = this.sessionManager.generateNewSession();
                     }
