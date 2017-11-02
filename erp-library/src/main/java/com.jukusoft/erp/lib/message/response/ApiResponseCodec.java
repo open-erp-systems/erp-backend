@@ -3,14 +3,14 @@ package com.jukusoft.erp.lib.message.response;
 import com.jukusoft.erp.lib.message.ResponseType;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.MessageCodec;
-import org.json.JSONObject;
+import io.vertx.core.json.JsonObject;
 
 public class ApiResponseCodec implements MessageCodec<ApiResponse, ApiResponse> {
 
     @Override
     public void encodeToWire(Buffer buffer, ApiResponse res) {
         //create new json object
-        JSONObject json = new JSONObject();
+        JsonObject json = new JsonObject();
 
         if (res.data == null) {
             throw new NullPointerException("json data of api response '" + res.getClass().getSimpleName() + "' cannot be null.");
@@ -47,12 +47,12 @@ public class ApiResponseCodec implements MessageCodec<ApiResponse, ApiResponse> 
         // Get JSON string by it`s length
         // Jump 4 because getInt() == 4 bytes
         String jsonStr = buffer.getString(_pos+=4, _pos+=length);
-        JSONObject json = new JSONObject(jsonStr);
+        JsonObject json = new JsonObject(jsonStr);
 
         ApiResponse res = new ApiResponse(json.getLong("cluster-message-id"), json.getString("session-id"), json.getString("event"));
 
         res.eventName = json.getString("event");
-        res.data = json.getJSONObject("data");
+        res.data = json.getJsonObject("data");
         res.ackID = json.getString("ackID");
         res.statusCode = ResponseType.getByString(json.getString("statusCode"));
         res.messageID = json.getLong("cluster-message-id");

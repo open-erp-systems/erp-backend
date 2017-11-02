@@ -1,7 +1,7 @@
 package com.jukusoft.erp.server.message;
 
 import com.jukusoft.erp.lib.message.ResponseType;
-import org.json.JSONObject;
+import io.vertx.core.json.JsonObject;
 
 public class ResponseGenerator {
 
@@ -14,12 +14,12 @@ public class ResponseGenerator {
      *
      * @return json string
     */
-    public static String generateResponse (String event, JSONObject jsonData, String sessionID, ResponseType type) {
+    public static String generateResponse (String event, JsonObject jsonData, String sessionID, ResponseType type) {
         if (jsonData == null) {
             throw new NullPointerException("json data cannot be null.");
         }
 
-        JSONObject json = new JSONObject();
+        JsonObject json = new JsonObject();
 
         json.put("event", event);
 
@@ -45,7 +45,7 @@ public class ResponseGenerator {
      * @return json string
      */
     public static String generateResponse (String event, String sessionID, ResponseType type) {
-        return generateResponse(event, new JSONObject(), sessionID, type);
+        return generateResponse(event, new JsonObject(), sessionID, type);
     }
 
 }

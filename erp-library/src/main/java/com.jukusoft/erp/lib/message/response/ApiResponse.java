@@ -1,6 +1,7 @@
 package com.jukusoft.erp.lib.message.response;
 
 import com.jukusoft.erp.lib.message.ResponseType;
+import io.vertx.core.json.JsonObject;
 import org.json.JSONObject;
 
 public class ApiResponse {
@@ -9,7 +10,7 @@ public class ApiResponse {
     protected String eventName = "";
 
     //json data
-    protected JSONObject data = new JSONObject();
+    protected JsonObject data = new JsonObject();
 
     protected String ackID = "";
 
@@ -36,11 +37,11 @@ public class ApiResponse {
         return this.eventName;
     }
 
-    public JSONObject getData () {
+    public JsonObject getData () {
         return this.data;
     }
 
-    public void setData (JSONObject json) {
+    public void setData (JsonObject json) {
         this.data = json;
     }
 
