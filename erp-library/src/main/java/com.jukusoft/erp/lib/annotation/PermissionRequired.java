@@ -12,6 +12,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PermissionRequired {
 
+    /**
+    * array with all names of required permissions to use this method.
+     * Else an error 403 - FORBIDDEN will be raised.
+    */
     String[] requiredPermissions ();
 
 }
