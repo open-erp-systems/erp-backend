@@ -5,6 +5,7 @@ import com.jukusoft.erp.lib.cache.CacheManager;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.database.DatabaseManager;
 import com.jukusoft.erp.lib.logging.ILogging;
+import com.jukusoft.erp.lib.permission.PermissionManager;
 import com.jukusoft.erp.lib.session.SessionManager;
 import io.vertx.core.Vertx;
 
@@ -28,7 +29,10 @@ public class AppContextImpl implements AppContext {
     //instance of cache manager
     protected CacheManager cacheManager = null;
 
-    public AppContextImpl (Vertx vertx, ILogging logger, HazelcastInstance hazelcastInstance, SessionManager sessionManager, DatabaseManager dbManager, CacheManager cacheManager) {
+    //instance of permission manager
+    protected PermissionManager permissionManager = null;
+
+    public AppContextImpl (Vertx vertx, ILogging logger, HazelcastInstance hazelcastInstance, SessionManager sessionManager, DatabaseManager dbManager, CacheManager cacheManager, PermissionManager permissionManager) {
         if (vertx == null) {
             throw new NullPointerException("vertx cannot be null.");
         }
@@ -53,12 +57,17 @@ public class AppContextImpl implements AppContext {
             throw new NullPointerException("cache manager cannot be null.");
         }
 
+        if (permissionManager == null) {
+            throw new NullPointerException("permission manager cannot be null.");
+        }
+
         this.vertx = vertx;
         this.logger = logger;
         this.hazelcastInstance = hazelcastInstance;
         this.sessionManager = sessionManager;
         this.dbManager = dbManager;
         this.cacheManager = cacheManager;
+        this.permissionManager = permissionManager;
     }
 
     @Override
@@ -89,6 +98,11 @@ public class AppContextImpl implements AppContext {
     @Override
     public CacheManager getCacheManager() {
         return this.cacheManager;
+    }
+
+    @Override
+    public PermissionManager getPermissionManager() {
+        return this.permissionManager;
     }
 
 }

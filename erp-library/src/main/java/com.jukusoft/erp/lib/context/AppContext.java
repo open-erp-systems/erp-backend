@@ -3,8 +3,8 @@ package com.jukusoft.erp.lib.context;
 import com.hazelcast.core.HazelcastInstance;
 import com.jukusoft.erp.lib.cache.CacheManager;
 import com.jukusoft.erp.lib.database.DatabaseManager;
-import com.jukusoft.erp.lib.database.MySQLDatabase;
 import com.jukusoft.erp.lib.logging.ILogging;
+import com.jukusoft.erp.lib.permission.PermissionManager;
 import com.jukusoft.erp.lib.session.SessionManager;
 import io.vertx.core.Vertx;
 
@@ -41,5 +41,12 @@ public interface AppContext {
      * @return instance of cache manager
     */
     public CacheManager getCacheManager ();
+
+    /**
+    * get instance of permission manager
+     *
+     * @return instance of permission manager
+    */
+    public PermissionManager getPermissionManager ();
 
 }

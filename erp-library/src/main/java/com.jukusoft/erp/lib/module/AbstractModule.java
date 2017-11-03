@@ -1,6 +1,7 @@
 package com.jukusoft.erp.lib.module;
 
 import com.jukusoft.erp.lib.annotation.LoginRequired;
+import com.jukusoft.erp.lib.annotation.PermissionRequired;
 import com.jukusoft.erp.lib.cache.CacheTypes;
 import com.jukusoft.erp.lib.cache.ICache;
 import com.jukusoft.erp.lib.cache.InjectCache;
@@ -275,6 +276,29 @@ public abstract class AbstractModule implements IModule {
                         event.reply(res);
 
                         return;
+                    }
+                }
+
+                //check required permissions
+                if (method.isAnnotationPresent(PermissionRequired.class)) {
+                    //get annotation
+                    PermissionRequired annotation = method.getAnnotation(PermissionRequired.class);
+
+                    //check permissions
+                    for (String permissionName : annotation.requiredPermissions()) {
+                        if (!context.getPermissionManager().hasPermission(req.getUserID(), permissionName)) {
+                            //user doesnt have the permission to see this page / use this api
+
+                            ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
+
+                            //set forbidden status code
+                            res.setStatusCode(ResponseType.FORBIDDEN);
+
+                            //reply to api request
+                            event.reply(res);
+
+                            return;
+                        }
                     }
                 }
 
