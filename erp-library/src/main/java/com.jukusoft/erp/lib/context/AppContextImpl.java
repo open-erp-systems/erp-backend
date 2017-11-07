@@ -105,4 +105,13 @@ public class AppContextImpl implements AppContext {
         return this.permissionManager;
     }
 
+    @Override
+    public void setPermissionManager(PermissionManager permissionManager) {
+        if (permissionManager == null) {
+            throw new NullPointerException("permission manager cannot be null.");
+        }
+
+        this.permissionManager = permissionManager;
+    }
+
 }

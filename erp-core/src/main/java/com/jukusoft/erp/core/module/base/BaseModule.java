@@ -1,10 +1,12 @@
 package com.jukusoft.erp.core.module.base;
 
 import com.jukusoft.data.repository.GroupRepository;
+import com.jukusoft.data.repository.PermissionRepository;
 import com.jukusoft.data.repository.UserRepository;
 import com.jukusoft.erp.core.module.base.service.group.GroupService;
 import com.jukusoft.erp.core.module.base.service.login.LoginService;
 import com.jukusoft.erp.core.module.base.service.loginform.LoginFormService;
+import com.jukusoft.erp.core.permission.PermissionManagerImpl;
 import com.jukusoft.erp.lib.module.AbstractModule;
 
 public class BaseModule extends AbstractModule {
@@ -14,6 +16,10 @@ public class BaseModule extends AbstractModule {
         //add repositories
         addRepository(new UserRepository(), UserRepository.class);
         addRepository(new GroupRepository(), GroupRepository.class);
+        addRepository(new PermissionRepository(), PermissionRepository.class);
+
+        //set permission manager
+        context.setPermissionManager(new PermissionManagerImpl(getRepository(GroupRepository.class), getRepository(PermissionRepository.class)));
 
         //add services
         addService(new LoginFormService());

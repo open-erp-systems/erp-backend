@@ -49,4 +49,11 @@ public interface AppContext {
     */
     public PermissionManager getPermissionManager ();
 
+    /**
+    * set instance of permission manager
+     *
+     * @param permissionManager instance of permission manager
+    */
+    public void setPermissionManager (PermissionManager permissionManager);
+
 }

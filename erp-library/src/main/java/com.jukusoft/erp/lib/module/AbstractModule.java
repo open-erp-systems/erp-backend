@@ -87,6 +87,10 @@ public abstract class AbstractModule implements IModule {
         context.getDatabaseManager().addRepository(repository, cls);
     }
 
+    protected <T extends Repository> T getRepository (Class<T> cls) {
+        return context.getDatabaseManager().getRepository(cls);
+    }
+
     protected <T extends IService> void addService(T page) {
         getLogger().debug("init_service", "Initialize service '" + page.getClass().getSimpleName() + "'.");
 

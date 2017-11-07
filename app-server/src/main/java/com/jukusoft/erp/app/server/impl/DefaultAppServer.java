@@ -20,6 +20,7 @@ import com.jukusoft.erp.lib.message.request.ApiRequestCodec;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.message.response.ApiResponseCodec;
 import com.jukusoft.erp.lib.module.IModule;
+import com.jukusoft.erp.lib.permission.PermissionManager;
 import com.jukusoft.erp.lib.session.SessionManager;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -187,7 +188,12 @@ public class DefaultAppServer implements AppServer {
         this.sessionManager = SessionManager.createHzMapSessionManager(this.hazelcastInstance);
 
         //create app content
-        this.context = new AppContextImpl(this.vertx, this.logger, this.hazelcastInstance, this.sessionManager, this.dbManager, this.cacheManager);
+        this.context = new AppContextImpl(this.vertx, this.logger, this.hazelcastInstance, this.sessionManager, this.dbManager, this.cacheManager, new PermissionManager() {
+            @Override
+            public boolean hasPermission(long userID, String permissionName) {
+                throw new IllegalStateException("no permission manager set yet.");
+            }
+        });
 
         //add event listeners to cleanup cache
         this.vertx.eventBus().consumer("cleanup-cache", res -> {

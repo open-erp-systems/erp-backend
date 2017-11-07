@@ -99,6 +99,30 @@ public class GroupRepository extends AbstractMySQLRepository {
         });
     }
 
+    public void listGroupIDsOfUser (long userID, Handler<AsyncResult<long[]>> handler) {
+        //first, check if list is in cache
+        if (this.groupMembersCache.contains("user-groupIDs-" + userID)) {
+            //get json array
+            JsonArray array = this.groupMembersCache.getArray("user-groupIDs-" + userID);
+
+            handler.handle(Future.succeededFuture(creareGroupIDsArray(array)));
+
+            return;
+        }
+
+        //TODO: read from database
+    }
+
+    private long[] creareGroupIDsArray (JsonArray array) {
+        long[] array1 = new long[array.size()];
+
+        for (int i = 0; i < array.size(); i++) {
+            array1[i] = array.getLong(i);
+        }
+
+        return array1;
+    }
+
     /**
     * converts rows to list with group membership instances
      *

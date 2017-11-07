@@ -20,9 +20,9 @@ public class TestService extends AbstractService {
 
     @LoginRequired
     @Route(routes = {"/metrics", "/metrics/"})
-    public void metrics (Message<ApiRequest> event, ApiRequest req, Handler<AsyncResult<ApiResponse>> handler) {
+    public void metrics (Message<ApiRequest> event, ApiRequest req, ApiResponse res, Handler<AsyncResult<ApiResponse>> handler) {
         //send new api answer
-        ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
+        //ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
 
         res.getData().put("content", "Metrics");
 
