@@ -64,4 +64,35 @@ public class GroupService extends AbstractService {
         });
     }
 
+    @Route(routes = "/list-my-groupIDs")
+    public void listMyGroupIDs (Message<ApiRequest> event, ApiRequest req, ApiResponse response, Handler<AsyncResult<ApiResponse>> handler) {
+        //first get user ID
+        long userID = req.getUserID();
+
+        //get an list with all groupIDs where user is member
+        this.groupRepository.listGroupIDsOfUser(userID, res -> {
+            if (!res.succeeded()) {
+                handler.handle(Future.failedFuture(res.cause()));
+                return;
+            }
+
+            //list with all groups where user is a member
+            long[] groupIDs = res.result();
+
+            //set successful status code of request
+            response.setStatusCode(ResponseType.OK);
+
+            JsonArray array = new JsonArray();
+
+            for (long groupID : groupIDs) {
+                array.add(groupID);
+            }
+
+            response.getData().put("group_count", groupIDs.length);
+            response.getData().put("groupIDs", array);
+
+            handler.handle(Future.succeededFuture(response));
+        });
+    }
+
 }
