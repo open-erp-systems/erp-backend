@@ -105,15 +105,37 @@ public class GroupRepository extends AbstractMySQLRepository {
             //get json array
             JsonArray array = this.groupMembersCache.getArray("user-groupIDs-" + userID);
 
-            handler.handle(Future.succeededFuture(creareGroupIDsArray(array)));
+            handler.handle(Future.succeededFuture(createGroupIDsArray(array)));
 
             return;
         }
 
+        //execute sql query to list rows of table
+        getMySQLDatabase().listRows("SELECT * FROM `" + getMySQLDatabase().getTableName("group_members") + "` WHERE `userID` = '" + userID + "'; ", res -> {
+            if (!res.succeeded()) {
+                handler.handle(Future.failedFuture(res.cause()));
+                return;
+            }
+
+            //create new json array
+            JsonArray groups = new JsonArray();
+
+            //iterate through all rows
+            for (JsonObject row : res.result()) {
+                //add row to json array
+                groups.add(row.getLong("groupID"));
+            }
+
+            //cache result
+            this.groupMembersCache.putArray("user-groupIDs-" + userID, groups);
+
+            handler.handle(Future.succeededFuture(createGroupIDsArray(groups)));
+        });
+
         //TODO: read from database
     }
 
-    private long[] creareGroupIDsArray (JsonArray array) {
+    private long[] createGroupIDsArray (JsonArray array) {
         long[] array1 = new long[array.size()];
 
         for (int i = 0; i < array.size(); i++) {
