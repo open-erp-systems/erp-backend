@@ -420,6 +420,12 @@ public class ERPServer implements IServer {
 
                     for (String str : array1[1].split("&")) {
                         String[] array2 = str.split("=");
+
+                        if (array2.length < 2) {
+                            //there is a key, but no value set
+                            continue;
+                        }
+
                         String key = array2[0];
                         String value = array2[1];
 
