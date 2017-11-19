@@ -16,6 +16,7 @@ public class ApiRequestCodec implements MessageCodec<ApiRequest, ApiRequest> {
         json.put("data", req.data);
         json.put("ackID", req.ackID);
         json.put("cluster-message-id", req.getMessageID());
+        json.put("ack-id", req.getExternalID());
         json.put("meta", req.meta);
         json.put("session-id", req.sessionID);
         json.put("is-logged-in", req.isLoggedIn);
@@ -51,6 +52,7 @@ public class ApiRequestCodec implements MessageCodec<ApiRequest, ApiRequest> {
         req.data = json.getJSONObject("data");
         req.ackID = json.getString("ackID");
         req.messageID = json.getLong("cluster-message-id");
+        req.externalID = json.getString("ack-id");
         req.meta = json.getJSONObject("meta");
         req.sessionID = json.getString("session-id");
         req.isLoggedIn = json.getBoolean("is-logged-in");

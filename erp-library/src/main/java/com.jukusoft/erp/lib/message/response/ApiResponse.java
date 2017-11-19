@@ -18,6 +18,9 @@ public class ApiResponse {
 
     protected long messageID = 0;
 
+    //external ack ID
+    protected String externalID = "";
+
     //meta information
     protected String sessionID = "";
 
@@ -27,8 +30,9 @@ public class ApiResponse {
 
     protected RESPONSE_TYPE type = RESPONSE_TYPE.JSON;
 
-    public ApiResponse (long messageID, String sessionID, String eventName) {
+    public ApiResponse (long messageID, String externalID, String sessionID, String eventName) {
         this.messageID = messageID;
+        this.externalID = externalID;
         this.sessionID = sessionID;
         this.eventName = eventName;
     }
@@ -55,6 +59,10 @@ public class ApiResponse {
 
     public long getMessageID () {
         return this.messageID;
+    }
+
+    public String getExternalID () {
+        return this.externalID;
     }
 
     public String getSessionID () {

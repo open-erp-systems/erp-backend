@@ -232,6 +232,13 @@ public class ERPServer implements IServer {
                 //get event name
                 String event = json.getString("event");
 
+                //get external ID, if available
+                String externalID = "";
+
+                if (json.has("messageID")) {
+                    externalID = json.getString("externalID");
+                }
+
                 //get data
                 JSONObject data = json.getJSONObject("data");
 
@@ -266,7 +273,7 @@ public class ERPServer implements IServer {
                 sessionID = session.getSessionID();
 
                 //create api request
-                ApiRequest req = new ApiRequest(event, data, messageID, sessionID, session.isLoggedIn(), session.getUserID());
+                ApiRequest req = new ApiRequest(event, data, messageID, externalID, sessionID, session.isLoggedIn(), session.getUserID());
 
                 //add meta information
                 req.getMeta().put("host", socket.remoteAddress().host());
@@ -460,10 +467,13 @@ public class ERPServer implements IServer {
 
                 sessionID = session.getSessionID();
 
+                //HTTP requests doesnt use external IDs (ack IDs)
+                String externalID = "";
+
                 response.putHeader("Set-Cookie", "sessionid=" + sessionID + "; HttpOnly; Path=/");
 
                 //create api request
-                ApiRequest req = new ApiRequest(event, data, messageID, sessionID, session.isLoggedIn(), session.getUserID());
+                ApiRequest req = new ApiRequest(event, data, messageID, externalID, sessionID, session.isLoggedIn(), session.getUserID());
 
                 //add meta information
                 req.getMeta().put("host", request.remoteAddress().host());

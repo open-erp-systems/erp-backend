@@ -271,7 +271,7 @@ public abstract class AbstractModule implements IModule {
                 if (method.isAnnotationPresent(LoginRequired.class)) {
                     //check, if user is logged in
                     if (!req.isLoggedIn()) {
-                        ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
+                        ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
 
                         //set forbidden status code
                         res.setStatusCode(ResponseType.FORBIDDEN);
@@ -293,7 +293,7 @@ public abstract class AbstractModule implements IModule {
                         if (!context.getPermissionManager().hasPermission(req.getUserID(), permissionName)) {
                             //user doesnt have the permission to see this page / use this api
 
-                            ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
+                            ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
 
                             //set forbidden status code
                             res.setStatusCode(ResponseType.FORBIDDEN);
@@ -308,7 +308,7 @@ public abstract class AbstractModule implements IModule {
 
                 if (method.getReturnType() == ApiResponse.class) {
                     //create new api answer
-                    ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
+                    ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
 
                     try {
                         res = (ApiResponse) method.invoke(page, event, req, res);
@@ -336,7 +336,7 @@ public abstract class AbstractModule implements IModule {
                     }
                 } else {
                     //create new api answer
-                    ApiResponse res = new ApiResponse(req.getMessageID(), req.getSessionID(), req.getEvent());
+                    ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
 
                     Handler<AsyncResult<ApiResponse>> handler = new Handler<AsyncResult<ApiResponse>>() {
                         @Override
