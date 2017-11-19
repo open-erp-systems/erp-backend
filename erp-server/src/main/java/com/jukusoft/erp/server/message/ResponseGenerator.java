@@ -14,14 +14,16 @@ public class ResponseGenerator {
      *
      * @return json string
     */
-    public static String generateResponse (String event, JsonObject jsonData, String sessionID, ResponseType type) {
+    public static String generateResponse (String event, JsonObject jsonData, String sessionID, String externalID, ResponseType type) {
         if (jsonData == null) {
             throw new NullPointerException("json data cannot be null.");
         }
 
         JsonObject json = new JsonObject();
 
+        //add header information
         json.put("event", event);
+        json.put("messageID", externalID);
 
         //set status code
         json.put("statusCode", type.getValue());
@@ -44,8 +46,8 @@ public class ResponseGenerator {
      *
      * @return json string
      */
-    public static String generateResponse (String event, String sessionID, ResponseType type) {
-        return generateResponse(event, new JsonObject(), sessionID, type);
+    public static String generateResponse (String event, String sessionID, String externalID, ResponseType type) {
+        return generateResponse(event, new JsonObject(), sessionID, externalID, type);
     }
 
 }

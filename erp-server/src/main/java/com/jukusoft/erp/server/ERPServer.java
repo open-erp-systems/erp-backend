@@ -208,7 +208,7 @@ public class ERPServer implements IServer {
                     logger.warn(messageID, "bad_request", "invalide json message: " + str);
 
                     //generate response string
-                    String str1 = ResponseGenerator.generateResponse("error", "", ResponseType.BAD_REQUEST);
+                    String str1 = ResponseGenerator.generateResponse("error", "", "none", ResponseType.BAD_REQUEST);
 
                     //write to the response and end it
                     socket.write(str1);
@@ -216,12 +216,19 @@ public class ERPServer implements IServer {
                     return;
                 }
 
+                //get external ID, if available
+                String externalID = "";
+
+                if (json.has("messageID")) {
+                    externalID = json.getString("messageID");
+                }
+
                 //check, if event name exists
                 if (!json.has("event")) {
                     logger.warn(messageID, "bad_request", "event doesnt exists in message: " + json.toString());
 
                     //generate response string
-                    String str1 = ResponseGenerator.generateResponse("error", "", ResponseType.BAD_REQUEST);
+                    String str1 = ResponseGenerator.generateResponse("error", "", externalID, ResponseType.BAD_REQUEST);
 
                     //write to the response and end it
                     socket.write(str1);
@@ -231,13 +238,6 @@ public class ERPServer implements IServer {
 
                 //get event name
                 String event = json.getString("event");
-
-                //get external ID, if available
-                String externalID = "";
-
-                if (json.has("messageID")) {
-                    externalID = json.getString("messageID");
-                }
 
                 //get data
                 JSONObject data = json.getJSONObject("data");
@@ -259,7 +259,7 @@ public class ERPServer implements IServer {
 
                     if (session == null) {
                         //generate response string
-                        String str1 = ResponseGenerator.generateResponse(event, sessionID, ResponseType.BAD_REQUEST);
+                        String str1 = ResponseGenerator.generateResponse(event, sessionID, externalID, ResponseType.BAD_REQUEST);
 
                         //write to the response and end it
                         socket.write(str1);
@@ -287,7 +287,7 @@ public class ERPServer implements IServer {
                     public void handleResponse(ApiResponse res) {
                         if (res.getType() == ApiResponse.RESPONSE_TYPE.JSON) {
                             //send response
-                            String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getStatusCode());
+                            String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getExternalID(), res.getStatusCode());
 
                             //write to the response and end it
                             socket.write(str);
@@ -301,7 +301,7 @@ public class ERPServer implements IServer {
                     @Override
                     public void responseFailed() {
                         //generate response string
-                        String str = ResponseGenerator.generateResponse(event, req.getSessionID(), ResponseType.SERVICE_UNAVAILABLE);
+                        String str = ResponseGenerator.generateResponse(event, req.getSessionID(), req.getExternalID(), ResponseType.SERVICE_UNAVAILABLE);
 
                         //write to the response and end it
                         socket.write(str);
@@ -468,7 +468,7 @@ public class ERPServer implements IServer {
                 sessionID = session.getSessionID();
 
                 //HTTP requests doesnt use external IDs (ack IDs)
-                String externalID = "";
+                String externalID = "none";
 
                 response.putHeader("Set-Cookie", "sessionid=" + sessionID + "; HttpOnly; Path=/");
 
@@ -488,7 +488,7 @@ public class ERPServer implements IServer {
                     public void handleResponse(ApiResponse res) {
                         if (res.getType() == ApiResponse.RESPONSE_TYPE.JSON) {
                             //send response
-                            String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getStatusCode());
+                            String str = ResponseGenerator.generateResponse(res.getEvent(), res.getData(), res.getSessionID(), res.getExternalID(), res.getStatusCode());
 
                             response.putHeader("content-type", "application/json");
 
@@ -512,7 +512,7 @@ public class ERPServer implements IServer {
                     @Override
                     public void responseFailed() {
                         //generate response string
-                        String str = ResponseGenerator.generateResponse(eventName, req.getSessionID(), ResponseType.SERVICE_UNAVAILABLE);
+                        String str = ResponseGenerator.generateResponse(eventName, req.getSessionID(), req.getExternalID(), ResponseType.SERVICE_UNAVAILABLE);
 
                         //write to the response and end it
                         response.end(str);
