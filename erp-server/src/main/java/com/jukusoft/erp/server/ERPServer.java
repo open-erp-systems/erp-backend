@@ -236,7 +236,7 @@ public class ERPServer implements IServer {
                 String externalID = "";
 
                 if (json.has("messageID")) {
-                    externalID = json.getString("externalID");
+                    externalID = json.getString("messageID");
                 }
 
                 //get data
