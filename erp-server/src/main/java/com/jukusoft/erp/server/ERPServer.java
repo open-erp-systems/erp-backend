@@ -76,8 +76,8 @@ public class ERPServer implements IServer {
     protected DatabaseManager dbManager = null;
 
     //number of threads
-    protected int eventLoopPoolSize = 2;
-    protected int workerPoolSize = 2;
+    protected int eventLoopPoolSize = 1;
+    protected int workerPoolSize = 1;
 
     public void start() {
         //create an new hazelcast instance
