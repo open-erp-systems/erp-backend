@@ -22,10 +22,7 @@ import com.jukusoft.erp.lib.message.response.ApiResponseCodec;
 import com.jukusoft.erp.lib.module.IModule;
 import com.jukusoft.erp.lib.permission.PermissionManager;
 import com.jukusoft.erp.lib.session.SessionManager;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
+import io.vertx.core.*;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.cluster.ClusterManager;
@@ -78,7 +75,7 @@ public class DefaultAppServer implements AppServer {
     protected CacheManager cacheManager = null;
 
     //cleanup interval for caches
-    protected final int CACHE_CLEANUP_INTERVAL = 30000;
+    protected final int CACHE_CLEANUP_INTERVAL = 60000;
 
     //number of threads
     protected int eventLoopPoolSize = 2;
@@ -211,9 +208,19 @@ public class DefaultAppServer implements AppServer {
 
         //cleanup cache every 30 seconds
         vertx.setPeriodic(CACHE_CLEANUP_INTERVAL, id -> {
-            logger.debug("cache_cleanup", "cleanup cache now: " + System.currentTimeMillis());
+            vertx.executeBlocking(new Handler<Future<Void>>() {
+                @Override
+                public void handle(Future<Void> event) {
+                    logger.debug("cache_cleanup", "cleanup cache now: " + System.currentTimeMillis());
 
-            this.cacheManager.cleanUp();
+                    cacheManager.cleanUp();
+                }
+            }, new Handler<AsyncResult<Void>>() {
+                @Override
+                public void handle(AsyncResult<Void> event) {
+                    System.out.println("cache successfully cleaned up.");
+                }
+            });
         });
     }
 
