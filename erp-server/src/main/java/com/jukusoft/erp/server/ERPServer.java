@@ -194,8 +194,6 @@ public class ERPServer implements IServer {
                 //convert to string and json object
                 String str = buffer.toString(StandardCharsets.UTF_8);
 
-                JSONObject json = new JSONObject(str);
-
                 //generate cluster-wide unique message id
                 final long messageID = generateMessageID();
 
@@ -215,6 +213,8 @@ public class ERPServer implements IServer {
 
                     return;
                 }
+
+                JSONObject json = new JSONObject(str);
 
                 //get external ID, if available
                 String externalID = "";
