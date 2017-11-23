@@ -39,3 +39,11 @@ Short Mindmap:
       * service-orientated architecture (SOA)
   - this erp system can scale out and so balance with your needs of performance
   - active development
+  
+## Permission System
+
+OS ERP System has an group-based permission system.\
+So you can add permissions to groups and every user belongs to one or more groups.\
+\
+**System permissions**:\
+System permissions are permissions which cannot be deleted.
