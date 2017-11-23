@@ -147,14 +147,16 @@ public class MySQLDatabase {
     }
 
     public void getRow (String sql, JsonArray params, Handler<AsyncResult<JsonObject>> handler) {
-        this.connection.queryWithParams(sql, params, res -> {
+        String sql1 = sql.replace("{prefix}", this.getPrefix());
+
+        this.connection.queryWithParams(sql1, params, res -> {
             if (!res.succeeded()) {
                 if (res.cause() != null) {
                     res.cause().printStackTrace();
                 }
 
                 handler.handle(Future.failedFuture(res.cause()));
-                throw new IllegalStateException("Couldnt execute query to read row: " + sql + ", exception: " + res.cause());
+                throw new IllegalStateException("Couldnt execute query to read row: " + sql1 + ", exception: " + res.cause());
             }
 
             //get result set
@@ -178,13 +180,15 @@ public class MySQLDatabase {
     }
 
     public void listRows (String sql, Handler<AsyncResult<List<JsonObject>>> handler) {
-        this.connection.query(sql, res -> {
+        String sql1 = sql.replace("{prefix}", this.getPrefix());
+
+        this.connection.query(sql1, res -> {
             if (!res.succeeded()) {
                 if (res.cause() != null) {
                     res.cause().printStackTrace();
                 }
 
-                throw new IllegalStateException("Couldnt execute query to read row: " + sql);
+                throw new IllegalStateException("Couldnt execute query to read row: " + sql1);
             }
 
             //get result set
@@ -198,13 +202,15 @@ public class MySQLDatabase {
     }
 
     public void listRows (String sql, JsonArray params, Handler<AsyncResult<List<JsonObject>>> handler) {
-        this.connection.queryWithParams(sql, params, res -> {
+        String sql1 = sql.replace("{prefix}", this.getPrefix());
+
+        this.connection.queryWithParams(sql1, params, res -> {
             if (!res.succeeded()) {
                 if (res.cause() != null) {
                     res.cause().printStackTrace();
                 }
 
-                throw new IllegalStateException("Couldnt execute query to read row: " + sql);
+                throw new IllegalStateException("Couldnt execute query to read row: " + sql1);
             }
 
             //get result set
@@ -218,6 +224,8 @@ public class MySQLDatabase {
     }
 
     public void update (String sql, Handler<AsyncResult<UpdateResult>> handler) {
+        sql = sql.replace("{prefix}", this.getPrefix());
+
         this.connection.update(sql, handler);
     }
 
