@@ -64,14 +64,20 @@ public class MenuService extends AbstractService {
                 if (parentID == -1) {
                     //it isnt an sub menu
 
+                    System.out.println("check menu: " + row.getString("title"));
+
                     //check login permissions
                     if (!checkLogin(req.getUserID(), row.getInteger("login_required"))) {
+                        getLogger().debug(req.getMessageID(), "list_menus_api", "Dont show menu, because user isnt logged in: " + row.getString("title"));
+
                         //login is required and user isnt logged in, so dont show this menu
                         continue;
                     }
 
                     //check permissions
                     if (!checkPermissions(req.getUserID(), row.getString("permissions"))) {
+                        getLogger().debug(req.getMessageID(), "list_menus_api", "Dont show menu, because user doesnt have permission: " + row.getString("title"));
+
                         //user doesnt have permissions, so dont show this menu
                         continue;
                     }
@@ -115,6 +121,8 @@ public class MenuService extends AbstractService {
                 //menu doesnt belongs to this parent menu
                 continue;
             }
+
+            System.out.println("check menu: " + row.getString("title"));
 
             //check login permissions
             if (!checkLogin(userID, row.getInteger("login_required"))) {
