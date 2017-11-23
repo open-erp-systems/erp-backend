@@ -22,7 +22,7 @@ public class MenuService extends AbstractService {
     @Route(routes = "/list-menus")
     public void listMenus (Message<ApiRequest> event, ApiRequest req, ApiResponse response, Handler<AsyncResult<ApiResponse>> handler) {
         //first, check if request contains menuID
-        if (req.getData().has("menuID")) {
+        if (!req.getData().has("menuID")) {
             response.setStatusCode(ResponseType.BAD_REQUEST);
 
             //log
