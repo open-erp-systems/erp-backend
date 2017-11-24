@@ -16,6 +16,8 @@ public interface ICache {
 
     public void remove (String key);
 
+    public void removeAll ();
+
     public boolean contains (String key);
 
     public JsonObject get (String key);

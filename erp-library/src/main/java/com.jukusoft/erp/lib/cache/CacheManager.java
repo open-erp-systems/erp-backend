@@ -5,6 +5,7 @@ import com.jukusoft.erp.lib.cache.impl.DefaultCacheManager;
 import com.jukusoft.erp.lib.logging.ILogging;
 
 import java.io.File;
+import java.util.List;
 
 public interface CacheManager {
 
@@ -40,6 +41,13 @@ public interface CacheManager {
      * @param cacheName name of cache
     */
     public void removeCache (String cacheName);
+
+    /**
+    * list names of all caches
+     *
+     * @return list with all cache names
+    */
+    public List<String> listCacheNames ();
 
     /**
     * clean up outdated entries from all caches

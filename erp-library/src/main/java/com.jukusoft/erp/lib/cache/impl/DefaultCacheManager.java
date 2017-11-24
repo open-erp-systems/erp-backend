@@ -7,6 +7,8 @@ import com.jukusoft.erp.lib.cache.ICache;
 import com.jukusoft.erp.lib.logging.ILogging;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -82,6 +84,18 @@ public class DefaultCacheManager implements CacheManager {
         if (cache != null) {
             cache.cleanUp();
         }
+    }
+
+    @Override
+    public List<String> listCacheNames() {
+        List<String> list = new ArrayList<>();
+
+        for (Map.Entry<String,ICache> entry : this.cacheMap.entrySet()) {
+            //add cache name to list
+            list.add(entry.getKey());
+        }
+
+        return list;
     }
 
     @Override

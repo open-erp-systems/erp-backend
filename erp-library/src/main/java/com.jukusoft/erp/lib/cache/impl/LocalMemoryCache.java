@@ -39,6 +39,12 @@ public class LocalMemoryCache implements ICache {
     }
 
     @Override
+    public void removeAll() {
+        this.cacheMap.clear();
+        this.accessMap.clear();
+    }
+
+    @Override
     public boolean contains(String key) {
         return this.cacheMap.get(key) != null;
     }

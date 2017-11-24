@@ -60,6 +60,11 @@ public class FileSystemCache implements ICache {
     }
 
     @Override
+    public void removeAll() {
+        //
+    }
+
+    @Override
     public boolean contains(String key) {
         //get filename
         String filename = this.getFileName(key);

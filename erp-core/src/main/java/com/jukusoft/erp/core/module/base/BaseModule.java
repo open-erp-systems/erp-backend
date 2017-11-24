@@ -4,6 +4,7 @@ import com.jukusoft.data.repository.GroupRepository;
 import com.jukusoft.data.repository.MenuRepository;
 import com.jukusoft.data.repository.PermissionRepository;
 import com.jukusoft.data.repository.UserRepository;
+import com.jukusoft.erp.core.module.base.service.cache.CacheService;
 import com.jukusoft.erp.core.module.base.service.group.GroupService;
 import com.jukusoft.erp.core.module.base.service.login.LoginService;
 import com.jukusoft.erp.core.module.base.service.loginform.LoginFormService;
@@ -31,6 +32,7 @@ public class BaseModule extends AbstractModule {
         addService(new GroupService());
         addService(new MenuService());
         addService(new PermissionService());
+        addService(new CacheService());
     }
 
     @Override

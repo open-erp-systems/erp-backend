@@ -25,6 +25,11 @@ public class HazelcastCache implements ICache {
     }
 
     @Override
+    public void removeAll() {
+        this.cacheMap.clear();
+    }
+
+    @Override
     public boolean contains(String key) {
         return this.cacheMap.containsKey(key);
     }
