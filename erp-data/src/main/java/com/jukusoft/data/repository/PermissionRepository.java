@@ -17,10 +17,7 @@ import io.vertx.core.impl.CompositeFutureImpl;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PermissionRepository extends AbstractMySQLRepository {
 
@@ -110,16 +107,18 @@ public class PermissionRepository extends AbstractMySQLRepository {
             Map<String,PermissionStates> permMap = new HashMap<>();
 
             List<Future<Map<String,PermissionStates>>> futureList = new ArrayList<>();
+            List<Future> futures = new ArrayList<>();
 
             for (long groupID : groupIDs) {
                 Future<Map<String,PermissionStates>> permFuture = Future.future();
                 this.listPermissionsByGroup(groupID, permFuture);
 
                 futureList.add(permFuture);
+                futures.add(permFuture);
             }
 
             //wait until all futures are succeeded or one of them failed
-            CompositeFutureImpl.all((Future<?>) futureList).setHandler(res1 -> {
+            CompositeFuture.all(futures).setHandler(res1 -> {
                 if (!res1.succeeded()) {
                     handler.handle(Future.failedFuture(res1.cause()));
                     return;
