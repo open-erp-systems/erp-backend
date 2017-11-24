@@ -8,6 +8,7 @@ import com.jukusoft.erp.lib.cache.InjectCache;
 import com.jukusoft.erp.lib.database.AbstractMySQLRepository;
 import com.jukusoft.erp.lib.database.InjectRepository;
 import com.jukusoft.erp.lib.permission.PermissionStates;
+import com.jukusoft.erp.lib.utils.JsonUtils;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -54,11 +55,38 @@ public class PermissionRepository extends AbstractMySQLRepository {
             return;
         }
 
-        //
+        //load permissions from database
+        getMySQLDatabase().listRows("SELECT * FROM `{prefix}group_permissions` WHERE `groupID` = '" + groupID + "'; ", res -> {
+            if (!res.succeeded()) {
+                handler.handle(Future.failedFuture(res.cause()));
+                return;
+            }
+
+            JsonArray rows = JsonUtils.convertJsonObjectListToArray(res.result());
+
+            //cache rows
+            this.groupPermCache.putArray("group-permissions-" + groupID, rows);
+
+            //convert rows to list
+            Map<String,PermissionStates> map = this.createMapFromJSONArray(rows);
+
+            //call handler
+            handler.handle(Future.succeededFuture(map));
+        });
     }
 
     protected Map<String,PermissionStates> createMapFromJSONArray (JsonArray array) {
         Map<String,PermissionStates> map = new HashMap<>();
+
+        for (int i = 0; i < array.size(); i++) {
+            //get entry
+            JsonObject json = array.getJsonObject(i);
+
+            String permission = json.getString("permission");
+            PermissionStates state = PermissionStates.valueOf(json.getString("value"));
+
+            map.put(permission, state);
+        }
 
         return map;
     }
