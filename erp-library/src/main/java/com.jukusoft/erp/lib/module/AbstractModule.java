@@ -263,7 +263,7 @@ public abstract class AbstractModule implements IModule {
 
     private <T extends IService> void registerHandler (String eventName, T page, Method method) {
         //register handler
-        getEventBus().consumer(eventName, (Handler<Message<ApiRequest>>) event -> {
+        getEventBus().consumer(eventName, Sync.fiberHandler((Message<ApiRequest> event) -> {
             getLogger().debug(event.body().getMessageID(), "consume_message", "consume message: " + event.body());
 
             //get message
@@ -393,7 +393,7 @@ public abstract class AbstractModule implements IModule {
                     e.printStackTrace();
                 }
             }
-        });
+        }));
     }
 
     @Override
