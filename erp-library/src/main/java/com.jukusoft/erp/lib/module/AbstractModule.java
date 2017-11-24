@@ -23,6 +23,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
+import io.vertx.ext.sync.Sync;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -260,20 +261,40 @@ public abstract class AbstractModule implements IModule {
         }
     }
 
-    private <T extends IService> void registerHandler (String event, T page, Method method) {
+    private <T extends IService> void registerHandler (String eventName, T page, Method method) {
         //register handler
-        getEventBus().consumer(event, new Handler<Message<ApiRequest>>() {
-            @Override
-            public void handle(Message<ApiRequest> event) {
-                getLogger().debug(event.body().getMessageID(), "consume_message", "consume message: " + event.body());
+        getEventBus().consumer(eventName, (Handler<Message<ApiRequest>>) event -> {
+            getLogger().debug(event.body().getMessageID(), "consume_message", "consume message: " + event.body());
 
-                //get message
-                ApiRequest req = event.body();
+            //get message
+            ApiRequest req = event.body();
 
-                //check, if login is required
-                if (method.isAnnotationPresent(LoginRequired.class)) {
-                    //check, if user is logged in
-                    if (!req.isLoggedIn()) {
+            //check, if login is required
+            if (method.isAnnotationPresent(LoginRequired.class)) {
+                //check, if user is logged in
+                if (!req.isLoggedIn()) {
+                    ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
+
+                    //set forbidden status code
+                    res.setStatusCode(ResponseType.FORBIDDEN);
+
+                    //reply to api request
+                    event.reply(res);
+
+                    return;
+                }
+            }
+
+            //check required permissions
+            if (method.isAnnotationPresent(PermissionRequired.class)) {
+                //get annotation
+                PermissionRequired annotation = method.getAnnotation(PermissionRequired.class);
+
+                //check permissions
+                for (String permissionName : annotation.requiredPermissions()) {
+                    if (!context.getPermissionManager().hasPermission(req.getUserID(), permissionName)) {
+                        //user doesnt have the permission to see this page / use this api
+
                         ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
 
                         //set forbidden status code
@@ -285,114 +306,91 @@ public abstract class AbstractModule implements IModule {
                         return;
                     }
                 }
+            }
 
-                //check required permissions
-                if (method.isAnnotationPresent(PermissionRequired.class)) {
-                    //get annotation
-                    PermissionRequired annotation = method.getAnnotation(PermissionRequired.class);
+            if (method.getReturnType() == ApiResponse.class) {
+                //create new api answer
+                ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
 
-                    //check permissions
-                    for (String permissionName : annotation.requiredPermissions()) {
-                        if (!context.getPermissionManager().hasPermission(req.getUserID(), permissionName)) {
-                            //user doesnt have the permission to see this page / use this api
+                try {
+                    res = (ApiResponse) method.invoke(page, event, req, res);
 
-                            ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
+                    getLogger().debug(req.getMessageID(), "reply_message", "reply to message: " + res);
 
-                            //set forbidden status code
-                            res.setStatusCode(ResponseType.FORBIDDEN);
+                    //reply to api request
+                    event.reply(res);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    event.fail(500, e.getLocalizedMessage());
+
+                    return;
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                    event.fail(500, e.getLocalizedMessage());
+
+                    return;
+                } catch (Exception e) {
+                    getLogger().warn(req.getMessageID(), "handler_exception", "Exception in " + page.getClass().getSimpleName() + "::" + method.getName() + ": " + e.getLocalizedMessage());
+
+                    e.printStackTrace();
+
+                    event.fail(500, e.getLocalizedMessage());
+                }
+            } else {
+                //create new api answer
+                ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
+
+                Handler<AsyncResult<ApiResponse>> handler = new Handler<AsyncResult<ApiResponse>>() {
+                    @Override
+                    public void handle(AsyncResult<ApiResponse> event1) {
+                        if (!event1.succeeded()) {
+                            //send error message
+                            res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+
+                            getLogger().warn(req.getMessageID(), "reply_message", "reply error message: " + res + ", cause: " + event1.cause());
 
                             //reply to api request
                             event.reply(res);
-
-                            return;
-                        }
-                    }
-                }
-
-                if (method.getReturnType() == ApiResponse.class) {
-                    //create new api answer
-                    ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
-
-                    try {
-                        res = (ApiResponse) method.invoke(page, event, req, res);
-
-                        getLogger().debug(req.getMessageID(), "reply_message", "reply to message: " + res);
-
-                        //reply to api request
-                        event.reply(res);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                        event.fail(500, e.getLocalizedMessage());
-
-                        return;
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                        event.fail(500, e.getLocalizedMessage());
-
-                        return;
-                    } catch (Exception e) {
-                        getLogger().warn(req.getMessageID(), "handler_exception", "Exception in " + page.getClass().getSimpleName() + "::" + method.getName() + ": " + e.getLocalizedMessage());
-
-                        e.printStackTrace();
-
-                        event.fail(500, e.getLocalizedMessage());
-                    }
-                } else {
-                    //create new api answer
-                    ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
-
-                    Handler<AsyncResult<ApiResponse>> handler = new Handler<AsyncResult<ApiResponse>>() {
-                        @Override
-                        public void handle(AsyncResult<ApiResponse> event1) {
-                            if (!event1.succeeded()) {
-                                //send error message
-                                res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
-
-                                getLogger().warn(req.getMessageID(), "reply_message", "reply error message: " + res + ", cause: " + event1.cause());
-
-                                //reply to api request
-                                event.reply(res);
-                            } else {
-                                getLogger().debug(req.getMessageID(), "reply_message", "reply to message: " + res);
-
-                                //reply to api request
-                                event.reply(event1.result());
-                            }
-                        }
-                    };
-
-                    try {
-                        if (method.getParameterCount() > 3) {
-                            method.invoke(page, event, req, res, handler);
                         } else {
-                            method.invoke(page, event, req, handler);
-                            throw new IllegalStateException("method " + page.getClass().getSimpleName() + "::" + method.getName() + " has wrong parameter count (should be 3, but is " + method.getParameterCount() + ").");
+                            getLogger().debug(req.getMessageID(), "reply_message", "reply to message: " + res);
+
+                            //reply to api request
+                            event.reply(event1.result());
                         }
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-
-                        //reply to api request
-                        res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
-                        event.reply(res);
-
-                        event.fail(500, e.getLocalizedMessage());
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-
-                        //reply to api request
-                        res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
-                        event.reply(res);
-
-                        event.fail(500, e.getLocalizedMessage());
-                    } catch (Exception e) {
-                        getLogger().warn(req.getMessageID(), "handler_exception", "Exception in " + page.getClass().getSimpleName() + "::" + method.getName() + ": " + e.getLocalizedMessage());
-
-                        //reply to api request
-                        res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
-                        event.reply(res);
-
-                        e.printStackTrace();
                     }
+                };
+
+                try {
+                    if (method.getParameterCount() > 3) {
+                        method.invoke(page, event, req, res, handler);
+                    } else {
+                        method.invoke(page, event, req, handler);
+                        throw new IllegalStateException("method " + page.getClass().getSimpleName() + "::" + method.getName() + " has wrong parameter count (should be 3, but is " + method.getParameterCount() + ").");
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+
+                    //reply to api request
+                    res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                    event.reply(res);
+
+                    event.fail(500, e.getLocalizedMessage());
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+
+                    //reply to api request
+                    res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                    event.reply(res);
+
+                    event.fail(500, e.getLocalizedMessage());
+                } catch (Exception e) {
+                    getLogger().warn(req.getMessageID(), "handler_exception", "Exception in " + page.getClass().getSimpleName() + "::" + method.getName() + ": " + e.getLocalizedMessage());
+
+                    //reply to api request
+                    res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                    event.reply(res);
+
+                    e.printStackTrace();
                 }
             }
         });

@@ -41,6 +41,13 @@
             <version>${hazelcast.version}</version>
         </dependency>
 
+        <!-- vertx-sync -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-sync</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
+
         <!-- bouncy castle for SSL self-signed certificate generation -->
         <dependency>
             <groupId>org.bouncycastle</groupId>

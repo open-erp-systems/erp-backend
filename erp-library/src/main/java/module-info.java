@@ -8,6 +8,7 @@ module erp.library {
     requires cache.api;
     requires vertx.sql.common;
     requires vertx.jdbc.client;
+    requires vertx.sync;
 
     exports com.jukusoft.erp.lib.module;
     exports com.jukusoft.erp.lib.gateway;
