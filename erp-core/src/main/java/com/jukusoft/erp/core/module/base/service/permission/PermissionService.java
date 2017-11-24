@@ -17,7 +17,7 @@ public class PermissionService extends AbstractService {
     @InjectRepository
     protected PermissionRepository permissionRepository;
 
-    @Route(routes = "/list-permissions")
+    @Route(routes = "/list-my-permissions")
     public void listPermissions (Message<ApiRequest> event, ApiRequest req, ApiResponse response, Handler<AsyncResult<ApiResponse>> handler) {
         //first get userID
         long userID = req.getUserID();
