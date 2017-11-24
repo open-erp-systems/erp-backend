@@ -1,0 +1,42 @@
+package com.jukusoft.erp.core.module.base.service.permission;
+
+import com.jukusoft.data.repository.PermissionRepository;
+import com.jukusoft.erp.lib.database.InjectRepository;
+import com.jukusoft.erp.lib.message.ResponseType;
+import com.jukusoft.erp.lib.message.request.ApiRequest;
+import com.jukusoft.erp.lib.message.response.ApiResponse;
+import com.jukusoft.erp.lib.route.Route;
+import com.jukusoft.erp.lib.service.AbstractService;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.eventbus.Message;
+
+public class PermissionService extends AbstractService {
+
+    @InjectRepository
+    protected PermissionRepository permissionRepository;
+
+    @Route(routes = "/list-permissions")
+    public void listPermissions (Message<ApiRequest> event, ApiRequest req, ApiResponse response, Handler<AsyncResult<ApiResponse>> handler) {
+        //first get userID
+        long userID = req.getUserID();
+
+        //list all permissions of user
+        this.permissionRepository.listPermissionsByUser(userID, res -> {
+            if (!res.succeeded()) {
+                getLogger().warn(req.getMessageID(), "list_permissions", "Internal Server Error, cannot get permissions of user: " + res.cause().getMessage());
+
+                response.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                handler.handle(Future.succeededFuture(response));
+
+                return;
+            }
+
+            response.setStatusCode(ResponseType.OK);
+            response.getData().put("permissions", res.result());
+            handler.handle(Future.succeededFuture(response));
+        });
+    }
+
+}
