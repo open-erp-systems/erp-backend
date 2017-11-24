@@ -92,6 +92,10 @@ public class PermissionRepository extends AbstractMySQLRepository {
     }
 
     public void listPermissionStatesByUser (long userID, Handler<AsyncResult<Map<String,PermissionStates>>> handler) {
+        if (this.groupRepository == null) {
+            throw new NullPointerException("group repository cannot be null.");
+        }
+
         //first, get groups of user
         this.groupRepository.listGroupIDsOfUser(userID, res -> {
             if (!res.succeeded()) {
