@@ -13,6 +13,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.sync.Sync;
 
 public class MenuService extends AbstractService {
 
@@ -38,7 +39,7 @@ public class MenuService extends AbstractService {
         int menuID = req.getData().getInt("menuID");
 
         //list menus from database
-        menuRepository.listMenusByMenuID(menuID, res -> {
+        menuRepository.listMenusByMenuID(menuID, Sync.fiberHandler(res -> {
             if (!res.succeeded()) {
                 response.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
                 handler.handle(Future.succeededFuture(response));
@@ -103,7 +104,7 @@ public class MenuService extends AbstractService {
             response.setStatusCode(ResponseType.OK);
             response.getData().put("menu", menuArray);
             handler.handle(Future.succeededFuture(response));
-        });
+        }));
     }
 
     protected void addSubMenusToJson (JsonObject json, int id, long userID, JsonArray rows) {
