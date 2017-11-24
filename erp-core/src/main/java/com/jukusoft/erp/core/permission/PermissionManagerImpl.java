@@ -18,6 +18,7 @@ public class PermissionManagerImpl implements PermissionManager {
 
     @Override
     public boolean hasPermission(long userID, String permissionName) {
+        //synchronize asynchronous handler
         return Sync.awaitResult(h -> {
             permissionRepository.listPermissionsByUser(userID, res -> {
                 if (!res.succeeded()) {
