@@ -26,6 +26,9 @@ public class PermissionRepository extends AbstractMySQLRepository {
     @InjectCache(name = "group-permissions-cache", type = CacheTypes.HAZELCAST_CACHE)
     protected ICache groupPermCache;
 
+    @InjectCache(name = "user-permission-cache", type = CacheTypes.HAZELCAST_CACHE)
+    protected ICache userPermCache;
+
     @InjectRepository
     protected GroupRepository groupRepository;
 
@@ -60,7 +63,7 @@ public class PermissionRepository extends AbstractMySQLRepository {
         return map;
     }
 
-    public void listPermissionsByUser (long userID, Handler<AsyncResult<Map<String,PermissionStates>>> handler) {
+    public void listPermissionStatesByUser (long userID, Handler<AsyncResult<Map<String,PermissionStates>>> handler) {
         //first, get groups of user
         this.groupRepository.listGroupIDsOfUser(userID, res -> {
             if (!res.succeeded()) {
@@ -98,6 +101,40 @@ public class PermissionRepository extends AbstractMySQLRepository {
 
                 handler.handle(Future.succeededFuture(permMap));
             });
+        });
+    }
+
+    public void listPermissionsByUser (long userID, Handler<AsyncResult<JsonArray>> handler) {
+        //first check, if list is already in cache
+        if (this.userPermCache.contains("user-permissions-" + userID)) {
+            handler.handle(Future.succeededFuture(this.userPermCache.getArray("user-permissions-" + userID)));
+            return;
+        }
+
+        //get permissions from database
+        this.listPermissionStatesByUser(userID, res -> {
+            if (!res.succeeded()) {
+                handler.handle(Future.failedFuture(res.cause()));
+                return;
+            }
+
+            //convert map to json array
+            JsonArray resultArray = new JsonArray();
+
+            //get map
+            Map<String,PermissionStates> map = res.result();
+
+            for (Map.Entry<String,PermissionStates> entry : map.entrySet()) {
+                if (entry.getValue() == PermissionStates.ALLOW) {
+                    //add permission to array
+                    resultArray.add(entry.getKey());
+                }
+            }
+
+            //cache array
+            this.userPermCache.putArray("user-permissions-" + userID, resultArray);
+
+            handler.handle(Future.succeededFuture(resultArray));
         });
     }
 
