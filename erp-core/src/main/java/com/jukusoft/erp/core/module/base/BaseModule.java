@@ -21,7 +21,6 @@ public class BaseModule extends AbstractModule {
         addRepository(new GroupRepository(), GroupRepository.class);
         addRepository(new PermissionRepository(), PermissionRepository.class);
         addRepository(new MenuRepository(), MenuRepository.class);
-        addRepository(new PermissionRepository(), PermissionRepository.class);
 
         //set permission manager
         context.setPermissionManager(new PermissionManagerImpl(getRepository(GroupRepository.class), getRepository(PermissionRepository.class)));
