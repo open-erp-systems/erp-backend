@@ -81,6 +81,9 @@ public abstract class AbstractModule implements IModule {
         //inject app context
         this.injectAppContext(repository);
 
+        //inject repositories
+        this.injectRepositories(repository);
+
         //inject caches
         this.injectCaches(repository);
 
@@ -123,7 +126,7 @@ public abstract class AbstractModule implements IModule {
         this.injectCaches(page);
     }
 
-    protected <T extends IService> void injectRepositories (T target/*, Class<T> cls*/) {
+    protected <T> void injectRepositories (T target/*, Class<T> cls*/) {
         //iterate through all fields in class
         for (Field field : target.getClass().getDeclaredFields()) {
             //get annotation
