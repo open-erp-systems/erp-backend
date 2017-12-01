@@ -1,6 +1,7 @@
 package com.jukusoft.erp.app.server;
 
 import com.jukusoft.erp.app.server.impl.DefaultAppServer;
+import com.jukusoft.erp.core.module.calculator.CalculatorModule;
 import com.jukusoft.erp.core.module.test.TestModule;
 import com.jukusoft.erp.core.module.base.BaseModule;
 
@@ -16,6 +17,7 @@ public class Main {
                 //add modules
                 server.deployModule(new TestModule(), TestModule.class);
                 server.deployModule(new BaseModule(), BaseModule.class);
+                server.deployModule(new CalculatorModule(), CalculatorModule.class);
             } else {
                 System.err.println("Couldnt start app server.");
 
