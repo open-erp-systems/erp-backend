@@ -1,5 +1,8 @@
 package com.jukusoft.erp.lib.message.request;
 
+import com.jukusoft.erp.lib.exception.HandlerException;
+import io.vertx.core.json.JsonObject;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class ApiRequest {
@@ -50,6 +53,53 @@ public class ApiRequest {
 
     public JSONObject getData () {
         return this.data;
+    }
+
+    /**
+    * check, if param exists, else throw an exception
+     *
+     * @param key key of param
+    */
+    public void checkParam (String key) throws HandlerException {
+        if (!getData().has(key)) {
+            throw new HandlerException("key doesnt exists: " + key);
+        }
+    }
+
+    public int getInt (String key) {
+        checkParam(key);
+
+        return getData().getInt(key);
+    }
+
+    public double getDouble (String key) {
+        checkParam(key);
+
+        return getData().getDouble(key);
+    }
+
+    public float getFloat (String key) {
+        checkParam(key);
+
+        return (float) getData().getDouble(key);
+    }
+
+    public String getString (String key) {
+        checkParam(key);
+
+        return getData().getString(key);
+    }
+
+    public JSONObject getJsonObject (String key) {
+        checkParam(key);
+
+        return getData().getJSONObject(key);
+    }
+
+    public JSONArray getJsonArray (String key) {
+        checkParam(key);
+
+        return getData().getJSONArray(key);
     }
 
     public long getMessageID () {

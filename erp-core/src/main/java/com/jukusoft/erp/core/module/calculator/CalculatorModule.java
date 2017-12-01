@@ -12,6 +12,11 @@ public class CalculatorModule extends AbstractModule {
             int sum = 0;
 
             //check and get params
+            int a = req.getInt("a");
+            int b = req.getInt("b");
+
+            //calculate sum
+            sum = a + b;
 
             //set return value and status code 200
             res.setResult(sum);
