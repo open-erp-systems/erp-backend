@@ -1,6 +1,6 @@
 package com.jukusoft.erp.server.message;
 
-import com.jukusoft.erp.lib.message.ResponseType;
+import com.jukusoft.erp.lib.message.StatusCode;
 import io.vertx.core.json.JsonObject;
 
 public class ResponseGenerator {
@@ -14,7 +14,7 @@ public class ResponseGenerator {
      *
      * @return json string
     */
-    public static String generateResponse (String event, JsonObject jsonData, String sessionID, String externalID, ResponseType type) {
+    public static String generateResponse (String event, JsonObject jsonData, String sessionID, String externalID, StatusCode type) {
         if (jsonData == null) {
             throw new NullPointerException("json data cannot be null.");
         }
@@ -46,7 +46,7 @@ public class ResponseGenerator {
      *
      * @return json string
      */
-    public static String generateResponse (String event, String sessionID, String externalID, ResponseType type) {
+    public static String generateResponse (String event, String sessionID, String externalID, StatusCode type) {
         return generateResponse(event, new JsonObject(), sessionID, externalID, type);
     }
 

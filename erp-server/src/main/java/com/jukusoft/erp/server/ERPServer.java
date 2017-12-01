@@ -5,7 +5,6 @@ import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IdGenerator;
-import com.jukusoft.erp.lib.cache.ICache;
 import com.jukusoft.erp.lib.database.DatabaseManager;
 import com.jukusoft.erp.lib.database.MySQLDatabase;
 import com.jukusoft.erp.lib.database.impl.DatabaseManagerImpl;
@@ -13,7 +12,7 @@ import com.jukusoft.erp.lib.gateway.ApiGateway;
 import com.jukusoft.erp.lib.gateway.ResponseHandler;
 import com.jukusoft.erp.lib.keystore.KeyStoreGenerator;
 import com.jukusoft.erp.lib.logging.ILogging;
-import com.jukusoft.erp.lib.message.ResponseType;
+import com.jukusoft.erp.lib.message.StatusCode;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.session.SessionManager;
@@ -29,7 +28,6 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.spi.cluster.ClusterManager;
@@ -206,7 +204,7 @@ public class ERPServer implements IServer {
                     logger.warn(messageID, "bad_request", "invalide json message: " + str);
 
                     //generate response string
-                    String str1 = ResponseGenerator.generateResponse("error", "", "none", ResponseType.BAD_REQUEST);
+                    String str1 = ResponseGenerator.generateResponse("error", "", "none", StatusCode.BAD_REQUEST);
 
                     //write to the response and end it
                     socket.write(str1);
@@ -228,7 +226,7 @@ public class ERPServer implements IServer {
                     logger.warn(messageID, "bad_request", "event doesnt exists in message: " + json.toString());
 
                     //generate response string
-                    String str1 = ResponseGenerator.generateResponse("error", "", externalID, ResponseType.BAD_REQUEST);
+                    String str1 = ResponseGenerator.generateResponse("error", "", externalID, StatusCode.BAD_REQUEST);
 
                     //write to the response and end it
                     socket.write(str1);
@@ -259,7 +257,7 @@ public class ERPServer implements IServer {
 
                     if (session == null) {
                         //generate response string
-                        String str1 = ResponseGenerator.generateResponse(event, sessionID, externalID, ResponseType.BAD_REQUEST);
+                        String str1 = ResponseGenerator.generateResponse(event, sessionID, externalID, StatusCode.BAD_REQUEST);
 
                         //write to the response and end it
                         socket.write(str1);
@@ -301,12 +299,12 @@ public class ERPServer implements IServer {
                     @Override
                     public void responseFailed() {
                         //generate response string
-                        String str = ResponseGenerator.generateResponse(event, req.getSessionID(), req.getExternalID(), ResponseType.SERVICE_UNAVAILABLE);
+                        String str = ResponseGenerator.generateResponse(event, req.getSessionID(), req.getExternalID(), StatusCode.SERVICE_UNAVAILABLE);
 
                         //write to the response and end it
                         socket.write(str);
 
-                        logger.warn(messageID, "request_failed", req.toString() + ", cause: " + ResponseType.SERVICE_UNAVAILABLE.name() + ".");
+                        logger.warn(messageID, "request_failed", req.toString() + ", cause: " + StatusCode.SERVICE_UNAVAILABLE.name() + ".");
                     }
                 });
             });
@@ -512,12 +510,12 @@ public class ERPServer implements IServer {
                     @Override
                     public void responseFailed() {
                         //generate response string
-                        String str = ResponseGenerator.generateResponse(eventName, req.getSessionID(), req.getExternalID(), ResponseType.SERVICE_UNAVAILABLE);
+                        String str = ResponseGenerator.generateResponse(eventName, req.getSessionID(), req.getExternalID(), StatusCode.SERVICE_UNAVAILABLE);
 
                         //write to the response and end it
                         response.end(str);
 
-                        logger.warn(messageID, "request_failed", req.toString() + ", cause: " + ResponseType.SERVICE_UNAVAILABLE.name() + ".");
+                        logger.warn(messageID, "request_failed", req.toString() + ", cause: " + StatusCode.SERVICE_UNAVAILABLE.name() + ".");
 
                         long endTime = System.currentTimeMillis();
                         long diff = endTime - startTime;

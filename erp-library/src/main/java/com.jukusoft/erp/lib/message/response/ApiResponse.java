@@ -1,8 +1,7 @@
 package com.jukusoft.erp.lib.message.response;
 
-import com.jukusoft.erp.lib.message.ResponseType;
+import com.jukusoft.erp.lib.message.StatusCode;
 import io.vertx.core.json.JsonObject;
-import org.json.JSONObject;
 
 public class ApiResponse {
 
@@ -14,7 +13,7 @@ public class ApiResponse {
 
     protected String ackID = "";
 
-    protected ResponseType statusCode = ResponseType.OK;
+    protected StatusCode statusCode = StatusCode.OK;
 
     protected long messageID = 0;
 
@@ -49,11 +48,11 @@ public class ApiResponse {
         this.data = json;
     }
 
-    public ResponseType getStatusCode () {
+    public StatusCode getStatusCode () {
         return this.statusCode;
     }
 
-    public void setStatusCode (ResponseType type) {
+    public void setStatusCode (StatusCode type) {
         this.statusCode = type;
     }
 

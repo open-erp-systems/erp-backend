@@ -2,7 +2,7 @@ package com.jukusoft.erp.core.module.base.service.menu;
 
 import com.jukusoft.data.repository.MenuRepository;
 import com.jukusoft.erp.lib.database.InjectRepository;
-import com.jukusoft.erp.lib.message.ResponseType;
+import com.jukusoft.erp.lib.message.StatusCode;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
@@ -24,7 +24,7 @@ public class MenuService extends AbstractService {
     public void listMenus (Message<ApiRequest> event, ApiRequest req, ApiResponse response, Handler<AsyncResult<ApiResponse>> handler) {
         //first, check if request contains menuID
         if (!req.getData().has("menuID")) {
-            response.setStatusCode(ResponseType.BAD_REQUEST);
+            response.setStatusCode(StatusCode.BAD_REQUEST);
 
             //log
             getLogger().warn(req.getMessageID(), "list_menus", "request doesnt contains menuID: " + req.toString());
@@ -41,7 +41,7 @@ public class MenuService extends AbstractService {
         //list menus from database
         menuRepository.listMenusByMenuID(menuID, Sync.fiberHandler(res -> {
             if (!res.succeeded()) {
-                response.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR);
                 handler.handle(Future.succeededFuture(response));
 
                 getLogger().warn(req.getMessageID(), "list_menus_api", "Couldnt get menu list by repository: " + res.cause().getMessage());
@@ -101,7 +101,7 @@ public class MenuService extends AbstractService {
                 }
             }
 
-            response.setStatusCode(ResponseType.OK);
+            response.setStatusCode(StatusCode.OK);
             response.getData().put("menu", menuArray);
             handler.handle(Future.succeededFuture(response));
         }));

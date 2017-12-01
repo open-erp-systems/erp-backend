@@ -9,14 +9,14 @@ import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.database.InjectAppContext;
 import com.jukusoft.erp.lib.database.InjectRepository;
 import com.jukusoft.erp.lib.database.Repository;
-import com.jukusoft.erp.lib.exception.CacheNotFoundException;
 import com.jukusoft.erp.lib.exception.RequiredRepositoryNotFoundException;
 import com.jukusoft.erp.lib.logging.ILogging;
-import com.jukusoft.erp.lib.message.ResponseType;
+import com.jukusoft.erp.lib.message.StatusCode;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
 import com.jukusoft.erp.lib.route.RouteHandler;
+import com.jukusoft.erp.lib.route.RouteHandlerWithoutReturn;
 import com.jukusoft.erp.lib.service.IService;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -277,7 +277,7 @@ public abstract class AbstractModule implements IModule {
                     ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
 
                     //set forbidden status code
-                    res.setStatusCode(ResponseType.FORBIDDEN);
+                    res.setStatusCode(StatusCode.FORBIDDEN);
 
                     //reply to api request
                     event.reply(res);
@@ -299,7 +299,7 @@ public abstract class AbstractModule implements IModule {
                         ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
 
                         //set forbidden status code
-                        res.setStatusCode(ResponseType.FORBIDDEN);
+                        res.setStatusCode(StatusCode.FORBIDDEN);
 
                         //reply to api request
                         event.reply(res);
@@ -346,7 +346,7 @@ public abstract class AbstractModule implements IModule {
                     public void handle(AsyncResult<ApiResponse> event1) {
                         if (!event1.succeeded()) {
                             //send error message
-                            res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                            res.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR);
 
                             getLogger().warn(req.getMessageID(), "reply_message", "reply error message: " + res + ", cause: " + event1.cause());
 
@@ -372,7 +372,7 @@ public abstract class AbstractModule implements IModule {
                     e.printStackTrace();
 
                     //reply to api request
-                    res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                    res.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR);
                     event.reply(res);
 
                     event.fail(500, e.getLocalizedMessage());
@@ -380,7 +380,7 @@ public abstract class AbstractModule implements IModule {
                     e.printStackTrace();
 
                     //reply to api request
-                    res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                    res.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR);
                     event.reply(res);
 
                     event.fail(500, e.getLocalizedMessage());
@@ -388,7 +388,7 @@ public abstract class AbstractModule implements IModule {
                     getLogger().warn(req.getMessageID(), "handler_exception", "Exception in " + page.getClass().getSimpleName() + "::" + method.getName() + ": " + e.getLocalizedMessage());
 
                     //reply to api request
-                    res.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                    res.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR);
                     event.reply(res);
 
                     e.printStackTrace();
@@ -400,7 +400,7 @@ public abstract class AbstractModule implements IModule {
     /**
     * add route handler
     */
-    public void addRoue (final String eventName, RouteHandler handler) {
+    public void addRoute (final String eventName, RouteHandler handler) {
         if (eventName == null || eventName.isEmpty()) {
             throw new NullPointerException("event name cannot be null or empty");
         }
@@ -420,12 +420,42 @@ public abstract class AbstractModule implements IModule {
             //handle request
             res = handler.handle(req, res);
 
+            if (res == null) {
+                getLogger().warn(req.getMessageID(), "reply_message", "Api request result is null.");
+
+                //generate error messsage
+                ApiResponse errorResult = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
+                errorResult.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR);
+
+                //send error message
+                event.reply(res);
+
+                return;
+            }
+
             //log answer
             getLogger().debug(req.getMessageID(), "reply_message", "reply to message: " + res);
 
             //reply to api request
             event.reply(res);
         }));
+    }
+
+    /**
+    * add route, but dont use an return statement
+     *
+     * @param eventName event name
+     * @param handler instance of handler
+    */
+    public void addRoute (final String eventName, RouteHandlerWithoutReturn handler) {
+        this.addRoute(eventName, new RouteHandler() {
+            @Override
+            public ApiResponse handle(ApiRequest req, ApiResponse res) {
+                handler.handle(req, res);
+
+                return res;
+            }
+        });
     }
 
     @Override

@@ -4,11 +4,11 @@ import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 
 @FunctionalInterface
-public interface RouteHandler {
+public interface RouteHandlerWithoutReturn {
 
     /**
-    * handle request
-    */
-    public ApiResponse handle (ApiRequest req, ApiResponse res);
+     * handle request
+     */
+    public void handle (ApiRequest req, ApiResponse res);
 
 }

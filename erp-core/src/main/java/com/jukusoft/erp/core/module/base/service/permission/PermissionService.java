@@ -2,7 +2,7 @@ package com.jukusoft.erp.core.module.base.service.permission;
 
 import com.jukusoft.data.repository.PermissionRepository;
 import com.jukusoft.erp.lib.database.InjectRepository;
-import com.jukusoft.erp.lib.message.ResponseType;
+import com.jukusoft.erp.lib.message.StatusCode;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
@@ -27,13 +27,13 @@ public class PermissionService extends AbstractService {
             if (!res.succeeded()) {
                 getLogger().warn(req.getMessageID(), "list_permissions", "Internal Server Error, cannot get permissions of user: " + res.cause().getMessage());
 
-                response.setStatusCode(ResponseType.INTERNAL_SERVER_ERROR);
+                response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR);
                 handler.handle(Future.succeededFuture(response));
 
                 return;
             }
 
-            response.setStatusCode(ResponseType.OK);
+            response.setStatusCode(StatusCode.OK);
             response.getData().put("permissions", res.result());
             handler.handle(Future.succeededFuture(response));
         });

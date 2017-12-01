@@ -1,6 +1,6 @@
 package com.jukusoft.erp.lib.message.response;
 
-import com.jukusoft.erp.lib.message.ResponseType;
+import com.jukusoft.erp.lib.message.StatusCode;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.MessageCodec;
 import io.vertx.core.json.JsonObject;
@@ -55,7 +55,7 @@ public class ApiResponseCodec implements MessageCodec<ApiResponse, ApiResponse> 
         res.eventName = json.getString("event");
         res.data = json.getJsonObject("data");
         res.ackID = json.getString("ackID");
-        res.statusCode = ResponseType.getByString(json.getString("statusCode"));
+        res.statusCode = StatusCode.getByString(json.getString("statusCode"));
         res.messageID = json.getLong("cluster-message-id");
         res.type = ApiResponse.getTypeByString(json.getString("type"));
 

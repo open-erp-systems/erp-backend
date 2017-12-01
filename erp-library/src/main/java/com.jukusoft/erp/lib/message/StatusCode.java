@@ -1,6 +1,6 @@
 package com.jukusoft.erp.lib.message;
 
-public enum ResponseType {
+public enum StatusCode {
 
     NOT_FOUND(404),
 
@@ -22,7 +22,7 @@ public enum ResponseType {
 
     private final int value;
 
-    private ResponseType (int value) {
+    private StatusCode(int value) {
         this.value = value;
     }
 
@@ -30,7 +30,7 @@ public enum ResponseType {
         return this.value;
     }
 
-    public static ResponseType getByString (String str) {
+    public static StatusCode getByString (String str) {
         switch (str.trim().toUpperCase()) {
             case "NOT_FOUND":
                 return NOT_FOUND;

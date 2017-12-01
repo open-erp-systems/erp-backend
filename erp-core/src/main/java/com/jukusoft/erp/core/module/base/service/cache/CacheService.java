@@ -2,7 +2,7 @@ package com.jukusoft.erp.core.module.base.service.cache;
 
 import com.jukusoft.erp.lib.annotation.PermissionRequired;
 import com.jukusoft.erp.lib.cache.CacheManager;
-import com.jukusoft.erp.lib.message.ResponseType;
+import com.jukusoft.erp.lib.message.StatusCode;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
@@ -34,7 +34,7 @@ public class CacheService extends AbstractService {
             cacheArray.add(cacheName);
         }
 
-        response.setStatusCode(ResponseType.OK);
+        response.setStatusCode(StatusCode.OK);
         response.getData().put("caches", cacheArray);
         handler.handle(Future.succeededFuture(response));
     }

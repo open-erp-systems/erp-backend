@@ -1,6 +1,5 @@
 package com.jukusoft.erp.lib.gateway;
 
-import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 
 public interface ResponseHandler {

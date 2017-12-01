@@ -3,7 +3,7 @@ package com.jukusoft.erp.core.module.base.service.login;
 import com.jukusoft.data.entity.User;
 import com.jukusoft.data.repository.UserRepository;
 import com.jukusoft.erp.lib.database.InjectRepository;
-import com.jukusoft.erp.lib.message.ResponseType;
+import com.jukusoft.erp.lib.message.StatusCode;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
@@ -25,7 +25,7 @@ public class LoginService extends AbstractService {
         if (!req.getData().has("username")) {
             getLogger().warn(req.getMessageID(), "failed_login", "username wasnt set.");
 
-            response.setStatusCode(ResponseType.BAD_REQUEST);
+            response.setStatusCode(StatusCode.BAD_REQUEST);
             handler.handle(Future.succeededFuture(response));
             return;
         }
@@ -37,7 +37,7 @@ public class LoginService extends AbstractService {
         if (!req.getData().has("password")) {
             getLogger().warn(req.getMessageID(), "failed_login", "password wasnt set.");
 
-            response.setStatusCode(ResponseType.BAD_REQUEST);
+            response.setStatusCode(StatusCode.BAD_REQUEST);
             handler.handle(Future.succeededFuture(response));
             return;
         }
@@ -128,7 +128,7 @@ public class LoginService extends AbstractService {
         //get session
         Session session = getContext().getSessionManager().getSession(req.getSessionID());
 
-        response.setStatusCode(ResponseType.OK);
+        response.setStatusCode(StatusCode.OK);
         response.getData().put("state", "logged-out");
 
         //guest user doesnt need to logout
@@ -149,13 +149,13 @@ public class LoginService extends AbstractService {
     }
 
     protected void generateFailedMessage (String message, ApiResponse response) {
-        response.setStatusCode(ResponseType.OK);
+        response.setStatusCode(StatusCode.OK);
         response.getData().put("login_state", "failed");
         response.getData().put("login_message", message);
     }
 
     protected void generateSuccessMessage (String message, long userID, String username, ApiResponse response) {
-        response.setStatusCode(ResponseType.OK);
+        response.setStatusCode(StatusCode.OK);
         response.getData().put("login_state", "success");
         response.getData().put("login_message", message);
         response.getData().put("userID", userID);

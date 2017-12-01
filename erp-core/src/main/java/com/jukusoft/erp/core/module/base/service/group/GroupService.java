@@ -1,10 +1,9 @@
 package com.jukusoft.erp.core.module.base.service.group;
 
-import com.jukusoft.data.entity.Group;
 import com.jukusoft.data.entity.GroupMember;
 import com.jukusoft.data.repository.GroupRepository;
 import com.jukusoft.erp.lib.database.InjectRepository;
-import com.jukusoft.erp.lib.message.ResponseType;
+import com.jukusoft.erp.lib.message.StatusCode;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
@@ -38,7 +37,7 @@ public class GroupService extends AbstractService {
             //list with all groups where user is a member
             List<GroupMember> groupList = res.result();
 
-            response.setStatusCode(ResponseType.OK);
+            response.setStatusCode(StatusCode.OK);
 
             JsonArray array = new JsonArray();
 
@@ -80,7 +79,7 @@ public class GroupService extends AbstractService {
             long[] groupIDs = res.result();
 
             //set successful status code of request
-            response.setStatusCode(ResponseType.OK);
+            response.setStatusCode(StatusCode.OK);
 
             JsonArray array = new JsonArray();
 
