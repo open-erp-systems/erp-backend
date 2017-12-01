@@ -16,6 +16,7 @@ import com.jukusoft.erp.lib.message.ResponseType;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
+import com.jukusoft.erp.lib.route.RouteHandler;
 import com.jukusoft.erp.lib.service.IService;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -393,6 +394,37 @@ public abstract class AbstractModule implements IModule {
                     e.printStackTrace();
                 }
             }
+        }));
+    }
+
+    /**
+    * add route handler
+    */
+    public void addRoue (final String eventName, RouteHandler handler) {
+        if (eventName == null || eventName.isEmpty()) {
+            throw new NullPointerException("event name cannot be null or empty");
+        }
+
+        if (handler == null) {
+            throw new NullPointerException("handler cannot be null.");
+        }
+
+        //register route
+        getEventBus().consumer(eventName, Sync.fiberHandler((Message<ApiRequest> event) -> {
+            //get message
+            ApiRequest req = event.body();
+
+            //create new api answer
+            ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
+
+            //handle request
+            res = handler.handle(req, res);
+
+            //log answer
+            getLogger().debug(req.getMessageID(), "reply_message", "reply to message: " + res);
+
+            //reply to api request
+            event.reply(res);
         }));
     }
 
