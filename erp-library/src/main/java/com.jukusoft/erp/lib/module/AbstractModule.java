@@ -9,6 +9,7 @@ import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.database.InjectAppContext;
 import com.jukusoft.erp.lib.database.InjectRepository;
 import com.jukusoft.erp.lib.database.Repository;
+import com.jukusoft.erp.lib.exception.HandlerException;
 import com.jukusoft.erp.lib.exception.RequiredRepositoryNotFoundException;
 import com.jukusoft.erp.lib.logging.ILogging;
 import com.jukusoft.erp.lib.message.StatusCode;
@@ -417,8 +418,19 @@ public abstract class AbstractModule implements IModule {
             //create new api answer
             ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
 
-            //handle request
-            res = handler.handle(req, res);
+            try {
+                //handle request
+                res = handler.handle(req, res);
+            } catch (HandlerException e) {
+                e.printStackTrace();
+
+                getLogger().warn(req.getMessageID(), "internal_server_error", "request: " + req.toString() + ", exception: " + e.getMessage());
+
+                //send internal server error
+                event.reply(this.generateInternalServerError(req));
+
+                return;
+            }
 
             if (res == null) {
                 getLogger().warn(req.getMessageID(), "reply_message", "Api request result is null.");
@@ -448,14 +460,20 @@ public abstract class AbstractModule implements IModule {
      * @param handler instance of handler
     */
     public void addRoute (final String eventName, RouteHandlerWithoutReturn handler) {
-        this.addRoute(eventName, new RouteHandler() {
-            @Override
-            public ApiResponse handle(ApiRequest req, ApiResponse res) {
-                handler.handle(req, res);
+        this.addRoute(eventName, (req, res) -> {
+            //call handler
+            handler.handle(req, res);
 
-                return res;
-            }
+            return res;
         });
+    }
+
+    private ApiResponse generateInternalServerError (ApiRequest req) {
+        //generate error messsage
+        ApiResponse errorResult = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());
+        errorResult.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR);
+
+        return errorResult;
     }
 
     @Override

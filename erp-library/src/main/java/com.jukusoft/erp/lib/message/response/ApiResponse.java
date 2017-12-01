@@ -48,6 +48,57 @@ public class ApiResponse {
         this.data = json;
     }
 
+    public void setResult (String res) {
+        checkResultNotExists();
+
+        //set status code
+        this.setStatusCode(StatusCode.OK);
+
+        getData().put("result", res);
+    }
+
+    public void setResult (int res) {
+        checkResultNotExists();
+
+        //set status code
+        this.setStatusCode(StatusCode.OK);
+
+        getData().put("result", res);
+    }
+
+    public void setResult (double res) {
+        checkResultNotExists();
+
+        //set status code
+        this.setStatusCode(StatusCode.OK);
+
+        getData().put("result", res);
+    }
+
+    public void setResult (float res) {
+        checkResultNotExists();
+
+        //set status code
+        this.setStatusCode(StatusCode.OK);
+
+        getData().put("result", res);
+    }
+
+    public void setResult (Object res) {
+        checkResultNotExists();
+
+        //set status code
+        this.setStatusCode(StatusCode.OK);
+
+        getData().put("result", res);
+    }
+
+    private void checkResultNotExists () {
+        if (getData().containsKey("result")) {
+            throw new IllegalStateException("result was already set before.");
+        }
+    }
+
     public StatusCode getStatusCode () {
         return this.statusCode;
     }
