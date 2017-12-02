@@ -3,6 +3,7 @@ package com.jukusoft.erp.lib.message.request;
 import com.jukusoft.erp.lib.exception.HandlerException;
 import io.vertx.core.json.JsonObject;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ApiRequest {
@@ -69,37 +70,61 @@ public class ApiRequest {
     public int getInt (String key) {
         checkParam(key);
 
-        return getData().getInt(key);
+        try {
+            return getData().getInt(key);
+        } catch (JSONException e) {
+            throw new HandlerException("key '" + key + "' is not an integer.");
+        }
     }
 
     public double getDouble (String key) {
         checkParam(key);
 
-        return getData().getDouble(key);
+        try {
+            return getData().getDouble(key);
+        } catch (JSONException e) {
+            throw new HandlerException("key '" + key + "' is not an double.");
+        }
     }
 
     public float getFloat (String key) {
         checkParam(key);
 
-        return (float) getData().getDouble(key);
+        try {
+            return (float) getData().getDouble(key);
+        } catch (JSONException e) {
+            throw new HandlerException("key '" + key + "' is not an float.");
+        }
     }
 
     public String getString (String key) {
         checkParam(key);
 
-        return getData().getString(key);
+        try {
+            return getData().getString(key);
+        } catch (JSONException e) {
+            throw new HandlerException("key '" + key + "' is not an string.");
+        }
     }
 
     public JSONObject getJsonObject (String key) {
         checkParam(key);
 
-        return getData().getJSONObject(key);
+        try {
+            return getData().getJSONObject(key);
+        } catch (JSONException e) {
+            throw new HandlerException("key '" + key + "' is not an json object.");
+        }
     }
 
     public JSONArray getJsonArray (String key) {
         checkParam(key);
 
-        return getData().getJSONArray(key);
+        try {
+            return getData().getJSONArray(key);
+        } catch (JSONException e) {
+            throw new HandlerException("key '" + key + "' is not an json array.");
+        }
     }
 
     public long getMessageID () {
