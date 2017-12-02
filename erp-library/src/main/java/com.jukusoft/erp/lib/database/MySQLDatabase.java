@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static io.vertx.ext.sync.Sync.awaitResult;
+
 public class MySQLDatabase {
 
     //instance of vertx
@@ -175,6 +177,23 @@ public class MySQLDatabase {
         });
     }
 
+    public JsonObject getRow (String sql, JsonArray params) {
+        String sql1 = sql.replace("{prefix}", this.getPrefix());
+
+        //query (with fiber for non-blocking event loop)
+        ResultSet rs = awaitResult(h -> this.connection.queryWithParams(sql1, params, h));
+
+        //check, if no row was found
+        if (rs.getRows().isEmpty()) {
+            return null;
+        }
+
+        //get first row
+        JsonObject row = rs.getRows().get(0);
+
+        return row;
+    }
+
     public void query (String sql, JsonArray params, Handler<AsyncResult<ResultSet>> handler) {
         this.connection.queryWithParams(sql, params, handler);
     }
@@ -221,6 +240,17 @@ public class MySQLDatabase {
 
             handler.handle(Future.succeededFuture(rows));
         });
+    }
+
+    public List<JsonObject> listRows (String sql, JsonArray params) {
+        String sql1 = sql.replace("{prefix}", this.getPrefix());
+
+        ResultSet rs = awaitResult(h -> this.connection.queryWithParams(sql1, params, h));
+
+        //get first row
+        List<JsonObject> rows = rs.getRows();
+
+        return rows;
     }
 
     public void update (String sql, Handler<AsyncResult<UpdateResult>> handler) {
