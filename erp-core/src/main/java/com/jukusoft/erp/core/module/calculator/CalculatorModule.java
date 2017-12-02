@@ -8,7 +8,7 @@ public class CalculatorModule extends AbstractModule {
     @Override
     public void start() throws Exception {
         //add api method for addition
-        this.addRoute("add_integer", (req, res) -> {
+        this.addRoute("/add_integer", (req, res) -> {
             int sum = 0;
 
             //check and get params
