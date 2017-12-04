@@ -30,6 +30,7 @@ public class PermissionRepository extends AbstractMySQLRepository {
     @InjectRepository
     protected GroupRepository groupRepository;
 
+    @Deprecated
     public void listPermissionsByGroup (long groupID, Handler<AsyncResult<Map<String,PermissionStates>>> handler) {
         if (groupID <= 0) {
             throw new IllegalArgumentException("groupID cannot be <= 0.");
@@ -88,6 +89,7 @@ public class PermissionRepository extends AbstractMySQLRepository {
         return map;
     }
 
+    @Deprecated
     public void listPermissionStatesByUser (long userID, Handler<AsyncResult<Map<String,PermissionStates>>> handler) {
         if (this.groupRepository == null) {
             throw new NullPointerException("group repository cannot be null.");
@@ -135,6 +137,7 @@ public class PermissionRepository extends AbstractMySQLRepository {
         });
     }
 
+    @Deprecated
     public void listPermissionsByUser (long userID, Handler<AsyncResult<JsonArray>> handler) {
         //first check, if list is already in cache
         if (this.userPermCache.contains("user-permissions-" + userID)) {

@@ -131,8 +131,6 @@ public class GroupRepository extends AbstractMySQLRepository {
 
             handler.handle(Future.succeededFuture(createGroupIDsArray(groups)));
         });
-
-        //TODO: read from database
     }
 
     private long[] createGroupIDsArray (JsonArray array) {
