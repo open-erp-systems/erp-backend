@@ -194,8 +194,20 @@ public class MySQLDatabase {
         return row;
     }
 
+    public JsonObject getRow (String sql) {
+        return this.getRow(sql, new JsonArray());
+    }
+
     public void query (String sql, JsonArray params, Handler<AsyncResult<ResultSet>> handler) {
         this.connection.queryWithParams(sql, params, handler);
+    }
+
+    public ResultSet query (String sql, JsonArray params) {
+        return awaitResult(h -> this.query(sql, params, h));
+    }
+
+    public ResultSet query (String sql) {
+        return this.query(sql, new JsonArray());
     }
 
     public void listRows (String sql, Handler<AsyncResult<List<JsonObject>>> handler) {
@@ -259,6 +271,16 @@ public class MySQLDatabase {
         this.connection.update(sql, handler);
     }
 
+    public UpdateResult update (String sql, JsonArray params) {
+        final String sql1 = sql.replace("{prefix}", this.getPrefix());
+
+        return awaitResult(h -> this.connection.updateWithParams(sql1, params, h));
+    }
+
+    public UpdateResult update (String sql) {
+        return awaitResult(h -> this.update(sql, h));
+    }
+
     public void setAutoCommit (boolean value) {
         this.connection.setAutoCommit(value, res -> {
             if (!res.succeeded()) {
@@ -288,7 +310,7 @@ public class MySQLDatabase {
     }
 
     public void close () {
-        //
+        this.connection.close();
     }
 
 }
