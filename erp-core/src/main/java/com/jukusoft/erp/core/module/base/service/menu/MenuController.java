@@ -76,7 +76,7 @@ public class MenuController extends AbstractController {
                     }
 
                     //check permissions
-                    if (!checkPermissions(req.getUserID(), row.getString("permissions"))) {
+                    if (!checkPermissions(req, row.getString("permissions"))) {
                         getLogger().debug(req.getMessageID(), "list_menus_api", "Dont show menu, because user doesnt have permission: " + row.getString("title"));
 
                         //user doesnt have permissions, so dont show this menu
@@ -94,7 +94,7 @@ public class MenuController extends AbstractController {
                     int id = row.getInteger("id");
 
                     //add sub menus
-                    this.addSubMenusToJson(json, id, req.getUserID(), rows);
+                    this.addSubMenusToJson(json, id, req, req.getUserID(), rows);
 
                     //add menu to array
                     menuArray.add(json);
@@ -107,7 +107,7 @@ public class MenuController extends AbstractController {
         }));
     }
 
-    protected void addSubMenusToJson (JsonObject json, int id, long userID, JsonArray rows) {
+    protected void addSubMenusToJson (JsonObject json, int id, ApiRequest request, long userID, JsonArray rows) {
         JsonArray subMenus = new JsonArray();
 
         //search for menu entries with parentID = id
@@ -132,7 +132,7 @@ public class MenuController extends AbstractController {
             }
 
             //check permissions
-            if (!checkPermissions(userID, row.getString("permissions"))) {
+            if (!checkPermissions(request, row.getString("permissions"))) {
                 //user doesnt have permissions, so dont show this menu
                 continue;
             }
@@ -148,7 +148,7 @@ public class MenuController extends AbstractController {
             int id1 = row.getInteger("id");
 
             //add sub menus
-            this.addSubMenusToJson(entry, id1, userID, rows);
+            this.addSubMenusToJson(entry, id1, request, userID, rows);
 
             //add menu entry to array
             subMenus.add(entry);
@@ -171,7 +171,7 @@ public class MenuController extends AbstractController {
         return false;
     }
 
-    protected boolean checkPermissions (long userID, String permissions) {
+    protected boolean checkPermissions (ApiRequest request, String permissions) {
         if (permissions.isEmpty()) {
             //no permissions required
             return true;
@@ -181,7 +181,7 @@ public class MenuController extends AbstractController {
 
         //check, if user has one of this permissions
         for (int i = 0; i < requiredPermissions.length; i++) {
-            boolean permitted = getContext().getPermissionManager().hasPermission(userID, requiredPermissions[0]);
+            boolean permitted = getContext().checkPermission(request, requiredPermissions[i]);
 
             if (permitted) {
                 return true;
