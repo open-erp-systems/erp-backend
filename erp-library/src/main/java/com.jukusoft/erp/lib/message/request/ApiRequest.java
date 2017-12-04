@@ -157,6 +157,18 @@ public class ApiRequest {
         return this.userID;
     }
 
+    public List<String> getPermissions () {
+        return this.permissions;
+    }
+
+    public void setPermissions (List<String> permissions) {
+        this.permissions = permissions;
+    }
+
+    public boolean hasPermission (String permission) {
+        return this.permissions.contains(permission);
+    }
+
     public String getIP () {
         return getMeta().getString("host");
     }

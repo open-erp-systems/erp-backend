@@ -4,7 +4,9 @@ import com.hazelcast.core.HazelcastInstance;
 import com.jukusoft.erp.lib.cache.CacheManager;
 import com.jukusoft.erp.lib.database.DatabaseManager;
 import com.jukusoft.erp.lib.logging.ILogging;
+import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.permission.PermissionManager;
+import com.jukusoft.erp.lib.permission.PermissionService;
 import com.jukusoft.erp.lib.session.SessionManager;
 import io.vertx.core.Vertx;
 
@@ -47,6 +49,7 @@ public interface AppContext {
      *
      * @return instance of permission manager
     */
+    @Deprecated
     public PermissionManager getPermissionManager ();
 
     /**
@@ -54,6 +57,31 @@ public interface AppContext {
      *
      * @param permissionManager instance of permission manager
     */
+    @Deprecated
     public void setPermissionManager (PermissionManager permissionManager);
+
+    /**
+    * get permission service
+     *
+     * @return permission service
+    */
+    public PermissionService getPermissionService ();
+
+    /**
+    * set permission service
+     *
+     * @param service instance of permission service
+    */
+    public void setPermissionService (PermissionService service);
+
+    /**
+    * check, if user has permission
+     *
+     * @param request api request
+     * @param permission permission token
+     *
+     * @return true, if user has permission
+    */
+    public boolean checkPermission (ApiRequest request, String permission);
 
 }

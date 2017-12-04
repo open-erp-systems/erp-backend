@@ -5,9 +5,12 @@ import com.jukusoft.erp.lib.cache.CacheManager;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.database.DatabaseManager;
 import com.jukusoft.erp.lib.logging.ILogging;
+import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.permission.PermissionManager;
+import com.jukusoft.erp.lib.permission.PermissionService;
 import com.jukusoft.erp.lib.session.SessionManager;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 
 public class AppContextImpl implements AppContext {
 
@@ -32,7 +35,9 @@ public class AppContextImpl implements AppContext {
     //instance of permission manager
     protected PermissionManager permissionManager = null;
 
-    public AppContextImpl (Vertx vertx, ILogging logger, HazelcastInstance hazelcastInstance, SessionManager sessionManager, DatabaseManager dbManager, CacheManager cacheManager, PermissionManager permissionManager) {
+    protected PermissionService permissionService = null;
+
+    public AppContextImpl (Vertx vertx, ILogging logger, HazelcastInstance hazelcastInstance, SessionManager sessionManager, DatabaseManager dbManager, CacheManager cacheManager, PermissionManager permissionManager, PermissionService permissionService) {
         if (vertx == null) {
             throw new NullPointerException("vertx cannot be null.");
         }
@@ -61,6 +66,10 @@ public class AppContextImpl implements AppContext {
             throw new NullPointerException("permission manager cannot be null.");
         }
 
+        if (permissionService == null) {
+            throw new NullPointerException("permission service cannot be null.");
+        }
+
         this.vertx = vertx;
         this.logger = logger;
         this.hazelcastInstance = hazelcastInstance;
@@ -68,6 +77,7 @@ public class AppContextImpl implements AppContext {
         this.dbManager = dbManager;
         this.cacheManager = cacheManager;
         this.permissionManager = permissionManager;
+        this.permissionService = permissionService;
     }
 
     @Override
@@ -112,6 +122,32 @@ public class AppContextImpl implements AppContext {
         }
 
         this.permissionManager = permissionManager;
+    }
+
+    @Override
+    public PermissionService getPermissionService() {
+        return this.permissionService;
+    }
+
+    @Override
+    public void setPermissionService(PermissionService service) {
+        this.permissionService = service;
+    }
+
+    @Override
+    public boolean checkPermission(ApiRequest request, String permission) {
+        //initialize permissions, if neccessary
+        if (request.getPermissions().size() == 0) {
+            getLogger().debug(request.getMessageID(), "initialize_permissions", "load permissions for userID: " + request.getUserID());
+
+            //load permissions
+            JsonArray permArray = this.permissionService.listUserPermissions(request.getUserID());
+
+            //cache permissions in cache object
+            request.setPermissions(permArray.getList());
+        }
+
+        return request.hasPermission(permission);
     }
 
 }

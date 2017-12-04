@@ -31,10 +31,10 @@ public class PermissionService implements IService {
     @InjectDatabase
     protected Database database;
 
-    public PermissionService (ICache groupPermCache, ICache userPermCache, ICache groupMembersCache, Database database) {
-        this.groupPermCache = groupPermCache;
-        this.userPermCache = userPermCache;
-        this.groupPermCache = groupPermCache;
+    public PermissionService (ICache cache, Database database) {
+        this.groupPermCache = cache;
+        this.userPermCache = cache;
+        this.groupMembersCache = cache;
         this.database = database;
     }
 
@@ -53,9 +53,9 @@ public class PermissionService implements IService {
         }
 
         //check, if result is already in cache
-        if (this.groupPermCache.contains("group-permissions-" + groupID)) {
+        if (this.groupPermCache.contains("group-permission-states-" + groupID)) {
             //get cache object
-            JsonArray jsonArray = this.groupPermCache.getArray("group-permissions-" + groupID);
+            JsonArray jsonArray = this.groupPermCache.getArray("group-permission-states-" + groupID);
 
             //convert rows to list
             Map<String,PermissionStates> map = this.createMapFromJSONArray(jsonArray);
@@ -68,7 +68,7 @@ public class PermissionService implements IService {
         JsonArray rows = database.listRowsAsArray("SELECT * FROM `{prefix}group_permissions` WHERE `groupID` = '" + groupID + "'; ");
 
         //cache rows
-        this.groupPermCache.putArray("group-permissions-" + groupID, rows);
+        this.groupPermCache.putArray("group-permission-states-" + groupID, rows);
 
         //convert rows to list
         Map<String,PermissionStates> map = this.createMapFromJSONArray(rows);

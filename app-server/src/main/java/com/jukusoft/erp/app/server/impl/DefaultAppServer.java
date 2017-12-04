@@ -7,6 +7,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.jukusoft.erp.app.server.AppServer;
 import com.jukusoft.erp.app.server.AppStartListener;
 import com.jukusoft.erp.lib.cache.CacheManager;
+import com.jukusoft.erp.lib.cache.CacheTypes;
 import com.jukusoft.erp.lib.cache.ICache;
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.context.AppContextImpl;
@@ -21,6 +22,7 @@ import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.message.response.ApiResponseCodec;
 import com.jukusoft.erp.lib.module.IModule;
 import com.jukusoft.erp.lib.permission.PermissionManager;
+import com.jukusoft.erp.lib.permission.PermissionService;
 import com.jukusoft.erp.lib.session.SessionManager;
 import io.vertx.core.*;
 import io.vertx.core.eventbus.EventBus;
@@ -80,6 +82,9 @@ public class DefaultAppServer implements AppServer {
     //number of threads
     protected int eventLoopPoolSize = 2;
     protected int workerPoolSize = 2;
+
+    //permission service
+    protected PermissionService permissionService = null;
 
     @Override
     public void start(AppStartListener listener) {
@@ -184,13 +189,16 @@ public class DefaultAppServer implements AppServer {
         //create new session manager
         this.sessionManager = SessionManager.createHzMapSessionManager(this.hazelcastInstance);
 
+        //create new permission service
+        this.permissionService = new PermissionService(cacheManager.getOrCreateCache("perm-cache", CacheTypes.HAZELCAST_CACHE), this.database);
+
         //create app content
         this.context = new AppContextImpl(this.vertx, this.logger, this.hazelcastInstance, this.sessionManager, this.dbManager, this.cacheManager, new PermissionManager() {
             @Override
             public boolean hasPermission(long userID, String permissionName) {
                 throw new IllegalStateException("no permission manager set yet.");
             }
-        });
+        }, this.permissionService);
 
         //add event listeners to cleanup cache
         this.vertx.eventBus().consumer("cleanup-cache", res -> {
