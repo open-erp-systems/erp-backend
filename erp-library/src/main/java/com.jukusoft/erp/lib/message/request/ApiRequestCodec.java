@@ -2,7 +2,11 @@ package com.jukusoft.erp.lib.message.request;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.MessageCodec;
+import io.vertx.core.json.JsonArray;
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class ApiRequestCodec implements MessageCodec<ApiRequest, ApiRequest> {
 
@@ -21,6 +25,15 @@ public class ApiRequestCodec implements MessageCodec<ApiRequest, ApiRequest> {
         json.put("session-id", req.sessionID);
         json.put("is-logged-in", req.isLoggedIn);
         json.put("user-id", req.userID);
+
+        //put permissions
+        JSONArray permArray = new JSONArray();
+
+        for (String permission : req.permissions) {
+            permArray.put(permission);
+        }
+
+        json.put("permissions", permArray);
 
         //encode json object to string
         String jsonToStr = json.toString();
@@ -57,6 +70,17 @@ public class ApiRequestCodec implements MessageCodec<ApiRequest, ApiRequest> {
         req.sessionID = json.getString("session-id");
         req.isLoggedIn = json.getBoolean("is-logged-in");
         req.userID = json.getLong("user-id");
+
+        JSONArray permArray = json.getJSONArray("permissions");
+
+        //clear old permissions
+        req.permissions.clear();
+
+        for (int i = 0; i < permArray.length(); i++) {
+            String permission = permArray.getString(i);
+
+            req.permissions.add(permission);
+        }
 
         return req;
     }

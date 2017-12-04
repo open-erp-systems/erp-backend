@@ -6,6 +6,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ApiRequest {
 
     //name of event
@@ -27,6 +30,9 @@ public class ApiRequest {
     protected String sessionID = "";
     protected boolean isLoggedIn = false;
     protected long userID = -1;
+
+    //user permissions
+    protected List<String> permissions = new ArrayList<>();
 
     /**
     * default constructor
