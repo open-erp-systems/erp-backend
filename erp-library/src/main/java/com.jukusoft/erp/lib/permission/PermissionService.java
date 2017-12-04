@@ -77,6 +77,10 @@ public class PermissionService implements IService {
     }
 
     protected Map<String,PermissionStates> createMapFromJSONArray (JsonArray array) {
+        if (array == null) {
+            throw new NullPointerException("json array cannot be null.");
+        }
+
         Map<String,PermissionStates> map = new HashMap<>();
 
         for (int i = 0; i < array.size(); i++) {

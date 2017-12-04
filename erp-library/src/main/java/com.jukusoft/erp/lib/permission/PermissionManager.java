@@ -10,6 +10,7 @@ public interface PermissionManager {
      *
      * @return true, if user has permission or false, if not
     */
+    @Deprecated
     public boolean hasPermission (long userID, String permissionName);
 
 }

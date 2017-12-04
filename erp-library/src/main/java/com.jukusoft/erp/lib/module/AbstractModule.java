@@ -460,7 +460,7 @@ public abstract class AbstractModule implements IModule {
 
                 //check permissions
                 for (String permissionName : annotation.requiredPermissions()) {
-                    if (!context.getPermissionManager().hasPermission(req.getUserID(), permissionName)) {
+                    if (!context.checkPermission(req, permissionName)) {
                         //user doesnt have the permission to see this page / use this api
 
                         ApiResponse res = new ApiResponse(req.getMessageID(), req.getExternalID(), req.getSessionID(), req.getEvent());

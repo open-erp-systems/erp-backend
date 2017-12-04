@@ -17,9 +17,10 @@ public class PermissionManagerImpl implements PermissionManager {
     }
 
     @Override
+    @Deprecated
     public boolean hasPermission(long userID, String permissionName) {
         //synchronize asynchronous handler
-        return Sync.awaitResult(h -> {
+        /*return Sync.awaitResult(h -> {
             permissionRepository.listPermissionsByUser(userID, res -> {
                 if (!res.succeeded()) {
                     h.handle(Future.failedFuture(res.cause()));
@@ -29,7 +30,9 @@ public class PermissionManagerImpl implements PermissionManager {
                 boolean hasPermission = res.result().contains(permissionName);
                 h.handle(Future.succeededFuture(hasPermission));
             });
-        });
+        });*/
+
+        throw new UnsupportedOperationException("method isnt supported any longer.");
     }
 
 }
