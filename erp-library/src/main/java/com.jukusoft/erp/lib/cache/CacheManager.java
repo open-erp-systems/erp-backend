@@ -19,6 +19,15 @@ public interface CacheManager {
     public ICache getCache (String cacheName);
 
     /**
+     * get instance of cache or create an new one, if cache doesnt exists
+     *
+     * @param cacheName name of cache
+     *
+     * @return instance of cache or null, if cache doesnt exists
+     */
+    public ICache getOrCreateCache (String cacheName, CacheTypes cacheType);
+
+    /**
     * check, if cache is present
      *
      * @param cacheName name of cache
