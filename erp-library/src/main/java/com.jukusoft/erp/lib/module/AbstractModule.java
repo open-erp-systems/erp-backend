@@ -1,5 +1,6 @@
 package com.jukusoft.erp.lib.module;
 
+import com.jukusoft.erp.lib.annotation.InjectLogger;
 import com.jukusoft.erp.lib.annotation.LoginRequired;
 import com.jukusoft.erp.lib.annotation.PermissionRequired;
 import com.jukusoft.erp.lib.cache.CacheTypes;
@@ -84,6 +85,9 @@ public abstract class AbstractModule implements IModule {
         //inject app context
         this.injectAppContext(repository);
 
+        //inject logger instance
+        this.injectLogger(repository);
+
         //inject repositories
         this.injectRepositories(repository);
 
@@ -121,6 +125,9 @@ public abstract class AbstractModule implements IModule {
                 }
             }
         }
+
+        //inject logger
+        this.injectLogger(page);
 
         //inject repositories
         this.injectRepositories(page);
@@ -161,7 +168,32 @@ public abstract class AbstractModule implements IModule {
                     getLogger().debug("inject_app_context", "set value successfully: " + field.getType());
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
-                    getLogger().warn("inject_repository_error", "cannot set injected value: " + target.getClass().getSimpleName() + "." + field.getType());
+                    getLogger().warn("inject_app_context_error", "cannot set injected value: " + target.getClass().getSimpleName() + "." + field.getType());
+                }
+            }
+        }
+    }
+
+    protected void injectLogger (Object target/*, Class<T> cls*/) {
+        //iterate through all fields in class
+        for (Field field : target.getClass().getDeclaredFields()) {
+            //get annotation
+            InjectLogger annotation = field.getAnnotation(InjectLogger.class);
+
+            if (annotation != null && AppContext.class.isAssignableFrom(field.getType())) {
+                getLogger().debug("inject_logger", "try to inject logger '" + field.getType().getSimpleName() + "' in class: " + target.getClass().getSimpleName());
+
+                //set field accessible, so we can change value
+                field.setAccessible(true);
+
+                //set value of field
+                try {
+                    field.set(target, this.context);
+
+                    getLogger().debug("inject_logger", "set value successfully: " + field.getType());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    getLogger().warn("inject_logger_error", "cannot set injected value: " + target.getClass().getSimpleName() + "." + field.getType());
                 }
             }
         }
