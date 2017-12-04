@@ -29,6 +29,10 @@ public class FileSystemCache implements ICache {
 
     @Override
     public void put(String key, JsonObject data) {
+        if (data == null) {
+            throw new NullPointerException("json object cannot be null.");
+        }
+
         //get filename
         String filename = this.getFileName(key);
 

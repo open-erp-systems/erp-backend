@@ -8,6 +8,10 @@ public interface ICache {
     public void put (String key, JsonObject data);
 
     default void putArray (String key, JsonArray array) {
+        if (array == null) {
+            throw new NullPointerException("array cannot be null.");
+        }
+
         JsonObject obj = new JsonObject();
         obj.put("array", array);
 
