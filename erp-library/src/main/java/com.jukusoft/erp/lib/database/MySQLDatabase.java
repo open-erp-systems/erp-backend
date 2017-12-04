@@ -268,10 +268,20 @@ public class MySQLDatabase implements Database {
 
         ResultSet rs = awaitResult(h -> this.connection.queryWithParams(sql1, params, h));
 
-        //get first row
+        //get list with all result rows
         List<JsonObject> rows = rs.getRows();
 
         return rows;
+    }
+
+    @Override
+    public JsonArray listRowsAsArray(String sql, JsonArray params) {
+        String sql1 = sql.replace("{prefix}", this.getPrefix());
+
+        ResultSet rs = awaitResult(h -> this.connection.queryWithParams(sql1, params, h));
+
+        //get first row
+        return rs.getOutput();
     }
 
     @Override
@@ -284,6 +294,16 @@ public class MySQLDatabase implements Database {
         List<JsonObject> rows = rs.getRows();
 
         return rows;
+    }
+
+    @Override
+    public JsonArray listRowsAsArray(String sql) {
+        String sql1 = sql.replace("{prefix}", this.getPrefix());
+
+        ResultSet rs = awaitResult(h -> this.connection.query(sql1, h));
+
+        //get result rows
+        return rs.getOutput();
     }
 
     public void update (String sql, Handler<AsyncResult<UpdateResult>> handler) {

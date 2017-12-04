@@ -98,10 +98,29 @@ public interface Database {
      * list rows from database
      *
      * @param sql sql query
+     * @param params query parameters
+     *
+     * @return list with all rows
+     */
+    public JsonArray listRowsAsArray (String sql, JsonArray params);
+
+    /**
+     * list rows from database
+     *
+     * @param sql sql query
      *
      * @return list with all rows
      */
     public List<JsonObject> listRows (String sql);
+
+    /**
+     * list rows from database
+     *
+     * @param sql sql query
+     *
+     * @return list with all rows
+     */
+    public JsonArray listRowsAsArray (String sql);
 
     /**
      * execute update query
