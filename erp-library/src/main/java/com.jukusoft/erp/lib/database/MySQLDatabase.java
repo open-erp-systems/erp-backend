@@ -22,7 +22,7 @@ import java.util.List;
 
 import static io.vertx.ext.sync.Sync.awaitResult;
 
-public class MySQLDatabase {
+public class MySQLDatabase implements Database {
 
     //instance of vertx
     protected Vertx vertx = null;
@@ -40,6 +40,7 @@ public class MySQLDatabase {
         this.vertx = vertx;
     }
 
+    @Override
     public void connect (String configFile, Handler<Future<Void>> handler) throws IOException {
         //check, if config file exists
         if (!new File(configFile).exists()) {
@@ -109,6 +110,7 @@ public class MySQLDatabase {
         });
     }
 
+    @Override
     public boolean isConnected () {
         return this.connection != null;
     }
@@ -117,10 +119,12 @@ public class MySQLDatabase {
         return this.connection;
     }
 
+    @Override
     public String getPrefix () {
         return this.prefix;
     }
 
+    @Override
     public String getTableName (String tableName) {
         return getPrefix() + tableName;
     }
@@ -177,6 +181,7 @@ public class MySQLDatabase {
         });
     }
 
+    @Override
     public JsonObject getRow (String sql, JsonArray params) {
         String sql1 = sql.replace("{prefix}", this.getPrefix());
 
@@ -194,6 +199,7 @@ public class MySQLDatabase {
         return row;
     }
 
+    @Override
     public JsonObject getRow (String sql) {
         return this.getRow(sql, new JsonArray());
     }
@@ -202,10 +208,12 @@ public class MySQLDatabase {
         this.connection.queryWithParams(sql, params, handler);
     }
 
+    @Override
     public ResultSet query (String sql, JsonArray params) {
         return awaitResult(h -> this.query(sql, params, h));
     }
 
+    @Override
     public ResultSet query (String sql) {
         return this.query(sql, new JsonArray());
     }
@@ -254,10 +262,23 @@ public class MySQLDatabase {
         });
     }
 
+    @Override
     public List<JsonObject> listRows (String sql, JsonArray params) {
         String sql1 = sql.replace("{prefix}", this.getPrefix());
 
         ResultSet rs = awaitResult(h -> this.connection.queryWithParams(sql1, params, h));
+
+        //get first row
+        List<JsonObject> rows = rs.getRows();
+
+        return rows;
+    }
+
+    @Override
+    public List<JsonObject> listRows (String sql) {
+        String sql1 = sql.replace("{prefix}", this.getPrefix());
+
+        ResultSet rs = awaitResult(h -> this.connection.query(sql1, h));
 
         //get first row
         List<JsonObject> rows = rs.getRows();
@@ -271,44 +292,79 @@ public class MySQLDatabase {
         this.connection.update(sql, handler);
     }
 
+    @Override
     public UpdateResult update (String sql, JsonArray params) {
         final String sql1 = sql.replace("{prefix}", this.getPrefix());
 
         return awaitResult(h -> this.connection.updateWithParams(sql1, params, h));
     }
 
+    @Override
     public UpdateResult update (String sql) {
         return awaitResult(h -> this.update(sql, h));
     }
 
-    public void setAutoCommit (boolean value) {
+    public void setAutoCommit (boolean value, Handler<Void> done) {
         this.connection.setAutoCommit(value, res -> {
             if (!res.succeeded()) {
                 throw new IllegalStateException("Couldnt set auto commit.");
             }
+
+            done.handle(null);
         });
     }
 
-    public void startTransation (Handler<ResultSet> done) {
+    public void startTransation (Handler<AsyncResult<Void>> done) {
         this.connection.setAutoCommit(false, res -> {
             if (res.failed()) {
+                done.handle(Future.failedFuture(res.cause()));
                 throw new RuntimeException(res.cause());
             }
 
-            done.handle(null);
+            done.handle(Future.succeededFuture());
+            //done.handle(null);
         });
     }
 
-    public void endTransation (Handler<ResultSet> done) {
+    @Override
+    public void startTransaction () {
+        Void void1 = awaitResult(h -> startTransation(h));
+    }
+
+    public void endTransation (Handler<AsyncResult<Void>> done) {
         this.connection.commit(res -> {
             if (res.failed()) {
+                done.handle(Future.failedFuture(res.cause()));
                 throw new RuntimeException(res.cause());
             }
 
-            done.handle(null);
+            done.handle(Future.succeededFuture());
+            //done.handle(null);
         });
     }
 
+    @Override
+    public void endTransaction () {
+        Void void1 = awaitResult(h -> endTransation(h));
+    }
+
+    public void rollbackTransaction (Handler<AsyncResult<Void>> done) {
+        this.connection.rollback(res -> {
+            if (res.failed()) {
+                done.handle(Future.failedFuture(res.cause()));
+                throw new RuntimeException(res.cause());
+            }
+
+            done.handle(Future.succeededFuture());
+        });
+    }
+
+    @Override
+    public void rollbackTransaction () {
+        Void void1 = awaitResult(h -> this.rollbackTransaction(h));
+    }
+
+    @Override
     public void close () {
         this.connection.close();
     }
