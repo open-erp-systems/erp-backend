@@ -10,6 +10,7 @@ import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.database.*;
 import com.jukusoft.erp.lib.exception.HandlerException;
 import com.jukusoft.erp.lib.exception.RequiredRepositoryNotFoundException;
+import com.jukusoft.erp.lib.exception.RequiredServiceNotFoundException;
 import com.jukusoft.erp.lib.logging.ILogging;
 import com.jukusoft.erp.lib.message.StatusCode;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
@@ -18,6 +19,8 @@ import com.jukusoft.erp.lib.route.Route;
 import com.jukusoft.erp.lib.route.RouteHandler;
 import com.jukusoft.erp.lib.route.RouteHandlerWithoutReturn;
 import com.jukusoft.erp.lib.controller.IController;
+import com.jukusoft.erp.lib.service.IService;
+import com.jukusoft.erp.lib.service.InjectService;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -29,6 +32,8 @@ import io.vertx.ext.sync.Sync;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractModule implements IModule {
 
@@ -40,6 +45,9 @@ public abstract class AbstractModule implements IModule {
 
     //instance of logger
     protected ILogging logger = null;
+
+    //map with all services
+    protected Map<Class<?>,IService> serviceMap = new ConcurrentHashMap<>();
 
     @Override
     public Vertx getVertx() {
@@ -136,8 +144,47 @@ public abstract class AbstractModule implements IModule {
         //inject repositories
         this.injectRepositories(page);
 
+        //inject services
+        this.injectServices(page);
+
         //inject caches
         this.injectCaches(page);
+    }
+
+    public <T extends IService> void addService (T service, Class<T> cls) {
+        //inject app context
+        this.injectAppContext(service);
+
+        //inject logger instance
+        this.injectLogger(service);
+
+        //inject database
+        this.injectDatabase(service);
+
+        //inject repositories
+        this.injectRepositories(service);
+
+        //inject services
+        this.injectServices(service);
+
+        //inject caches
+        this.injectCaches(service);
+
+        //start service
+        service.start();
+
+        //put servive to map
+        this.serviceMap.put(cls, service);
+    }
+
+    protected <T extends IService> T getService (Class<T> cls) {
+        IService service = this.serviceMap.get(cls);
+
+        if (service == null) {
+            throw new IllegalStateException("service " + cls.getName() + " isnt registered yet. Add with addService() first.");
+        }
+
+        return cls.cast(service);
     }
 
     protected <T> void injectRepositories (T target/*, Class<T> cls*/) {
@@ -147,8 +194,21 @@ public abstract class AbstractModule implements IModule {
             InjectRepository annotation = field.getAnnotation(InjectRepository.class);
 
             if (annotation != null && Repository.class.isAssignableFrom(field.getType())) {
-                getLogger().debug("inject_repository", "try to inject repository '" + field.getType().getSimpleName() + "' in service: " + target.getClass().getSimpleName());
+                getLogger().debug("inject_repository", "try to inject repository '" + field.getType().getSimpleName() + "' in class: " + target.getClass().getSimpleName());
                 injectRepositoryField(target, field, annotation.nullable());
+            }
+        }
+    }
+
+    protected <T> void injectServices (T target/*, Class<T> cls*/) {
+        //iterate through all fields in class
+        for (Field field : target.getClass().getDeclaredFields()) {
+            //get annotation
+            InjectService annotation = field.getAnnotation(InjectService.class);
+
+            if (annotation != null && IService.class.isAssignableFrom(field.getType())) {
+                getLogger().debug("inject_service", "try to inject service '" + field.getType().getSimpleName() + "' in class: " + target.getClass().getSimpleName());
+                injectServiceField(target, field, annotation.nullable());
             }
         }
     }
@@ -283,6 +343,51 @@ public abstract class AbstractModule implements IModule {
                     + "' is required by service '" + field.getDeclaringClass().getName() + "' but does not exist.");
         } else {
             getLogger().warn("inject_repository", "Repository doesnt exists: " + field.getType().getSimpleName());
+        }
+    }
+
+    /**
+     * Injects value of field in given service
+     *
+     * @param target
+     *            The object whose field should be injected.
+     * @param field
+     *            The field.
+     * @param nullable
+     *            Whether the field can be null.
+     */
+    private void injectServiceField(Object target, Field field, boolean nullable) {
+        // check if component present
+        if (this.serviceMap.get(field.getType()) != null) {
+            //set field accessible, so we can change value
+            field.setAccessible(true);
+
+            try {
+                Object value = this.serviceMap.get(field.getType());
+
+                if (value == null) {
+                    if (nullable) {
+                        getLogger().debug("inject_service", "Service '" + field.getType().getSimpleName() + "' doesnt exists.");
+                    } else {
+                        throw new NullPointerException("injected object cannot be null.");
+                    }
+                } else {
+                    //set value of field
+                    field.set(target, value);
+
+                    getLogger().debug("inject_service", "set value successfully: " + field.getType());
+                }
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                e.printStackTrace();
+
+                throw new RuntimeException("Couldn't inject service '" + field.getType() + "' in '"
+                        + field.getDeclaringClass().getName() + "'. Exception: " + e.getLocalizedMessage());
+            }
+        } else if (!nullable) {
+            throw new RequiredServiceNotFoundException("Service '" + field.getType()
+                    + "' is required by class '" + field.getDeclaringClass().getName() + "' but does not exist.");
+        } else {
+            getLogger().warn("inject_service", "Service doesnt exists: " + field.getType().getSimpleName());
         }
     }
 
