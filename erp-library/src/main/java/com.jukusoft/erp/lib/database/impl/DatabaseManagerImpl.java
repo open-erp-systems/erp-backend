@@ -97,6 +97,11 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
+    public Database getMainDatabase() {
+        return this.mySQLDatabase;
+    }
+
+    @Override
     public boolean contains(Class<?> cls) {
         if (!cls.isInstance(Repository.class)) {
             //check, if parent classes implements this interface

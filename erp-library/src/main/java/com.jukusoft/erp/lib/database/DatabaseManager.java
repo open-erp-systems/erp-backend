@@ -32,6 +32,13 @@ public interface DatabaseManager {
     public Object getRepositoryAsObject (Class<?> cls);
 
     /**
+    * get main database
+     *
+     * @return database instance
+    */
+    public Database getMainDatabase ();
+
+    /**
     * check if database manager contains repository type
      *
      * @param cls repository class

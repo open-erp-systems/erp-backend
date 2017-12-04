@@ -7,9 +7,7 @@ import com.jukusoft.erp.lib.cache.CacheTypes;
 import com.jukusoft.erp.lib.cache.ICache;
 import com.jukusoft.erp.lib.cache.InjectCache;
 import com.jukusoft.erp.lib.context.AppContext;
-import com.jukusoft.erp.lib.database.InjectAppContext;
-import com.jukusoft.erp.lib.database.InjectRepository;
-import com.jukusoft.erp.lib.database.Repository;
+import com.jukusoft.erp.lib.database.*;
 import com.jukusoft.erp.lib.exception.HandlerException;
 import com.jukusoft.erp.lib.exception.RequiredRepositoryNotFoundException;
 import com.jukusoft.erp.lib.logging.ILogging;
@@ -88,6 +86,9 @@ public abstract class AbstractModule implements IModule {
         //inject logger instance
         this.injectLogger(repository);
 
+        //inject database
+        this.injectDatabase(repository);
+
         //inject repositories
         this.injectRepositories(repository);
 
@@ -128,6 +129,9 @@ public abstract class AbstractModule implements IModule {
 
         //inject logger
         this.injectLogger(page);
+
+        //inject database
+        this.injectDatabase(page);
 
         //inject repositories
         this.injectRepositories(page);
@@ -180,7 +184,7 @@ public abstract class AbstractModule implements IModule {
             //get annotation
             InjectLogger annotation = field.getAnnotation(InjectLogger.class);
 
-            if (annotation != null && AppContext.class.isAssignableFrom(field.getType())) {
+            if (annotation != null && ILogging.class.isAssignableFrom(field.getType())) {
                 getLogger().debug("inject_logger", "try to inject logger '" + field.getType().getSimpleName() + "' in class: " + target.getClass().getSimpleName());
 
                 //set field accessible, so we can change value
@@ -188,12 +192,37 @@ public abstract class AbstractModule implements IModule {
 
                 //set value of field
                 try {
-                    field.set(target, this.context);
+                    field.set(target, this.logger);
 
                     getLogger().debug("inject_logger", "set value successfully: " + field.getType());
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                     getLogger().warn("inject_logger_error", "cannot set injected value: " + target.getClass().getSimpleName() + "." + field.getType());
+                }
+            }
+        }
+    }
+
+    protected void injectDatabase (Object target/*, Class<T> cls*/) {
+        //iterate through all fields in class
+        for (Field field : target.getClass().getDeclaredFields()) {
+            //get annotation
+            InjectDatabase annotation = field.getAnnotation(InjectDatabase.class);
+
+            if (annotation != null && Database.class.isAssignableFrom(field.getType())) {
+                getLogger().debug("inject_database", "try to inject database '" + field.getType().getSimpleName() + "' in class: " + target.getClass().getSimpleName());
+
+                //set field accessible, so we can change value
+                field.setAccessible(true);
+
+                //set value of field
+                try {
+                    field.set(target, this.context.getDatabaseManager().getMainDatabase());
+
+                    getLogger().debug("inject_database", "set value successfully: " + field.getType());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    getLogger().warn("inject_database_error", "cannot set injected value: " + target.getClass().getSimpleName() + "." + field.getType());
                 }
             }
         }
