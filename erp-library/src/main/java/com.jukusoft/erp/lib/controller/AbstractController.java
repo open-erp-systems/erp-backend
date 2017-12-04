@@ -1,11 +1,11 @@
-package com.jukusoft.erp.lib.service;
+package com.jukusoft.erp.lib.controller;
 
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.logging.ILogging;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 
-public class AbstractService implements IService {
+public class AbstractController implements IController {
 
     //instance of vertx
     protected Vertx vertx = null;

@@ -4,12 +4,12 @@ import com.jukusoft.erp.lib.annotation.LoginRequired;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
-import com.jukusoft.erp.lib.service.AbstractService;
+import com.jukusoft.erp.lib.controller.AbstractController;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 
-public class TestService extends AbstractService {
+public class TestController extends AbstractController {
 
     @Route(routes = "/")
     public ApiResponse homePage (Message<ApiRequest> event, ApiRequest req, ApiResponse res) {

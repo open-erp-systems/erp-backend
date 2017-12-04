@@ -1,11 +1,11 @@
-package com.jukusoft.erp.lib.service;
+package com.jukusoft.erp.lib.controller;
 
 import com.jukusoft.erp.lib.context.AppContext;
 import com.jukusoft.erp.lib.logging.ILogging;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 
-public interface IService {
+public interface IController {
 
     /**
      * get a reference to the Vert.x instance that deployed this verticle

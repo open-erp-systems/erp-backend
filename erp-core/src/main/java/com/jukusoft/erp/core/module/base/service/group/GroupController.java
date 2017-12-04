@@ -7,7 +7,7 @@ import com.jukusoft.erp.lib.message.StatusCode;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
-import com.jukusoft.erp.lib.service.AbstractService;
+import com.jukusoft.erp.lib.controller.AbstractController;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -17,7 +17,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 
-public class GroupService extends AbstractService {
+public class GroupController extends AbstractController {
 
     @InjectRepository
     protected GroupRepository groupRepository;

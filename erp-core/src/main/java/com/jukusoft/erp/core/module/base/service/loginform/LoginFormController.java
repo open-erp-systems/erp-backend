@@ -3,10 +3,10 @@ package com.jukusoft.erp.core.module.base.service.loginform;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
-import com.jukusoft.erp.lib.service.AbstractService;
+import com.jukusoft.erp.lib.controller.AbstractController;
 import io.vertx.core.eventbus.Message;
 
-public class LoginFormService extends AbstractService {
+public class LoginFormController extends AbstractController {
 
     @Route(routes = "/login-form")
     public ApiResponse loginForm (Message<ApiRequest> event, ApiRequest req, ApiResponse res) {

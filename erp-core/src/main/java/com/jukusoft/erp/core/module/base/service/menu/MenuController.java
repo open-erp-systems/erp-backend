@@ -6,7 +6,7 @@ import com.jukusoft.erp.lib.message.StatusCode;
 import com.jukusoft.erp.lib.message.request.ApiRequest;
 import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
-import com.jukusoft.erp.lib.service.AbstractService;
+import com.jukusoft.erp.lib.controller.AbstractController;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -15,7 +15,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.sync.Sync;
 
-public class MenuService extends AbstractService {
+public class MenuController extends AbstractController {
 
     @InjectRepository
     protected MenuRepository menuRepository;

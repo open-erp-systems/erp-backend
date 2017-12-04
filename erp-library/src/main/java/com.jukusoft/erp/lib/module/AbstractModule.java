@@ -18,7 +18,7 @@ import com.jukusoft.erp.lib.message.response.ApiResponse;
 import com.jukusoft.erp.lib.route.Route;
 import com.jukusoft.erp.lib.route.RouteHandler;
 import com.jukusoft.erp.lib.route.RouteHandlerWithoutReturn;
-import com.jukusoft.erp.lib.service.IService;
+import com.jukusoft.erp.lib.controller.IController;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -97,8 +97,8 @@ public abstract class AbstractModule implements IModule {
         return context.getDatabaseManager().getRepository(cls);
     }
 
-    protected <T extends IService> void addService(T page) {
-        getLogger().debug("init_service", "Initialize service '" + page.getClass().getSimpleName() + "'.");
+    protected <T extends IController> void addController(T page) {
+        getLogger().debug("init_controller", "Initialize controller '" + page.getClass().getSimpleName() + "'.");
 
         //initialize service
         page.init(getVertx(), this.context, getLogger());
@@ -263,7 +263,7 @@ public abstract class AbstractModule implements IModule {
         }
     }
 
-    private <T extends IService> void registerHandler (String eventName, T page, Method method) {
+    private <T extends IController> void registerHandler (String eventName, T page, Method method) {
         //register handler
         getEventBus().consumer(eventName, Sync.fiberHandler((Message<ApiRequest> event) -> {
             getLogger().debug(event.body().getMessageID(), "consume_message", "consume message: " + event.body());
